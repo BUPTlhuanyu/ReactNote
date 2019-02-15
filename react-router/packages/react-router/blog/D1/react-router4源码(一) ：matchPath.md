@@ -16,7 +16,7 @@ matchPath(pathname, props)
 	  exact // optional, defaults to false
 	}
 
-例子：
+例子：匹配的情况
 
 	const match = matchPath('/user/123',{
 	  path: '/user/:id',
@@ -36,6 +36,20 @@ matchPath(pathname, props)
 			id : "123"
 		｝
 	｝
+
+不匹配的情况
+
+	const match = matchPath('/login/123',{
+	  path: '/user/:id',
+	  exact: true,
+	  strict: false
+	})
+	
+	console.log(match)
+
+输出结果为：
+
+	null
 
 结合源码以及测试结果分析可知，matchPath可以将路径匹配规则（props.path）对目标路径（pathname）进行匹配，返回的结果重新组合了props.path与pathname，以及params。
 

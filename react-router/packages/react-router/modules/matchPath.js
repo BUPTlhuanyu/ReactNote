@@ -48,6 +48,14 @@ function compilePath(path, options) {
 
 /**
  * Public API for matching a URL pathname to a path.
+ * 匹配的时候返回值：
+         {
+             path:string,
+             url: string,
+             isExact:boolean,
+             params: Object
+         }
+ * 未匹配的时候返回值：null
  */
 function matchPath(pathname, options = {}) {
   if (typeof options === "string") options = { path: options };

@@ -28,6 +28,7 @@ class Router extends React.Component {
     this._pendingLocation = null;
 
     if (!props.staticContext) {
+      //监听location的变化，设置回调函数
       this.unlisten = props.history.listen(location => {
         if (this._isMounted) {
           this.setState({ location });
@@ -47,6 +48,7 @@ class Router extends React.Component {
   }
 
   componentWillUnmount() {
+    //清除回调函数
     if (this.unlisten) this.unlisten();
   }
 

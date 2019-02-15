@@ -20,8 +20,9 @@ function Redirect({ computedMatch, to, push = false }) {
 
         const method = push ? history.push : history.replace;
         const location = createLocation(
-          computedMatch
-            ? typeof to === "string"
+            //当redirect是switch的子组件，则存在computedMatch
+          computedMatch  //如果存在computedMatch，根据to的数据类型产生对应的路径。如果不存在则返回to用于产生location
+            ? typeof to === "string"  //如果to为字符串类型，结合computedMatch中的parmas产生路径
               ? generatePath(to, computedMatch.params)
               : {
                   ...to,
@@ -39,9 +40,11 @@ function Redirect({ computedMatch, to, push = false }) {
 
         return (
           <Lifecycle
+              //在onMount在Lifecycle组件componentDidMount调用
             onMount={() => {
               method(location);
             }}
+              //在onMount在Lifecycle组件componentDidUpdate调用
             onUpdate={(self, prevProps) => {
               if (!locationsAreEqual(prevProps.to, location)) {
                 method(location);
