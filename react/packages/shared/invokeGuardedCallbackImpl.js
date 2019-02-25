@@ -83,6 +83,7 @@ if (__DEV__) {
           'canceled in `componentWillUnmount`), or you can change the test itself ' +
           'to be asynchronous.',
       );
+      //创建事件
       const evt = document.createEvent('Event');
 
       // Keeps track of whether the user-provided callback threw an error. We
@@ -91,6 +92,8 @@ if (__DEV__) {
       // set to false. This strategy works even if the browser is flaky and
       // fails to call our global error handler, because it doesn't rely on
       // the error event at all.
+      //  用于标记传入的func是否发生错误，如果为true则表示发生错误，为false表示没有发生
+      //  由callback函数可知，当func执行返回的时候，将didError置为false说明func执行没有error
       let didError = true;
 
       // Keeps track of the value of window.event so that we can reset it
@@ -109,6 +112,9 @@ if (__DEV__) {
       // dispatch our fake event using `dispatchEvent`. Inside the handler, we
       // call the user-provided callback.
       const funcArgs = Array.prototype.slice.call(arguments, 3);
+      // 对传入的func包装，将didError标志位为false，表示错误没有发生，
+      // 当func函数执行的时候发生错误，window.error事件触发，
+      // 调用回调函数handleWindowError将didError置为true标志错误已经处理
       function callCallback() {
         // We immediately remove the callback from event listeners so that
         // nested `invokeGuardedCallback` calls do not clash. Otherwise, a
@@ -144,6 +150,7 @@ if (__DEV__) {
       // ignore it because `didError` will be false, as described above.
       let error;
       // Use this to track whether the error event is ever called.
+      //  用于标记错误是否处理了，false为没有处理，true为已经处理
       let didSetError = false;
       let isCrossOriginError = false;
 
@@ -151,6 +158,13 @@ if (__DEV__) {
         error = event.error;
         didSetError = true;
         if (error === null && event.colno === 0 && event.lineno === 0) {
+          //当加载自不同域的脚本中发生语法错误时，为避免信息泄露，语法错误的细节将不会报告，而代之简单的"Script error."
+          //  event：
+          // message：错误信息（字符串）。可用于HTML onerror=""处理程序中的event。
+          // source：发生错误的脚本URL（字符串）
+          // lineno：发生错误的行号（数字）
+          // colno：发生错误的列号（数字）
+          // error：Error对象（对象）
           isCrossOriginError = true;
         }
         if (event.defaultPrevented) {
@@ -176,7 +190,9 @@ if (__DEV__) {
 
       // Synchronously dispatch our fake event. If the user-provided function
       // errors, it will trigger our global error handler.
+        // 初始化一个evtType事件，不可以冒泡，无法被取消
       evt.initEvent(evtType, false, false);
+      //触发evtType事件，调用callCallback，执行传入的func函数
       fakeNode.dispatchEvent(evt);
 
       if (windowEventDescriptor) {
@@ -184,8 +200,9 @@ if (__DEV__) {
       }
 
       if (didError) {
+        //回调函数func执行了，并且发生了错误
         if (!didSetError) {
-          // The callback errored, but the error event never fired.
+          // 回调函数func执行了，并且发生了错误，但是error事件没有触发，handleWindowError没有执行
           error = new Error(
             'An error was thrown inside one of your components, but React ' +
               "doesn't know what it was. This is likely due to browser " +
@@ -197,12 +214,14 @@ if (__DEV__) {
               'actually an issue with React, please file an issue.',
           );
         } else if (isCrossOriginError) {
+            // 当加载自不同域的脚本中发生语法错误
           error = new Error(
             "A cross-origin error was thrown. React doesn't have access to " +
               'the actual error object in development. ' +
               'See https://fb.me/react-crossorigin-error for more information.',
           );
         }
+        //输出重新构建的error信息
         this.onError(error);
       }
 

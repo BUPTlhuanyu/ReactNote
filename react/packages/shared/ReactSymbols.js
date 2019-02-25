@@ -11,6 +11,7 @@
 // nor polyfill, then a plain number is used for performance.
 const hasSymbol = typeof Symbol === 'function' && Symbol.for;
 
+//返回以字符串作为名称的Symbol值
 export const REACT_ELEMENT_TYPE = hasSymbol
   ? Symbol.for('react.element')
   : 0xeac7;
@@ -48,8 +49,12 @@ export const REACT_MEMO_TYPE = hasSymbol ? Symbol.for('react.memo') : 0xead3;
 export const REACT_LAZY_TYPE = hasSymbol ? Symbol.for('react.lazy') : 0xead4;
 
 const MAYBE_ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
+
+//Map数据结构：@@iterator 属性的初始值与 entries 属性的初始值是同一个函数对象。
+//Array数据结构：@@iterator 属性的初始值与 values 属性的初始值是同一个函数对象。
 const FAUX_ITERATOR_SYMBOL = '@@iterator';
 
+//返回对象的遍历器方法
 export function getIteratorFn(maybeIterable: ?any): ?() => ?Iterator<*> {
   if (maybeIterable === null || typeof maybeIterable !== 'object') {
     return null;

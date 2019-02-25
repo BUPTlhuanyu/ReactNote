@@ -6,7 +6,7 @@
  *
  * @flow
  */
-
+// 侦测是否浏览器环境，可操作dom节点
 export const canUseDOM: boolean = !!(
   typeof window !== 'undefined' &&
   window.document &&

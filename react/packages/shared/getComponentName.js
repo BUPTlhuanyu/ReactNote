@@ -25,6 +25,13 @@ import {
 } from 'shared/ReactSymbols';
 import {refineResolvedLazyComponent} from 'shared/ReactLazyComponent';
 
+// 优先级从高到低为：outerType.displayName || innerType.displayName || innerType.name || wrapperName
+// 对应的返回值为:
+// outerType.displayName ||
+// ${wrapperName}(${innerType.displayName}) ||
+// ${wrapperName}(${innerType.name}) ||
+// wrapperName
+
 function getWrappedName(
   outerType: mixed,
   innerType: any,
@@ -36,6 +43,13 @@ function getWrappedName(
     (functionName !== '' ? `${wrapperName}(${functionName})` : wrapperName)
   );
 }
+
+//传入的type有多种类型的值：
+// null ： 不是组件
+// function ： 组件，不管是纯函数组件还是类组件都属于这种
+// string ： 字符串文本
+// symbol值 ： 传入的为react特定的组件类型，如Fragment等等
+// object ： 复杂的嵌套的组件类型
 
 function getComponentName(type: mixed): string | null {
   if (type == null) {

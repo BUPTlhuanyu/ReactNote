@@ -27,6 +27,11 @@ if (__DEV__) {
   };
 }
 
+
+// 开发模式和生产环境下，当 condition 为 false 时显示 invariant
+// format : invariant信息
+
+
 export default function invariant(condition, format, a, b, c, d, e, f) {
   validateFormat(format);
 
@@ -41,6 +46,7 @@ export default function invariant(condition, format, a, b, c, d, e, f) {
       const args = [a, b, c, d, e, f];
       let argIndex = 0;
       error = new Error(
+        //  格式，利用参数代替format中%s占位符
         format.replace(/%s/g, function() {
           return args[argIndex++];
         }),

@@ -35,6 +35,16 @@ function is(x, y) {
  */
 function shallowEqual(objA: mixed, objB: mixed): boolean {
   if (is(objA, objB)) {
+      // 两个值都是 undefined
+      // 两个值都是 null
+      // 两个值都是 true 或者都是 false
+      // 两个值是由相同个数的字符按照相同的顺序组成的字符串
+      // 两个值指向同一个对象
+      // 两个值都是数字并且
+        // 都是正零 +0
+        // 都是负零 -0
+        // 都是 NaN
+        // 都是除零和 NaN 外的其它同一个数字
     return true;
   }
 
@@ -44,6 +54,7 @@ function shallowEqual(objA: mixed, objB: mixed): boolean {
     typeof objB !== 'object' ||
     objB === null
   ) {
+      //objA与objB有一个不是对象或者有一个是null，则返回不相等。比如objA = 3
     return false;
   }
 
