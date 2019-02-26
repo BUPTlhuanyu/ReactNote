@@ -4,11 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
+//用于输出报错信息
 import warningWithoutStack from 'shared/warningWithoutStack';
 
+//存储组件还没挂载的时候状态更新出现的错误是否已经显示错误的标志
 const didWarnStateUpdateForUnmountedComponent = {};
 
+//根据传入publicInstance以及callerName，生成warningKey
+//如果didWarnStateUpdateForUnmountedComponent[warningKey]为true表示已经报错，直接跳过
+//为false，则显示错误信息，并标记didWarnStateUpdateForUnmountedComponent[warningKey]为true
 function warnNoop(publicInstance, callerName) {
   //在开发模式下执行
   if (__DEV__) {

@@ -41,7 +41,8 @@ class App extends React.Component{
     }
 }
 
-
+console.log(React)
+console.log(React.Component.prototype.isMounted(Header))
 
 ReactDOM.render(
     <App/>,

@@ -19,6 +19,8 @@ if (__DEV__) {
 /**
  * Base class helpers for the updating state of a component.
  */
+
+//定义Component构造函数
 function Component(props, context, updater) {
   this.props = props;
   this.context = context;
@@ -26,6 +28,7 @@ function Component(props, context, updater) {
   this.refs = emptyObject;
   // We initialize the default updater but the real one gets injected by the
   // renderer.
+  // 默认为ReactNoopUpdateQueue，在实例化的时候为updater
   this.updater = updater || ReactNoopUpdateQueue;
 }
 
@@ -124,6 +127,7 @@ if (__DEV__) {
   }
 }
 
+//组合寄生继承
 function ComponentDummy() {}
 ComponentDummy.prototype = Component.prototype;
 

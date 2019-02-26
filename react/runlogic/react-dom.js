@@ -19540,7 +19540,7 @@
         if (callback !== null) {
             work.then(callback);
         }
-        console.log(root);
+        console.log("root",root);
         updateContainer(children, root, null, work._onCommit);
         return work;
     };

@@ -21,7 +21,7 @@ const ReactCurrentOwner = {
    * @internal
    * @type {ReactComponent}
    */
-    : (null: null | Fiber),
+  current : (null: null | Fiber),
   currentDispatcher: (null: null | Dispatcher),
 };
 

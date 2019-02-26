@@ -25,7 +25,7 @@ import {
   createFactory,
   cloneElement,
   isValidElement,
-} from './ReactElement';
+  } from './ReactElement';
 //
 import {createContext} from './ReactContext';
 //
