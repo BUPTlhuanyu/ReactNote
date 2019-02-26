@@ -18,8 +18,9 @@
 	}
 
 ### getLowestCommonAncestor ###
-//获取节点A与B的最近的公共祖先节点
-//算法题：找到两个链表的公共节点
+获取节点A与B的最近的公共祖先节点
+
+算法题：找到两个链表的公共节点
 
 	export function getLowestCommonAncestor(instA, instB) {
 	  //获取子节点A在树中的深度
