@@ -1,6 +1,7 @@
 /**
  * Created by lhy on 2018/12/6.
  */
+
 class Header extends React.Component{
     render(){
         return (
@@ -35,8 +36,8 @@ class Footer extends React.Component{
 const child1 = React.createElement('li', null, 'First Text Content');
 const child2 = React.createElement('li', null, 'Second Text Content');
 const child3 = React.createElement('li', null, 'Third Text Content');
-const FooterEnhance = React.createElement(Footer, {a:100,children:"第二个参数children"} ,"0000000");
-
+const FooterEnhance = React.createElement(Footer, {key:1,ref:null,a:100,children:"第二个参数children"} ,"0000000");
+console.log("FooterEnhance",FooterEnhance.props.key)
 
 class App extends React.Component{
     render(){

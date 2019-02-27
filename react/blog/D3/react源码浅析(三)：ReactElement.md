@@ -1,4 +1,8 @@
 ### 总览： ###
+你将会明白：
+如何做到props.key以及props.ref获取不到值？
+如何通过hasValidRef以及defineRefPropWarningGetter在createElement中切断ref在props中的传递？
+...
 
 ----------
 
@@ -6,9 +10,9 @@
 
 	│   ├── hasValidRef ------------------------------------ 检测是否含有合法的Ref
 	│   ├── hasValidKey ------------------------------------ 检测是否含有合法的key
-	│   ├── defineKeyPropWarningGetter ---------标记props中的key值不合法，并显示错误
-	│   ├── defineRefPropWarningGetter ---------标记props中的ref值不合法，并显示错误
-	│   ├── ReactElement -------------被createElement函数调用，根据环境设置对应的属性
+	│   ├── defineKeyPropWarningGetter ----- 锁定props.key的值使得无法获取props.key
+	│   ├── defineRefPropWarningGetter ----- 锁定props.ref的值使得无法获取props.ref
+	│   ├── ReactElement ------------ 被createElement函数调用，根据环境设置对应的属性
 	
 **向外暴露的函数**
 
@@ -22,7 +26,7 @@
 ----------
 
 ### hasValidRef ###
-通过Ref属性的取值器对象的isReactWarning属性检测是否含有合法的Ref
+通过Ref属性的取值器对象的isReactWarning属性检测是否含有合法的Ref，也就是如果这个props是react元素的props那么上面的ref就是不合法的，因为在creatElement的时候已经调用了defineRefPropWarningGetter。
 
 	function hasValidRef(config) {
 	  //在开发模式下
@@ -42,7 +46,7 @@
 	}
 
 ### hasValidKey ###
-通过key属性的取值器对象的isReactWarning属性检测是否含有合法的key，逻辑与上同
+通过key属性的取值器对象的isReactWarning属性检测是否含有合法的key，也就是如果这个props是react元素的props那么上面的key就是不合法的，因为在creatElement的时候已经调用了defineKeyPropWarningGetter。逻辑与上同
 
 	function hasValidKey(config) {
 	  if (__DEV__) {
@@ -57,7 +61,7 @@
 	}
 
 ### defineKeyPropWarningGetter ###
-标记props中的key值不合法，并显示错误
+锁定props.key的值使得无法获取props.key,标记获取props中的key值是不合法的，当使用props.key的时候，会执行warnAboutAccessingKey函数，进行报错，从而获取不到key属性的值。
 
 **key属性不能存在于props中，否则为undefined**,即如下调用始终返回undefined:
 
@@ -89,7 +93,7 @@ specialPropKeyWarningShown用于标记key不合法的错误信息是否已经显
 	}
 
 ### defineRefPropWarningGetter ###
-逻辑与defineKeyPropWarningGetter一致，标记props中的ref值不合法，并显示错误
+逻辑与defineKeyPropWarningGetter一致，锁定props.ref的值使得无法获取props.ref,标记获取props中的ref值是不合法的，当使用props.ref的时候，会执行warnAboutAccessingKey函数，进行报错，从而获取不到ref属性的值。
 
 **ref属性不能存在于props中，否则为undefined**，即如下调用始终返回undefined:
 
@@ -168,7 +172,8 @@ React.createElement API：
 type(类型) 参数：可以是一个标签名字字符串（例如 'div' 或'span'），或者是一个 React 组件 类型（一个类或者是函数），或者一个 React fragment 类型。
 
 #### 仅在开发模式下props中的ref与key会报错 ####
-props：将除key，ref，\__self，__source以外的属性值，assign到type上的props。
+props：将key，ref，\__self，__source的属性分别复制到新react元素的key，ref，\__self，__source上，其他的属性值，assign到type上的props上。**当这个props是react元素的props，那么其ref与key是无法传入新元素上的ref与key。只有这个props是一个新对象的时候才是有效的。这里就切断了ref与key通过props的传递。**
+
 children：当children存在的时候，createElement返回的组件的props中不会存在children，如果存在的时候，返回的组件的props.children会被传入的children覆盖掉。
 
 #### 参数中的children覆盖顺序 ####
@@ -296,8 +301,7 @@ children：当children存在的时候，createElement返回的组件的props中�
 	  }
 	  //开发环境下
 	  if (__DEV__) {
-	    // 由于config其实就是传入的props，如果config上有key和ref，就说明这些key和ref是不合法的
-	    //  需要利用defineKeyPropWarningGetter与defineRefPropWarningGetter标记为不合法，并报错
+	    //  需要利用defineKeyPropWarningGetter与defineRefPropWarningGetter标记新组件上的props也就是这里的props上的ref与key在获取其值得时候是不合法的。
 	    if (key || ref) {
 	      //type如果是个函数说明不是原生的dom标签，可能是一个组件，那么可以取
 	      const displayName =
@@ -403,7 +407,7 @@ children：当children存在的时候，createElement返回的组件的props中�
 	  [...children]
 	)
 
-使用 element 作为起点，克隆并返回一个新的 React 元素。 所产生的元素的props由原始元素的 props被新的 props 浅层合并而来，并且最终合并后的props的属性为undefined，就用element.type.defaultProps也就是默认props值进行设置。props中的key 和 ref 将被存放在返回的新元素的key与ref上。
+使用 element 作为起点，克隆并返回一个新的 React 元素。 所产生的元素的props由原始元素的 props被新的 props 浅层合并而来，并且最终合并后的props的属性为undefined，就用element.type.defaultProps也就是默认props值进行设置。如果props不是react元素的props，呢么props中的key 和 ref 将被存放在返回的新元素的key与ref上。
 
 返回的元素相当于：
 

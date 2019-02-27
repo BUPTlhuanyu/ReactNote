@@ -50,7 +50,7 @@ function hasValidKey(config) {
   return config.key !== undefined;
 }
 
-// 调用了defineKeyPropWarningGetter函数就说明key值不合法。
+// 当试图获取props.key值的时候会报错其不合法。
 // 给props对象定义key属性，以及key属性的取值器为warnAboutAccessingKey对象
 // 该对象上存在一个isReactWarning为true的标志，在hasValidKey上就是通过isReactWarning来判断key是否合法
 // specialPropKeyWarningShown用于标记key不合法的错误信息是否已经显示，初始值为undefined
@@ -245,8 +245,7 @@ export function createElement(type, config, children) {
   }
   //开发环境下
   if (__DEV__) {
-    // 由于config其实就是传入的props，如果config上有key和ref，就说明这些key和ref是不合法的
-    //  需要利用defineKeyPropWarningGetter与defineRefPropWarningGetter标记为不合法，并报错
+      //  需要利用defineKeyPropWarningGetter与defineRefPropWarningGetter标记新组件上的props也就是这里的props上的ref与key在获取其值得时候是不合法的。
     if (key || ref) {
       //type如果是个函数说明不是原生的dom标签，可能是一个组件，那么可以取
       const displayName =
