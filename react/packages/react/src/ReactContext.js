@@ -32,6 +32,8 @@ export function createContext<T>(
     }
   }
 
+
+  //定义context对象
   const context: ReactContext<T> = {
     $$typeof: REACT_CONTEXT_TYPE,
     _calculateChangedBits: calculateChangedBits,
@@ -47,6 +49,7 @@ export function createContext<T>(
     Consumer: (null: any),
   };
 
+  //定义context的Provider属性，其中_context指向context
   context.Provider = {
     $$typeof: REACT_PROVIDER_TYPE,
     _context: context,

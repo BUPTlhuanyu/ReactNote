@@ -20,6 +20,9 @@ class Content extends React.Component{
     }
 }
 class Footer extends React.Component{
+    constructor(props,ref){
+        super(props)
+    }
     render(){
         return (
             <div>
@@ -42,7 +45,14 @@ class App extends React.Component{
 }
 
 console.log(React)
-console.log(React.Component.prototype.isMounted(Header))
+
+console.log("Footer",Object.keys(Footer))
+
+// console.log(React.Component.prototype.isMounted(Header))
+
+// React.forwardRef((props)=><div>a</div>)
+
+React.forwardRef(Footer)
 
 ReactDOM.render(
     <App/>,
