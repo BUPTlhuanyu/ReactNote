@@ -20,17 +20,23 @@ class Content extends React.Component{
     }
 }
 class Footer extends React.Component{
-    constructor(props,ref){
+    constructor(props){
         super(props)
     }
     render(){
         return (
             <div>
-                this is Footer
+                this is Footer {this.props.children}
             </div>
         )
     }
 }
+
+const child1 = React.createElement('li', null, 'First Text Content');
+const child2 = React.createElement('li', null, 'Second Text Content');
+const child3 = React.createElement('li', null, 'Third Text Content');
+const FooterEnhance = React.createElement(Footer, {a:100,children:"第二个参数children"} ,"0000000");
+
 
 class App extends React.Component{
     render(){
@@ -38,7 +44,8 @@ class App extends React.Component{
             <div>
                 <Header/>
                 <Content/>
-                <Footer/>
+                <Footer>aaaaa</Footer>
+                {FooterEnhance}
             </div>
         )
     }
@@ -52,7 +59,11 @@ console.log("Footer",Object.keys(Footer))
 
 // React.forwardRef((props)=><div>a</div>)
 
-React.forwardRef(Footer)
+// React.forwardRef(Footer)
+
+// createFactory
+console.log(React.createFactory('div')())
+console.log(React.createFactory(Footer)())
 
 ReactDOM.render(
     <App/>,

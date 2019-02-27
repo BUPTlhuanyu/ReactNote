@@ -50,9 +50,10 @@ function hasValidKey(config) {
   return config.key !== undefined;
 }
 
-//给props对象定义key属性，以及key属性的取值器为warnAboutAccessingKey对象，该对象为函数用于将
-//错误标记设置为true（表示已经显示过错误信息）然后显示错误信息。如果已经显示过了就不需要再显示。
-//这里specialPropKeyWarningShown为该文件模块内部顶层变量
+// 调用了defineKeyPropWarningGetter函数就说明key值不合法。
+// 给props对象定义key属性，以及key属性的取值器为warnAboutAccessingKey对象
+// 该对象上存在一个isReactWarning为true的标志，在hasValidKey上就是通过isReactWarning来判断key是否合法
+// specialPropKeyWarningShown用于标记key不合法的错误信息是否已经显示，初始值为undefined
 function defineKeyPropWarningGetter(props, displayName) {
   const warnAboutAccessingKey = function() {
     if (!specialPropKeyWarningShown) {
@@ -186,6 +187,8 @@ export function createElement(type, config, children) {
   let self = null;
   let source = null;
 
+  //将config上有但是RESERVED_PROPS上没有的属性，添加到props上
+  //将config上合法的ref与key保存到内部变量ref和key
   if (config != null) {
     //判断config是否具有合法的ref与key，有就保存到内部变量ref和key中
     if (hasValidRef(config)) {
@@ -212,6 +215,8 @@ export function createElement(type, config, children) {
 
   // Children can be more than one argument, and those are transferred onto
   // the newly allocated props object.
+  //  如果只有三个参数，将第三个参数直接覆盖到props.children上
+  //  如果不止三个参数，将后面的参数组成一个数组，覆盖到props.children上
   const childrenLength = arguments.length - 2;
   if (childrenLength === 1) {
     props.children = children;
@@ -229,6 +234,7 @@ export function createElement(type, config, children) {
   }
 
   // Resolve default props
+  //  如果有默认的props值，那么将props上为undefined的属性设置初始值
   if (type && type.defaultProps) {
     const defaultProps = type.defaultProps;
     for (propName in defaultProps) {
@@ -239,6 +245,8 @@ export function createElement(type, config, children) {
   }
   //开发环境下
   if (__DEV__) {
+    // 由于config其实就是传入的props，如果config上有key和ref，就说明这些key和ref是不合法的
+    //  需要利用defineKeyPropWarningGetter与defineRefPropWarningGetter标记为不合法，并报错
     if (key || ref) {
       //type如果是个函数说明不是原生的dom标签，可能是一个组件，那么可以取
       const displayName =
@@ -255,6 +263,7 @@ export function createElement(type, config, children) {
       }
     }
   }
+  //注意生产环境下的ref和key还是被赋值到组件上
   return ReactElement(
     type,
     key,
@@ -340,7 +349,8 @@ export function cloneElement(element, config, children) {
     if (element.type && element.type.defaultProps) {
       defaultProps = element.type.defaultProps;
     }
-    //将defaultProps中的props与传入的config上新的prop浅合并
+    //所产生的元素的props由原始元素的 props被新的 props 浅层合并而来，
+    // 并且最终合并后的props的属性为undefined，就用element.type.defaultProps也就是默认props值进行设置。
     for (propName in config) {
       if (
         hasOwnProperty.call(config, propName) &&
