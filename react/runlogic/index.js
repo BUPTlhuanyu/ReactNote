@@ -41,6 +41,9 @@ console.log("FooterEnhance",FooterEnhance.props.key)
 
 class App extends React.Component{
     render(){
+        console.log(React.Children.count(this.props.children))
+        console.log(this.props.children)
+        console.log(React.Children.map(this.props.children,(children)=>{console.log(this);return [children,children,children]}),<Header/>)
         return (
             <div>
                 <Header/>
@@ -56,6 +59,8 @@ console.log(React)
 
 console.log("Footer",Object.keys(Footer))
 
+console.log("App", <App/>)
+
 // console.log(React.Component.prototype.isMounted(Header))
 
 // React.forwardRef((props)=><div>a</div>)
@@ -67,6 +72,17 @@ console.log(React.createFactory('div')())
 console.log(React.createFactory(Footer)())
 
 ReactDOM.render(
-    <App/>,
+    <App>
+        {/*测试*/}
+        <Header/>
+        <Content/>
+        string 1
+        <React.Fragment>
+            Some text.
+            <h2>A heading</h2>
+        </React.Fragment>
+        <Footer>覆盖</Footer>
+        string 2
+    </App>,
     document.getElementById('app')
 );

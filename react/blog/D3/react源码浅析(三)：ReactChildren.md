@@ -1,0 +1,286 @@
+[react.children官方API](http://react.html.cn/docs/react-api.html#react.children)
+
+
+全文中react树中每个节点都是一个react元素，或者是一个文本字符串或者数字，children为react树中的某个子树。组件的props.children即为当前组件为根节点的react元素子树。
+
+## 内部工具函数 ##
+### traverseContextPool数据结构 ###
+
+	//数据结构：context池，大小为10。当做一个栈使用
+	const POOL_SIZE = 10;
+	const traverseContextPool = [];
+	//获取一个context
+	//给栈顶的context设置相应属性值，并弹出返回。
+	//如果栈中没有元素，直接返回一个对象，相应的设置了属性值
+	function getPooledTraverseContext(
+	  mapResult,
+	  keyPrefix,
+	  mapFunction,
+	  mapContext,
+	) {
+	  if (traverseContextPool.length) {
+	    const traverseContext = traverseContextPool.pop();
+	    traverseContext.result = mapResult;
+	    traverseContext.keyPrefix = keyPrefix;
+	    traverseContext.func = mapFunction;
+	    traverseContext.context = mapContext;
+	    traverseContext.count = 0;
+	    return traverseContext;
+	  } else {
+	    return {
+	      result: mapResult,
+	      keyPrefix: keyPrefix,
+	      func: mapFunction,
+	      context: mapContext,
+	      count: 0,
+	    };
+	  }
+	}
+	
+	//如果栈未满，push一个空context对象
+	function releaseTraverseContext(traverseContext) {
+	  traverseContext.result = null;
+	  traverseContext.keyPrefix = null;
+	  traverseContext.func = null;
+	  traverseContext.context = null;
+	  traverseContext.count = 0;
+	  if (traverseContextPool.length < POOL_SIZE) {
+	    traverseContextPool.push(traverseContext);
+	  }
+	}
+
+
+### escape ###
+将传入的key中所有的'='替换成'=0',':'替换成 '=2',并在key之前加上'$'
+
+	function escape(key) {
+	  const escapeRegex = /[=:]/g;
+	  const escaperLookup = {
+	    '=': '=0',
+	    ':': '=2',
+	  };
+	  const escapedString = ('' + key).replace(escapeRegex, function(match) {
+	    return escaperLookup[match];
+	  });
+	
+	  return '$' + escapedString;
+	}
+
+### getComponentKey ###
+如果component存在不为null的key，则返回escape(component.key)，否则返回index.toString(36)
+
+	function getComponentKey(component, index) {
+	  // Do some typechecking here since we call this blindly. We want to ensure
+	  // that we don't blog potential future ES APIs.
+	  if (
+	    typeof component === 'object' &&
+	    component !== null &&
+	    component.key != null
+	  ) {
+	    // Explicit key
+	    return escape(component.key);
+	  }
+	  // Implicit key determined by the index in the set
+	  // 转换成36进制
+	  return index.toString(36);
+	}
+
+### traverseAllChildrenImpl ###
+**Children不能是一个对象**
+代码有点长，简述其作用：输入children树，返回树中节点类型是string，number，或者节点的即$$typeof为REACT_ELEMENT_TYPE，REACT_PORTAL_TYPE的节点数量。因此React.Fragment的$$typeof也为REACT_ELEMENT_TYPE,所以React.Fragment为一个节点。如果children是Array或者其他类型的子节点，则递归调用traverseAllChildrenImpl，直到children的typeof是string，number，或者$$typeof为REACT_ELEMENT_TYPE，REACT_PORTAL_TYPE时，对该children执行callback函数，并返回1。注意：不是对所有的节点遍历。
+
+callback传入的参数为traverseContext，children，nameSoFar 
+其中nameSoFar === '' ? '.' + getComponentKey(children, 0) : nameSoFar。
+
+	callback(
+      traverseContext,
+      children,
+      // If it's the only child, treat the name as if it was wrapped in an array
+      // so that it's consistent if the number of children grows.
+      nameSoFar === '' ? SEPARATOR + getComponentKey(children, 0) : nameSoFar,
+    );
+
+可以参看blog/D3文件下的reactchildren.vsdx文件中的流程图以及react文件夹下对应的源码注释。
+
+	function traverseAllChildrenImpl(
+	  children,
+	  nameSoFar,
+	  callback,
+	  traverseContext,
+	){...}
+
+### traverseAllChildren ###
+traverseAllChildrenImpl调用封装，与其功能一样。
+
+
+### forEachSingleChild ###
+执行bookKeeping.func，并将bookKeeping.count的值加1。func传入的参数为bookKeeping.context,child以及bookKeeping.count。
+
+	function forEachSingleChild(bookKeeping, child, name) {
+	  const {func, context} = bookKeeping;
+	  //执行bookKeeping.func，bookKeeping.count计数增加一
+	  func.call(context, child, bookKeeping.count++);
+	}
+
+### forEachChildren ###
+通过调用getPooledTraverseContext将传入的参数forEachFunc以及forEachContext赋值给traverseContext的func与context属性。
+调用traverseAllChildren
+
+	function forEachChildren(children, forEachFunc, forEachContext) {
+	  if (children == null) {
+	    return children;
+	  }
+	  const traverseContext = getPooledTraverseContext(
+	    null,
+	    null,
+	    forEachFunc,
+	    forEachContext,
+	  );
+	  traverseAllChildren(children, forEachSingleChild, traverseContext);
+	  releaseTraverseContext(traverseContext);
+	}
+
+### escapeUserProvidedKey ###
+匹配一个或者多个 "/",并用'$&/'替换
+
+	const userProvidedKeyEscapeRegex = /\/+/g;
+	function escapeUserProvidedKey(text) {
+	  return ('' + text).replace(userProvidedKeyEscapeRegex, '$&/');
+	}
+
+### mapIntoWithKeyPrefixInternal ###
+调用escapeUserProvidedKey对传入的prefix进行处理得到escapedPrefix，载
+通过调用getPooledTraverseContext将传入的参数array、escapedPrefix、func以及context赋值给traverseContext的result、keyPrefix、func与context属性。
+调用traverseAllChildren。最后清除traverseContext上的属性，并入栈。
+
+	function mapIntoWithKeyPrefixInternal(children, array, prefix, func, context) {
+	  let escapedPrefix = '';
+	  if (prefix != null) {
+	    escapedPrefix = escapeUserProvidedKey(prefix) + '/';
+	  }
+	  const traverseContext = getPooledTraverseContext(
+	    array,
+	    escapedPrefix,
+	    func,
+	    context,
+	  );
+	  traverseAllChildren(children, mapSingleChildIntoContext, traverseContext);
+	  releaseTraverseContext(traverseContext);
+	}
+
+### mapSingleChildIntoContext ###
+对children执行func（func为传入的React.Children.map中的func）,
+如果返回了一个数组，则对这个数组调用mapIntoWithKeyPrefixInternal目的是添加特定的key
+克隆以child节点为根节点的树中的所有child，替换掉每个新child元素的key，push到bookKeeping中的result
+
+	function mapSingleChildIntoContext(bookKeeping, child, childKey) {
+	  const {result, keyPrefix, func, context} = bookKeeping;
+	
+	  let mappedChild = func.call(context, child, bookKeeping.count++);
+	  if (Array.isArray(mappedChild)) {
+	      //如果child中包含多个child，则返回的mappedChild是一个数组，则递归调用mapIntoWithKeyPrefixInternal
+	    mapIntoWithKeyPrefixInternal(mappedChild, result, childKey, c => c);
+	  } else if (mappedChild != null) {
+	      //如果child中只有一个child，并且是合法的react元素，
+	      // 则将mappedChild的key属性值替换掉
+	    //  最后将新的react元素push到bookKeeping.result
+	    if (isValidElement(mappedChild)) {
+	      mappedChild = cloneAndReplaceKey(
+	        mappedChild,
+	        // Keep both the (mapped) and old keys if they differ, just as
+	        // traverseAllChildren used to do for objects as children
+	        keyPrefix +
+	          (mappedChild.key && (!child || child.key !== mappedChild.key)
+	            ? escapeUserProvidedKey(mappedChild.key) + '/'
+	            : '') +
+	          childKey,
+	      );
+	    }
+	    result.push(mappedChild);
+	  }
+	}
+
+## 对外接口 ##
+
+### mapChildren ###
+
+	React.Children.map(children, func, context)
+参数描述：
+
+	children：
+		不能是一个对象，children为null或者undefined就返回null或者undefined，children中的Fragment为一个子组件。
+	func：
+		对有效的children执行的函数，func会被传入两个参数，有效的children以及到当前children的数量。所有执行func返回的children都会添加到一个数组中，没有嵌套。
+	context:
+		一般都为null
+
+返回值：
+	返回一个数组
+
+例子：
+
+	React.Children.map(this.props.children,(children)=>[children,children,children])
+返回的数组的长度是原children数组长度的三倍。
+
+
+#### 源码： ####
+
+
+	function mapChildren(children, func, context) {
+	//children为null或者undefined就返回null或者undefined
+	  if (children == null) {
+	    return children;
+	  }
+	  const result = [];
+	  mapIntoWithKeyPrefixInternal(children, result, null, func, context);
+	  return result;
+	}
+
+#### 运行逻辑： ####
+
+**mapChildren函数中**：mapChildren传入（children，func，context），调用mapIntoWithKeyPrefixInternal(children, [], null, func, context)
+
+**mapIntoWithKeyPrefixInternal函数中**：prefix为传入的第三个参数null，此时traverseContextPool=[]，直接返回
+
+	traverseContext={
+      result: [],
+      keyPrefix: null,
+      func: func,
+      context: context,
+      count: 0,
+    }
+调用traverseAllChildren(children, mapSingleChildIntoContext, traverseContext)
+
+**traverseAllChildren函数中**：调用traverseAllChildrenImpl(children, '', mapSingleChildIntoContext, traverseContext)
+
+**traverseAllChildrenImpl函数中**：
+如果children是有效的则调用mapSingleChildIntoContext(traverseContext,children,'.’+children的key)。
+
+**mapSingleChildIntoContext函数中**：traverseContext.func为mapChildren函数接收到的func，调用traverseContext.func.call(context, children, traverseContext.count++)。如果传入mapChildren的func对该children进行了改造。并返回了一数组的新children，则调用mapIntoWithKeyPrefixInternal为有效的成员添加特定的Key之后，添加到result数组中。
+
+### toArray ###
+利用mapChildren也能实现toArray的功能，只需要func为child => child即可
+
+	function toArray(children) {
+	  const result = [];
+	  mapIntoWithKeyPrefixInternal(children, result, null, child => child);
+	  return result;
+	}
+
+### onlyChild ###
+判断children是否是单个React element child
+
+	function onlyChild(children) {
+	  invariant(
+	    isValidElement(children),
+	    'React.Children.only expected to receive a single React element child.',
+	  );
+	  return children;
+	}
+
+### countChildren ###
+计算children个数
+
+	function countChildren(children) {
+	  return traverseAllChildren(children, () => null, null);
+	}
