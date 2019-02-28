@@ -1,8 +1,6 @@
 ### 总览： ###
 你将会明白：
-开发环境下如何做到props.key以及props.ref获取不到值？
-开发环境下如何通过hasValidRef以及defineRefPropWarningGetter在createElement中切断ref在props中的传递？
-在开发环境下会判断获取props上的key以及ref的合法性，生产环境不会判断？
+react元素的key和ref为什么不会存在props上，并且传递，开发环境下与生产环境下处理key和ref的区别？
 ...
 
 ----------
@@ -27,7 +25,7 @@
 ----------
 
 ### hasValidRef ###
-通过Ref属性的取值器对象的isReactWarning属性检测是否含有合法的Ref，在开发环境下，如果这个props是react元素的props那么上面的ref就是不合法的，因为在creatElement的时候已经调用了defineRefPropWarningGetter。生产环境下如果config.ref !== undefined，说明合法。
+通过Ref属性的取值器对象的isReactWarning属性检测是否含有合法的Ref，在开发环境下，如果这个props是react元素的props那么获取上面的ref就是不合法的，因为在creatElement的时候已经调用了defineRefPropWarningGetter。生产环境下如果config.ref !== undefined，说明合法。
 
 	function hasValidRef(config) {
 	  //在开发模式下
@@ -417,6 +415,33 @@ children：当children存在的时候，createElement返回的组件的props中�
 	<element.type {...element.props} {...props}>{children}</element.type>
 
 其源码与createElement类似，不同的地方是在开发环境下cloneElement不会对props调用defineKeyPropWarningGetter与defineRefPropWarningGetter对props.ref与props.key进行获取拦截。
+
+### 总结 ###
+react元素的key和ref为什么不会在props上，并且传递，开发环境下与生产环境下处理key和ref的区别？
+
+creatElement函数中阻止ref、key等属性赋值给props，所以react元素的key和ref不会在props上，并且在组件间通过props传递
+
+    for (propName in config) {
+      if (
+        hasOwnProperty.call(config, propName) &&
+        !RESERVED_PROPS.hasOwnProperty(propName)
+      ) {
+        props[propName] = config[propName];
+      }
+    }
+
+开发环境下与生产环境下处理key和ref的区别：开发环境下还会调用defineRefPropWarningGetter与defineKeyPropWarningGetter，利用Object.defineProperty进行拦截报错：
+
+	  Object.defineProperty(props, 'key', {
+	    get: warnAboutAccessingKey,
+	    configurable: true,
+	  });
+
+**不能将一个react元素的ref通过props传递给其他组件。**
+
+
+
+
 
 
 
