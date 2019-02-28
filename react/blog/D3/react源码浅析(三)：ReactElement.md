@@ -1,15 +1,16 @@
 ### 总览： ###
 你将会明白：
-如何做到props.key以及props.ref获取不到值？
-如何通过hasValidRef以及defineRefPropWarningGetter在createElement中切断ref在props中的传递？
+开发环境下如何做到props.key以及props.ref获取不到值？
+开发环境下如何通过hasValidRef以及defineRefPropWarningGetter在createElement中切断ref在props中的传递？
+在开发环境下会判断获取props上的key以及ref的合法性，生产环境不会判断？
 ...
 
 ----------
 
 **内部方法**
 
-	│   ├── hasValidRef ------------------------------------ 检测是否含有合法的Ref
-	│   ├── hasValidKey ------------------------------------ 检测是否含有合法的key
+	│   ├── hasValidRef ----------------------------- 检测获取config上的ref是否合法
+	│   ├── hasValidKey ----------------------------- 检测获取config上的key是否合法
 	│   ├── defineKeyPropWarningGetter ----- 锁定props.key的值使得无法获取props.key
 	│   ├── defineRefPropWarningGetter ----- 锁定props.ref的值使得无法获取props.ref
 	│   ├── ReactElement ------------ 被createElement函数调用，根据环境设置对应的属性
@@ -26,7 +27,7 @@
 ----------
 
 ### hasValidRef ###
-通过Ref属性的取值器对象的isReactWarning属性检测是否含有合法的Ref，也就是如果这个props是react元素的props那么上面的ref就是不合法的，因为在creatElement的时候已经调用了defineRefPropWarningGetter。
+通过Ref属性的取值器对象的isReactWarning属性检测是否含有合法的Ref，在开发环境下，如果这个props是react元素的props那么上面的ref就是不合法的，因为在creatElement的时候已经调用了defineRefPropWarningGetter。生产环境下如果config.ref !== undefined，说明合法。
 
 	function hasValidRef(config) {
 	  //在开发模式下
@@ -61,14 +62,14 @@
 	}
 
 ### defineKeyPropWarningGetter ###
-锁定props.key的值使得无法获取props.key,标记获取props中的key值是不合法的，当使用props.key的时候，会执行warnAboutAccessingKey函数，进行报错，从而获取不到key属性的值。
+开发模式下，该函数在creatElement函数中可能被调用。锁定props.key的值使得无法获取props.key,标记获取props中的key值是不合法的，当使用props.key的时候，会执行warnAboutAccessingKey函数，进行报错，从而获取不到key属性的值。
 
-**key属性不能存在于props中，否则为undefined**,即如下调用始终返回undefined:
+即如下调用始终返回undefined:
 
 	props.key
 
 给props对象定义key属性，以及key属性的取值器为warnAboutAccessingKey对象
-该对象上存在一个isReactWarning为true的标志，在hasValidKey上就是通过isReactWarning来判断key是否合法
+该对象上存在一个isReactWarning为true的标志，在hasValidKey上就是通过isReactWarning来判断获取key是否合法
 specialPropKeyWarningShown用于标记key不合法的错误信息是否已经显示，初始值为undefined。
 
 	function defineKeyPropWarningGetter(props, displayName) {
@@ -95,7 +96,7 @@ specialPropKeyWarningShown用于标记key不合法的错误信息是否已经显
 ### defineRefPropWarningGetter ###
 逻辑与defineKeyPropWarningGetter一致，锁定props.ref的值使得无法获取props.ref,标记获取props中的ref值是不合法的，当使用props.ref的时候，会执行warnAboutAccessingKey函数，进行报错，从而获取不到ref属性的值。
 
-**ref属性不能存在于props中，否则为undefined**，即如下调用始终返回undefined:
+即如下调用始终返回undefined:
 
 	props.ref
 
@@ -159,6 +160,8 @@ specialPropKeyWarningShown用于标记key不合法的错误信息是否已经显
 	};
 
 ### createElement ###
+**在开发模式和生产模式下，第二参数props中的ref与key属性不会传入新react元素的props上，所以开发模式和生产模式都无法通过props传递ref与key。生产模式下ref与key不为undefined就赋值给新react元素对应的ref与key属性上，开发模式下获取ref与key是合法的（第二参数不是某个react元素的props，其key与ref则为合法），则赋值给新react元素对应的ref与key属性上。**
+
 使用 JSX 编写的代码将被转成使用 React.createElement() 
 
 React.createElement API：
@@ -171,7 +174,7 @@ React.createElement API：
 
 type(类型) 参数：可以是一个标签名字字符串（例如 'div' 或'span'），或者是一个 React 组件 类型（一个类或者是函数），或者一个 React fragment 类型。
 
-#### 仅在开发模式下props中的ref与key会报错 ####
+#### 仅在开发模式下获取props中的ref与key会抛出错误 ####
 props：将key，ref，\__self，__source的属性分别复制到新react元素的key，ref，\__self，__source上，其他的属性值，assign到type上的props上。**当这个props是react元素的props，那么其ref与key是无法传入新元素上的ref与key。只有这个props是一个新对象的时候才是有效的。这里就切断了ref与key通过props的传递。**
 
 children：当children存在的时候，createElement返回的组件的props中不会存在children，如果存在的时候，返回的组件的props.children会被传入的children覆盖掉。
@@ -301,7 +304,7 @@ children：当children存在的时候，createElement返回的组件的props中�
 	  }
 	  //开发环境下
 	  if (__DEV__) {
-	    //  需要利用defineKeyPropWarningGetter与defineRefPropWarningGetter标记新组件上的props也就是这里的props上的ref与key在获取其值得时候是不合法的。
+	      //  需要利用defineKeyPropWarningGetter与defineRefPropWarningGetter标记新组件上的props也就是这里的props上的ref与key在获取其值得时候是不合法的。
 	    if (key || ref) {
 	      //type如果是个函数说明不是原生的dom标签，可能是一个组件，那么可以取
 	      const displayName =
@@ -309,11 +312,11 @@ children：当children存在的时候，createElement返回的组件的props中�
 	          ? type.displayName || type.name || 'Unknown'
 	          : type;
 	      if (key) {
-	        //在开发环境下给key属性设置错误提示相关函数
+	        //在开发环境下标记获取新组件的props.key是不合法的,获取不到值
 	        defineKeyPropWarningGetter(props, displayName);
 	      }
 	      if (ref) {
-	        //在开发环境下给ref属性设置错误提示相关函数
+	        //在开发环境下标记获取新组件的props.ref是不合法的,获取不到值
 	        defineRefPropWarningGetter(props, displayName);
 	      }
 	    }
@@ -413,7 +416,7 @@ children：当children存在的时候，createElement返回的组件的props中�
 
 	<element.type {...element.props} {...props}>{children}</element.type>
 
-其源码与createElement类似，不同的地方是cloneElement不会对props中的ref与key报错。
+其源码与createElement类似，不同的地方是在开发环境下cloneElement不会对props调用defineKeyPropWarningGetter与defineRefPropWarningGetter对props.ref与props.key进行获取拦截。
 
 
 

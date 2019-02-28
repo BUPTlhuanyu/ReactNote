@@ -18,9 +18,10 @@ const RESERVED_PROPS = {
   __self: true,
   __source: true,
 };
-//两种错误是否显示的标记
+
 let specialPropKeyWarningShown, specialPropRefWarningShown;
-//检测是否含有合法的Ref
+//检测获取config上的ref是否合法，
+// defineRefPropWarningGetter处理过的config，isReactWarning为true，不合法
 function hasValidRef(config) {
   //在开发模式下
   if (__DEV__) {
@@ -253,11 +254,11 @@ export function createElement(type, config, children) {
           ? type.displayName || type.name || 'Unknown'
           : type;
       if (key) {
-        //在开发环境下给key属性设置错误提示相关函数
+        //在开发环境下标记获取新组件的props.key是不合法的,获取不到值
         defineKeyPropWarningGetter(props, displayName);
       }
       if (ref) {
-        //在开发环境下给ref属性设置错误提示相关函数
+        //在开发环境下标记获取新组件的props.ref是不合法的,获取不到值
         defineRefPropWarningGetter(props, displayName);
       }
     }
