@@ -6,6 +6,8 @@
  *
  * @flow
  */
+//生产模式ReactDebugCurrentFrame={}
+//开发环境ReactDebugCurrentFrame=｛getCurrentStack:null | (() => string),getStackAddendum:() => string｝
 
 import type {ReactElement} from 'shared/ReactElementType';
 
@@ -18,6 +20,7 @@ let currentlyValidatingElement = (null: null | ReactElement);
 
 export function setCurrentlyValidatingElement(element: null | ReactElement) {
   if (__DEV__) {
+      //开发模式下将currentlyValidatingElement设置为传入的ReactElement类型的元素
     currentlyValidatingElement = element;
   }
 }
@@ -34,9 +37,9 @@ if (__DEV__) {
       const name = getComponentName(currentlyValidatingElement.type);
       const owner = currentlyValidatingElement._owner;
       stack += describeComponentFrame(
-        name,
-        currentlyValidatingElement._source,
-        owner && getComponentName(owner.type),
+        name,//组件的名字
+        currentlyValidatingElement._source,//包含组件信息（组件路径，错误发生的行数）的对象
+        owner && getComponentName(owner.type),//组件的父组件名字
       );
     }
 
@@ -45,7 +48,7 @@ if (__DEV__) {
     if (impl) {
       stack += impl() || '';
     }
-
+    //返回组件的一些信息，错误发生在哪个文件的第几行
     return stack;
   };
 }

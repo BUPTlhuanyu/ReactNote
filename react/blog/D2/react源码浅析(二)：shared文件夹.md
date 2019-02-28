@@ -9,9 +9,9 @@
 	
 	
 	export default function(
-	  name: null | string,
-	  source: any,
-	  ownerName: null | string,
+	  name: null | string, //组件的名字
+	  source: any,//包含组件信息（组件路径，错误发生的行数）的对象
+	  ownerName: null | string,//组件的父组件名字
 	) {
 	  let sourceInfo = '';
 	  if (source) {
