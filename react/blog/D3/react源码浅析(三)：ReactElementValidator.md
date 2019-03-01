@@ -1,5 +1,5 @@
 1. react遇到React.Fragment标签，先验证器检测是否符合规范，再调用createElement创建reactElement。
-2. React.Fragment允许传入的属性有key,children，不能传入ref，因为React.Fragment最终不会渲染成一个真实DOM，所以ref引用到的是null，因此不能传入ref作为属性。
+2. React.Fragment允许传入的属性有key,children，不能传入ref以及其他属性，因为React.Fragment最终不会渲染成一个真实DOM，所以ref引用到的是null，因此不能传入ref作为属性。
 
 
 ----------
