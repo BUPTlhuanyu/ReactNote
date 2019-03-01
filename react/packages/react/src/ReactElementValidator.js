@@ -37,6 +37,7 @@ if (__DEV__) {
   propTypesMisspellWarningShown = false;
 }
 
+//返回字符串，内容为：检查ReactCurrentOwner.current.type上的render方法
 function getDeclarationErrorAddendum() {
   if (ReactCurrentOwner.current) {
     const name = getComponentName(ReactCurrentOwner.current.type);
@@ -47,6 +48,7 @@ function getDeclarationErrorAddendum() {
   return '';
 }
 
+//返回字符串，内容为：检查某个文件下的某一行代码
 function getSourceInfoErrorAddendum(elementProps) {
   if (
     elementProps !== null &&
@@ -68,6 +70,7 @@ function getSourceInfoErrorAddendum(elementProps) {
  */
 const ownerHasKeyUseWarning = {};
 
+// 错误提示，在ReactCurrentOwner.current不存在的时候，提示检查parentType上的render
 function getCurrentComponentErrorInfo(parentType) {
   let info = getDeclarationErrorAddendum();
 
@@ -94,6 +97,7 @@ function getCurrentComponentErrorInfo(parentType) {
  * @param {ReactElement} element Element that requires a key.
  * @param {*} parentType element's parent's type.
  */
+  //对传入的组件是否具有key进行错误处理
 function validateExplicitKey(element, parentType) {
   if (!element._store || element._store.validated || element.key != null) {
     return;
@@ -143,6 +147,7 @@ function validateExplicitKey(element, parentType) {
  * @param {ReactNode} node Statically passed child of any type.
  * @param {*} parentType node's parent's type.
  */
+//对传入的node中的每个element判断是否存在key
 function validateChildKeys(node, parentType) {
   if (typeof node !== 'object') {
     return;
@@ -183,6 +188,9 @@ function validateChildKeys(node, parentType) {
  *
  * @param {ReactElement} element
  */
+
+//检查propTypes的否大小写正确，类组件或者函数组件设置默认prop只能用defaultProps
+// getDefaultProps只能用于React.createClass中
 function validatePropTypes(element) {
   const type = element.type;
   let name, propTypes;
@@ -235,12 +243,26 @@ function validatePropTypes(element) {
  * Given a fragment, validate that it can only be provided with fragment props
  * @param {ReactElement} fragment
  */
+// React.Fragment 也是通过createElement创建的
+// React.Fragment 只能有key和children作为其属性
+// React.Fragment 特别注意不能传入ref作为其属性，因为React.Fragment不会渲染成一个真实的DOM，自然不会允许有ref
+// <React.Fragment key111="Fragment 只能有key和children作为其props属性"
+//
+// children111="Fragment 只能有key和children作为其props属性"
+// ref={{"some":"Fragment 也不能使用ref获取引用"}}
+// key="允许的"
+// children="允许的,貌似没什么用，根本用不了，真实的children就是React.Fragment包裹的内容"
+//     >
+//     Some text.
+// <h2>A heading</h2>
+// </React.Fragment>
 function validateFragmentProps(fragment) {
   setCurrentlyValidatingElement(fragment);
 
   const keys = Object.keys(fragment.props);
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
+    //由于在开发环境下，React.Fragment的props中存在key与ref，但是获取到得值为undefined
     if (key !== 'children' && key !== 'key') {
       warning(
         false,
@@ -259,6 +281,12 @@ function validateFragmentProps(fragment) {
   setCurrentlyValidatingElement(null);
 }
 
+// 先检查传入的type是否是合法的element类型，见isValidElementType，如果不是抛出错误
+// 如果是则将type, props, children等参数传入createElement生成对应的react元素
+// 然后调用validateChildKeys对参数children的每个element判断是否存在key
+// 接着，如果type类型是REACT_FRAGMENT_TYPE，调用validateFragmentProps检查Fragment上的属性（这里函数名为props不妥，key与ref
+// 不算是props中的，attributes比较好）
+// 其他type类型的元素的props的规则一致。
 export function createElementWithValidation(type, props, children) {
   const validType = isValidElementType(type);
 
@@ -359,11 +387,13 @@ export function createFactoryWithValidation(type) {
   return validatedFactory;
 }
 
+//返回一个REACT_ELEMENT_TYPE类型的元素，其type属性值为传入的element
 export function cloneElementWithValidation(element, props, children) {
   const newElement = cloneElement.apply(this, arguments);
   for (let i = 2; i < arguments.length; i++) {
     validateChildKeys(arguments[i], newElement.type);
   }
+  //newElement为REACT_ELEMENT_TYPE类型，所以不许要判断是否是REACT_FRAGMENT_TYPE类型
   validatePropTypes(newElement);
   return newElement;
 }

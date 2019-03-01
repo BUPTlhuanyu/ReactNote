@@ -1,6 +1,18 @@
 /**
  * Created by lhy on 2018/12/6.
  */
+// let ReactFragment1 = React.cloneElement(<React.Fragment children={["child","child","child"]}/>,{xxx:"这会被添加到React.Fragment的props上"})
+// console.log("ReactFragment1",ReactFragment1)
+// console.log("ReactFragment1",React.Fragment)
+//
+// ReactDOM.render(
+//     <React.Fragment children={["child","child","child"]}/>,
+//     document.getElementById('app')
+// );
+//
+// console.log("ReactFragment",<React.Fragment xxx="不允许的"/>)
+
+console.log("debug from here")
 
 class Header extends React.Component{
     render(){
@@ -13,6 +25,7 @@ class Header extends React.Component{
 }
 class Content extends React.Component{
     render(){
+        console.log("Content props",this.props)
         return (
             <div>
                 this is Content
@@ -55,9 +68,6 @@ class App extends React.Component{
         console.log(React.Children.map([reactChildLike,[reactChildLike,this.props.children]],(children)=>[children,children,children]))
         return (
             <div>
-                <Header/>
-                <Content/>
-                <Footer>aaaaa</Footer>
                 {FooterEnhance}
             </div>
         )
@@ -81,16 +91,21 @@ console.log(React.createFactory('div')())
 console.log(React.createFactory(Footer)())
 
 
-
+console.log("debug from here")
 
 
 ReactDOM.render(
     <App>
         {/*测试*/}
         <Header/>
-        <Content/>
+        <Content key="1" ref={{}}/>
         string 1
-        <React.Fragment>
+        <React.Fragment key111="Fragment 只能有key和children作为其属性"
+                        children111="Fragment 只能有key和children作为其属性"
+                        ref={{"some":"Fragment 也不能使用ref获取引用"}}
+                        key="允许的"
+                        children="允许的,貌似没什么用，根本用不了，真实的children就是React.Fragment包裹的内容"
+        >
             Some text.
             <h2>A heading</h2>
         </React.Fragment>

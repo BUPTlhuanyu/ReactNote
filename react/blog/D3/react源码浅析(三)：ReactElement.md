@@ -1,6 +1,7 @@
 ### 总览： ###
 你将会明白：
-react元素的key和ref为什么不会存在props上，并且传递，开发环境下与生产环境下处理key和ref的区别？
+开发环境下，key和ref会存在于react元素的props上，但是获取到的值为undefined，并报错。在生产环境下，key和ref不会存在于react元素的props上的。
+react组件上的传递的key与ref参数值不会被props传递给其他组件，开发环境下与生产环境下处理key和ref的区别？
 ...
 
 ----------
@@ -419,7 +420,8 @@ children：当children存在的时候，createElement返回的组件的props中�
 其源码与createElement类似，不同的地方是在开发环境下cloneElement不会对props调用defineKeyPropWarningGetter与defineRefPropWarningGetter对props.ref与props.key进行获取拦截。
 
 ### 总结 ###
-react元素的key和ref为什么不会在props上，并且传递，开发环境下与生产环境下处理key和ref的区别？
+开发环境下，key和ref会存在于react元素的props上，但是获取到的值为undefined，并报错。在生产环境下，key和ref不会存在于react元素的props上的。
+react组件上的传递的key与ref参数值不会被props传递给其他组件，开发环境下与生产环境下处理key和ref的区别？
 
 creatElement函数中阻止ref、key等属性赋值给props，所以react元素的key和ref不会在props上，并且在组件间通过props传递
 
@@ -432,7 +434,7 @@ creatElement函数中阻止ref、key等属性赋值给props，所以react元素�
       }
     }
 
-开发环境下与生产环境下处理key和ref的区别：开发环境下还会调用defineRefPropWarningGetter与defineKeyPropWarningGetter，利用Object.defineProperty进行拦截报错：
+开发环境下与生产环境下处理key和ref的区别：开发环境下还会调用defineRefPropWarningGetter与defineKeyPropWarningGetter，利用Object.defineProperty进行拦截报错，同时在生产环境下，key和ref不会存在于react元素的props上的。：
 
 	  Object.defineProperty(props, 'key', {
 	    get: warnAboutAccessingKey,
