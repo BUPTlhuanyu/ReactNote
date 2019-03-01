@@ -1,7 +1,16 @@
 [react.children官方API](http://react.html.cn/docs/react-api.html#react.children)
+,阅读全文，可以了解react.children基本原理，掌握react.children各个API的用法，还能了解到官方API以外的补充用法。
 
+预备知识：
+react元素的$$typeof:
 
-全文中react树中每个节点都是一个react元素，或者是一个文本字符串或者数字，children为react树中的某个子树。组件的props.children即为当前组件为根节点的react元素子树。
+	$$typeof: REACT_FORWARD_REF_TYPE
+	$$typeof: REACT_MEMO_TYPE
+	$$typeof: REACT_CONTEXT_TYPE
+	$$typeof: REACT_PROVIDER_TYPE
+	$$typeof: REACT_ELEMENT_TYPE
+	$$typeof: REACT_LAZY_TYPE
+	$$typeof: REACT_PORTAL_TYPE
 
 ## 内部工具函数 ##
 ### traverseContextPool数据结构 ###
@@ -208,19 +217,80 @@ traverseAllChildrenImpl调用封装，与其功能一样。
 参数描述：
 
 	children：
-		不能是一个对象，children为null或者undefined就返回null或者undefined，children中的Fragment为一个子组件。
+		可以是一个对象，但是必须具备属性$$typeof为Symbol.for('react.portal')或者Symbol.for('react.element')，可以称其为类reactChild对象，否则报错。
+		children为null或者undefined就返回null或者undefined，children中的Fragment为一个子组件。
 	func：
-		对有效的children执行的函数，func会被传入两个参数，有效的children以及到当前children的数量。所有执行func返回的children都会添加到一个数组中，没有嵌套。
+		对符合规定的children执行的函数，func会被传入两个参数，符合规定的children以及到当前children的数量。所有执行func返回的children都会添加到一个数组中，没有嵌套。
 	context:
-		一般都为null
+		一般都为null，如果传入context则func运行中的this为context，看例2
 
 返回值：
-	返回一个数组
+	返回一个平面数组，看例1
 
-例子：
+例子相关代码，见runLogic文件夹的index.js：
 
-	React.Children.map(this.props.children,(children)=>[children,children,children])
-返回的数组的长度是原children数组长度的三倍。
+	//
+	<App>
+        {/*测试*/}
+        <Header/>
+        <Content/>
+        string 1
+        <React.Fragment>
+            Some text.
+            <h2>A heading</h2>
+        </React.Fragment>
+        <Footer>覆盖</Footer>
+        string 2
+    </App>
+
+	//
+	class App extends React.Component{
+	    render(){
+			例1代码
+			例2代码
+	        return (
+	            <div>
+					...
+	            </div>
+	        )
+	    }
+	}																
+
+例1：测试children是一个嵌套结构，返回的数组是否是一个平面数组：
+
+	let reactChildLike = {$$typeof:Symbol.for('react.element')}
+	let complexChildren = [reactChildLike,[reactChildLike,this.props.children]]
+	console.log(React.Children.map(complexChildren,(children)=>[children,children,children]))
+
+结果：
+
+	this.props.children为：
+	(6) [{…}, {…}, "string 1", {…}, {…}, "string 2"]
+
+	complexChildren中符合规定的child为1+1+6=8，所以输出的result为3*8=24个元素的平面数组
+
+	(24) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, "string 1", "string 1", "string 1", {…}, {…}, {…}, {…}, {…}, {…}, "string 2", "string 2", "string 2"]
+
+例2：测试context的作用
+
+		let reactChildLike = {$$typeof:Symbol.for('react.element')}
+        let func = function (child) {
+            console.log(this)
+            this.a=1000;
+            return child
+        }
+        let contextTest = {a:1}
+        console.log("React.Children.map test",React.Children.map(reactChildLike,func,contextTest))
+        console.log("contextTest.a",contextTest.a)
+
+结果：
+
+		React.Children.map test 
+			[{…}]
+			0: {$$typeof: Symbol(react.element), type: undefined, key: ".0", ref: undefined, props: undefined, …}length: 1__proto__: Array(0)
+		contextTest.a 1000
+func给this.a赋值为1000，在传入context的时候，外部的context.a变成了1000。
+
 
 
 #### 源码： ####
@@ -238,8 +308,13 @@ traverseAllChildrenImpl调用封装，与其功能一样。
 
 #### 运行逻辑： ####
 
+----------
+#### 1. 初始调用 ####
 **mapChildren函数中**：mapChildren传入（children，func，context），调用mapIntoWithKeyPrefixInternal(children, [], null, func, context)
 
+
+----------
+#### 2. 构建traverseContext ####
 **mapIntoWithKeyPrefixInternal函数中**：prefix为传入的第三个参数null，此时traverseContextPool=[]，直接返回
 
 	traverseContext={
@@ -251,12 +326,22 @@ traverseAllChildrenImpl调用封装，与其功能一样。
     }
 调用traverseAllChildren(children, mapSingleChildIntoContext, traverseContext)
 
+----------
+
+#### 3. children构建key ####
 **traverseAllChildren函数中**：调用traverseAllChildrenImpl(children, '', mapSingleChildIntoContext, traverseContext)
 
 **traverseAllChildrenImpl函数中**：
-如果children是有效的则调用mapSingleChildIntoContext(traverseContext,children,'.’+children的key)。
+如果children是符合规定的则调用mapSingleChildIntoContext(traverseContext,children,'.’+children的key)。
 
-**mapSingleChildIntoContext函数中**：traverseContext.func为mapChildren函数接收到的func，调用traverseContext.func.call(context, children, traverseContext.count++)。如果传入mapChildren的func对该children进行了改造。并返回了一数组的新children，则调用mapIntoWithKeyPrefixInternal为有效的成员添加特定的Key之后，添加到result数组中。
+
+----------
+#### 4. 对children执行func，并添加到结果数组 ####
+**mapSingleChildIntoContext函数中**：traverseContext.func为mapChildren函数接收到的func，调用traverseContext.func.call(context, children, traverseContext.count++)。如果传入mapChildren的func对该children进行了改造。并返回了一数组的新children，则调用mapIntoWithKeyPrefixInternal为符合规定的成员添加特定的Key之后，添加到result数组中。
+
+----------
+
+
 
 ### toArray ###
 利用mapChildren也能实现toArray的功能，只需要func为child => child即可

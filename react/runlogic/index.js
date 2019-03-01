@@ -41,9 +41,18 @@ console.log("FooterEnhance",FooterEnhance.props.key)
 
 class App extends React.Component{
     render(){
+        let reactChildLike = {$$typeof:Symbol.for('react.element')}
+        let func = function (child) {
+            console.log(this)
+            this.a=1000;
+            return child
+        }
+        let contextTest = {a:1}
+        console.log("React.Children.map test",React.Children.map(reactChildLike,func,contextTest))
+        console.log("contextTest.a",contextTest.a)
         console.log(React.Children.count(this.props.children))
         console.log(this.props.children)
-        console.log(React.Children.map(this.props.children,(children)=>{console.log(this);return [children,children,children]}),<Header/>)
+        console.log(React.Children.map([reactChildLike,[reactChildLike,this.props.children]],(children)=>[children,children,children]))
         return (
             <div>
                 <Header/>
@@ -70,6 +79,10 @@ console.log("App", <App/>)
 // createFactory
 console.log(React.createFactory('div')())
 console.log(React.createFactory(Footer)())
+
+
+
+
 
 ReactDOM.render(
     <App>

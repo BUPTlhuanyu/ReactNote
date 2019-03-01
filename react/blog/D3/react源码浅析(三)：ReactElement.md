@@ -162,6 +162,8 @@ specialPropKeyWarningShown用于标记key不合法的错误信息是否已经显
 
 使用 JSX 编写的代码将被转成使用 React.createElement() 
 
+在利用isValidElementType检测createElement()的时候返回false
+
 React.createElement API：
 
 	React.createElement(
@@ -332,7 +334,7 @@ children：当children存在的时候，createElement返回的组件的props中�
 	}
 
 ### createFactory ###
-返回一个函数，该函数生成给定类型的 React 元素。
+返回一个函数，该函数生成给定类型的 React 元素。在利用isValidElementType检测createFactory()的时候返回true
 用于将在字符串或者函数或者类转换成一个react元素，该元素的type为字符串或者函数或者类的构造函数
 
 例如：Footer为文章的类组件
