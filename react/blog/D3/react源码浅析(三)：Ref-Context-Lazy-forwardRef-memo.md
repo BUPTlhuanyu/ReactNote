@@ -27,7 +27,7 @@
 
 
 
-定义一个Lazy函数，传入一个函数，返回一个懒加载组件，其_ctor中为动态加载逻辑，$$typeof: 为REACT_LAZY_TYPE组件类型
+定义一个Lazy函数，传入一个函数，返回一个对象，其_ctor中为动态加载逻辑包含需要懒加载组件调的位置，$$typeof: 为REACT_LAZY_TYPE组件类型
 
 	export function lazy<T, R>(ctor: () => Thenable<T, R>): LazyComponent<T> {
 	  return {

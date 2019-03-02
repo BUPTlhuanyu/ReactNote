@@ -41,5 +41,11 @@
 
 ### ToDo
 - [ ] react
+    - [x] shared  整个项目通用代码
+    - [x] react   核心代码，react定义、reactElement类型对象的构建过程、ReactChildren对react树的操作原理等等
+    - [x] react-is  梳理react框架中两大类型：ReactElement以及Portal类型。梳理React.memo，Ref等类型的构建成ReactElementd的过程
+    - [ ] scheduler 规划 React 初始化，更新等等
+    - [ ] react-reconciler  React调制器
+    - [ ] react-dom  DOM渲染
 - [ ] redux-saga：管理react副作用，尽可能使组件为纯函数
 - [ ] react-transition-group其他
