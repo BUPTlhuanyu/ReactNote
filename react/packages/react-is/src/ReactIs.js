@@ -27,11 +27,19 @@ import lowPriorityWarning from 'shared/lowPriorityWarning';
 export function typeOf(object: any) {
   if (typeof object === 'object' && object !== null) {
     const $$typeof = object.$$typeof;
-
+    //先判断object.$$typeof，
+    // 如果是REACT_ELEMENT_TYPE，继续判断type
+    // 如果是REACT_PORTAL_TYPE，返回REACT_PORTAL_TYPE
     switch ($$typeof) {
       case REACT_ELEMENT_TYPE:
         const type = object.type;
-
+        //判断object.type，如果是如下类型则返回该类型：
+        //   REACT_ASYNC_MODE_TYPE
+        //   REACT_CONCURRENT_MODE_TYPE
+        //   REACT_FRAGMENT_TYPE
+        //   REACT_PROFILER_TYPE
+        //   REACT_STRICT_MODE_TYPE
+        //  如果都不是，则判断object.type.$$typeof
         switch (type) {
           case REACT_ASYNC_MODE_TYPE:
           case REACT_CONCURRENT_MODE_TYPE:
@@ -41,13 +49,18 @@ export function typeOf(object: any) {
             return type;
           default:
             const $$typeofType = type && type.$$typeof;
-
+            // 如果object.type.$$typeof是如下类型，则返回该类型：
+            //   REACT_CONTEXT_TYPE
+            //   REACT_FORWARD_REF_TYPE
+            //   REACT_PROVIDER_TYPE
+            //  如果都不是则返回object.$$typeof，该值不属于react类型
             switch ($$typeofType) {
               case REACT_CONTEXT_TYPE:
               case REACT_FORWARD_REF_TYPE:
               case REACT_PROVIDER_TYPE:
                 return $$typeofType;
               default:
+                //检测到是REACT_MEMO_TYPE或者REACT_LAZY_TYPE的时候，返回REACT_ELEMENT_TYPE
                 return $$typeof;
             }
         }
