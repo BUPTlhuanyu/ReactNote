@@ -1,5 +1,19 @@
 ## 对react相关代码库以及框架的源码进行了一定的分析
 * 由于水平有限，实战经验有限，暂时很多地方分析的不到位，以后慢慢完善，望指正
+### ToDo
+- [ ] react
+    - [x] shared  整个项目通用代码
+    - [x] react   核心代码，react定义、reactElement类型对象的构建过程、ReactChildren对react树的操作原理等等
+    - [x] react-is  梳理react框架中两大类型：ReactElement以及Portal类型。梳理React.memo，Ref等类型的构建成ReactElementd的过程
+    - [ ] scheduler 规划 React 初始化，更新等等
+    - [ ] react-reconciler  React调制器
+    - [ ] react-dom  DOM渲染
+    - [ ] events 合成事件系统
+- [x] react-router4各个API的使用与源码分析
+- [ ] react-transition-group
+    - [x] 基本组件：Transition组件分析，结合生命周期详细分析该组件实现动画的原理
+    - [ ] TransitionGroup组件：对children中Transition或者CSSTransition组件的动画的管理
+- [ ] redux-saga：管理react副作用，尽可能使组件为纯函数
 
 ### react16.6
 *源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，打log分析react对不同组件的处理逻辑等等运行机制*
@@ -38,17 +52,3 @@
 ### react-transition-group
 #### D1
 - [react-transition-group源码浅析(一)：Transition](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react-transition-group/blog/D1/react-transition-group%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%B8%80)%EF%BC%9ATransition.md)
-
-### ToDo
-- [ ] react
-    - [x] shared  整个项目通用代码
-    - [x] react   核心代码，react定义、reactElement类型对象的构建过程、ReactChildren对react树的操作原理等等
-    - [x] react-is  梳理react框架中两大类型：ReactElement以及Portal类型。梳理React.memo，Ref等类型的构建成ReactElementd的过程
-    - [ ] scheduler 规划 React 初始化，更新等等
-    - [ ] react-reconciler  React调制器
-    - [ ] react-dom  DOM渲染
-- [x] react-router4各个API的使用与源码分析
-- [ ] react-transition-group
-    - [x] 基本组件：Transition组件分析，结合生命周期详细分析该组件实现动画的原理
-    - [ ] TransitionGroup组件：对children中Transition或者CSSTransition组件的动画的管理
-- [ ] redux-saga：管理react副作用，尽可能使组件为纯函数
