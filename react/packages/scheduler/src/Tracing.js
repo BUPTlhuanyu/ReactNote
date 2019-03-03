@@ -6,7 +6,11 @@
  *
  * @flow
  */
-
+// packages\shared\ReactFeatureFlags.js中enableSchedulerTracing = __PROFILE__
+// 而在react-master\scripts\rollup\build.js中找到如下代码，表示构建过程中全局__PROFILE__的取值
+// isProfiling表明处于profile状态，isProduction表示在生产环境
+// __PROFILE__: isProfiling || !isProduction ? 'true' : 'false'
+// __PROFILE__为true，因此这里认为enableSchedulerTracing = true
 import {enableSchedulerTracing} from 'shared/ReactFeatureFlags';
 
 export type Interaction = {|
@@ -118,6 +122,7 @@ export function unstable_trace(
     return callback();
   }
 
+  //根据传入的参数name、timestamp，以及当前交互事件数量interactionIDCounter构建一个interaction
   const interaction: Interaction = {
     __count: 1,
     id: interactionIDCounter++,
@@ -125,20 +130,36 @@ export function unstable_trace(
     timestamp,
   };
 
+  //保存当前interactionsRef.current为prevInteractions
   const prevInteractions = interactionsRef.current;
 
   // Traced interactions should stack/accumulate.
   // To do that, clone the current interactions.
   // The previous set will be restored upon completion.
+  // 被跟踪的interactions应该被处理，
+  // 复制当前interactions到prevInteractions，完成之后再还原interactions
+  // 利用prevInteractions构建一个interactions，然后把要跟踪的interaction添加进去
   const interactions = new Set(prevInteractions);
   interactions.add(interaction);
+  // 之前的interactions被保存在中prevInteractions，然后在当前的interactions中插入一个interaction
   interactionsRef.current = interactions;
 
+  // 获取当前的订阅者
   const subscriber = subscriberRef.current;
   let returnValue;
 
+  //interaction为当前正在被追踪的活动
+  //多个订阅者订阅了这个interaction，所以interaction.__count的数量就是订阅者的数量
+  //执行订阅者上的onInteractionTraced(interaction)
+  //执行subscriber.onWorkStarted(interactions, threadID)
+  //执行returnValue = callback()
+  //恢复interactionsRef.current = prevInteractions
+  //执行subscriber.onWorkStopped(interactions, threadID);
+  //interaction发生，订阅者执行相应的回调之后，interaction.__count的数量就减少一个，interaction.__count--;
+  //当该活动的订阅者都执行了相应的回调，即interaction.__count === 0，就执行subscriber.onInteractionScheduledWorkCompleted(interaction);
   try {
     if (subscriber !== null) {
+      //scheduler\src\TracingSubscriptions.js中subscribers订阅者集合所有的subscriber都会执行其subscriber.onInteractionTraced(interaction)
       subscriber.onInteractionTraced(interaction);
     }
   } finally {
@@ -182,6 +203,7 @@ export function unstable_wrap(
 
   const wrappedInteractions = interactionsRef.current;
 
+  //subscribers订阅所有wrappedInteractions
   let subscriber = subscriberRef.current;
   if (subscriber !== null) {
     subscriber.onWorkScheduled(wrappedInteractions, threadID);
@@ -189,12 +211,15 @@ export function unstable_wrap(
 
   // Update the pending async work count for the current interactions.
   // Update after calling subscribers in case of error.
+  // 每个interaction.__count加一
   wrappedInteractions.forEach(interaction => {
     interaction.__count++;
   });
 
   let hasRun = false;
 
+  //用于执行subscriber上订阅的wrappedInteractions，
+  //执行完callback并return returnValue之后每个interaction.__count减一
   function wrapped() {
     const prevInteractions = interactionsRef.current;
     interactionsRef.current = wrappedInteractions;
@@ -242,6 +267,8 @@ export function unstable_wrap(
     }
   }
 
+  //  用于取消subscriber上订阅的wrappedInteractions
+  //  每个interaction.__count减一
   wrapped.cancel = function cancel() {
     subscriber = subscriberRef.current;
 

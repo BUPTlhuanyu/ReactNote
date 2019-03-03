@@ -17,6 +17,8 @@ if (enableSchedulerTracing) {
   subscribers = new Set();
 }
 
+// 添加subscriber到subscribers，
+// 如果subscribers集合只有刚添加的subscriber，则将__subscriberRef.current构建成一个对象，并添加一些方法
 export function unstable_subscribe(subscriber: Subscriber): void {
   if (enableSchedulerTracing) {
     subscribers.add(subscriber);
@@ -34,6 +36,7 @@ export function unstable_subscribe(subscriber: Subscriber): void {
   }
 }
 
+// 删除subscribers集合中指定的subscriber，如果集合为空，则__subscriberRef.current = null
 export function unstable_unsubscribe(subscriber: Subscriber): void {
   if (enableSchedulerTracing) {
     subscribers.delete(subscriber);
@@ -44,14 +47,20 @@ export function unstable_unsubscribe(subscriber: Subscriber): void {
   }
 }
 
+// 定义subscriber中的方法
+
+// 当前订阅者__subscriberRef.current执行onInteractionTraced，
+// 其他订阅者都会执行其onInteractionTraced
 function onInteractionTraced(interaction: Interaction): void {
   let didCatchError = false;
   let caughtError = null;
 
+  //为了不打断forEach，设置didCatchError与caughtError
   subscribers.forEach(subscriber => {
     try {
       subscriber.onInteractionTraced(interaction);
     } catch (error) {
+      //记录第一个发生错误的信息
       if (!didCatchError) {
         didCatchError = true;
         caughtError = error;
@@ -64,6 +73,8 @@ function onInteractionTraced(interaction: Interaction): void {
   }
 }
 
+//当前订阅者__subscriberRef.current执行onInteractionScheduledWorkCompleted，
+// 其他订阅者都会执行其onInteractionScheduledWorkCompleted
 function onInteractionScheduledWorkCompleted(interaction: Interaction): void {
   let didCatchError = false;
   let caughtError = null;
@@ -84,6 +95,7 @@ function onInteractionScheduledWorkCompleted(interaction: Interaction): void {
   }
 }
 
+// 当一个订阅者执行onWorkScheduled，其他订阅者都会执行其onWorkScheduled
 function onWorkScheduled(
   interactions: Set<Interaction>,
   threadID: number,
@@ -107,6 +119,8 @@ function onWorkScheduled(
   }
 }
 
+//当前订阅者__subscriberRef.current执行onWorkStarted，
+// 其他订阅者都会执行其onWorkStarted
 function onWorkStarted(interactions: Set<Interaction>, threadID: number): void {
   let didCatchError = false;
   let caughtError = null;
@@ -127,6 +141,8 @@ function onWorkStarted(interactions: Set<Interaction>, threadID: number): void {
   }
 }
 
+//当前订阅者__subscriberRef.current执行onWorkStopped，
+// 其他订阅者都会执行其onWorkStopped
 function onWorkStopped(interactions: Set<Interaction>, threadID: number): void {
   let didCatchError = false;
   let caughtError = null;
@@ -147,6 +163,8 @@ function onWorkStopped(interactions: Set<Interaction>, threadID: number): void {
   }
 }
 
+//当前订阅者__subscriberRef.current执行onWorkCanceled，
+// 其他订阅者都会执行其onWorkCanceled
 function onWorkCanceled(
   interactions: Set<Interaction>,
   threadID: number,

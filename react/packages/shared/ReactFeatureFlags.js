@@ -30,6 +30,10 @@ export const warnAboutDeprecatedLifecycles = false;
 export const enableProfilerTimer = __PROFILE__;
 
 // Trace which interactions trigger each commit.
+// 在react-master\scripts\rollup\build.js中找到如下代码，表示构建过程中全局__PROFILE__的取值
+// isProfiling表明处于profile状态，isProduction表示在生产环境
+// __PROFILE__: isProfiling || !isProduction ? 'true' : 'false'
+// __PROFILE__为true
 export const enableSchedulerTracing = __PROFILE__;
 
 // Only used in www builds.

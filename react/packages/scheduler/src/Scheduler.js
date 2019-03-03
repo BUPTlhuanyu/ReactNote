@@ -9,6 +9,7 @@
 /* eslint-disable no-var */
 
 // TODO: Use symbols?
+// 优先级
 var ImmediatePriority = 1;
 var UserBlockingPriority = 2;
 var NormalPriority = 3;
@@ -20,21 +21,26 @@ var IdlePriority = 5;
 // 0b111111111111111111111111111111
 var maxSigned31BitInt = 1073741823;
 
+//各个优先级对应的过期时间
 // Times out immediately
 var IMMEDIATE_PRIORITY_TIMEOUT = -1;
 // Eventually times out
 var USER_BLOCKING_PRIORITY = 250;
 var NORMAL_PRIORITY_TIMEOUT = 5000;
 var LOW_PRIORITY_TIMEOUT = 10000;
-// Never times out
+// Never times out 空闲优先级，在1073741823后将回调函数加入任务队列的定时器
 var IDLE_PRIORITY = maxSigned31BitInt;
 
 // Callbacks are stored as a circular, doubly linked list.
+// 回调函数被存储双向循环链表中
 var firstCallbackNode = null;
-
+//过期标志
 var currentDidTimeout = false;
+//当前优先级
 var currentPriorityLevel = NormalPriority;
+//当前事件开始时间
 var currentEventStartTime = -1;
+//当前事件到期时间
 var currentExpirationTime = -1;
 
 // This is set when a callback is being executed, to prevent re-entrancy.
@@ -265,9 +271,12 @@ function unstable_wrapCallback(callback) {
 }
 
 function unstable_scheduleCallback(callback, deprecated_options) {
+  //计算开始时间
   var startTime =
     currentEventStartTime !== -1 ? currentEventStartTime : getCurrentTime();
 
+  //计算到期时间 = 开始时间 + 传入的参数options中的timeout
+  //deprecated_options.timeout表示多少毫秒之后过期
   var expirationTime;
   if (
     typeof deprecated_options === 'object' &&
@@ -277,6 +286,7 @@ function unstable_scheduleCallback(callback, deprecated_options) {
     // FIXME: Remove this branch once we lift expiration times out of React.
     expirationTime = startTime + deprecated_options.timeout;
   } else {
+    //根据当前优先级确定过期时间
     switch (currentPriorityLevel) {
       case ImmediatePriority:
         expirationTime = startTime + IMMEDIATE_PRIORITY_TIMEOUT;
@@ -296,17 +306,19 @@ function unstable_scheduleCallback(callback, deprecated_options) {
     }
   }
 
+  //新节点：保存了传入的回调函数，优先级，到期时间
   var newNode = {
     callback,
     priorityLevel: currentPriorityLevel,
     expirationTime,
-    next: null,
-    previous: null,
+    next: null,//链表后一个节点
+    previous: null,//链表前一个节点
   };
 
   // Insert the new callback into the list, ordered first by expiration, then
   // by insertion. So the new callback is inserted any other callback with
   // equal expiration.
+  // 将当前包含回调函数的节点按照到期时间从firstNode开始以小到大的顺序插入到双向循环链表中，
   if (firstCallbackNode === null) {
     // This is the first callback in the list.
     firstCallbackNode = newNode.next = newNode.previous = newNode;
@@ -449,6 +461,7 @@ var shouldYieldToHost;
 
 if (typeof window !== 'undefined' && window._schedMock) {
   // Dynamic injection, only for testing purposes.
+  // 动态注入，用于测试
   var impl = window._schedMock;
   requestHostCallback = impl[0];
   cancelHostCallback = impl[1];
@@ -461,6 +474,7 @@ if (typeof window !== 'undefined' && window._schedMock) {
   // if this is a mocked "window" object. So we need to validate that too.
   typeof window.addEventListener !== 'function'
 ) {
+  //在non-DOM环境下
   var _callback = null;
   var _currentTime = -1;
   var _flushCallback = function(didTimeout, ms) {
