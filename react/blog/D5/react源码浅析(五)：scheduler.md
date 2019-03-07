@@ -19,7 +19,7 @@
 
 给出一张图如下或许你会有一个更加清晰的理解：
 
-![](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D5/scheduler%20-%20%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.vsdx)
+![](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D5/scheduler%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.png)
 
 
 # 优先级以及对应的过期时间 #
