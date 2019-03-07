@@ -1117,6 +1117,7 @@
                 previousFrameTime = nextFrameTime;
             }
             frameDeadline = rafTime + activeFrameTime;
+            console.log("frameDeadline",frameDeadline)
             if (!isMessageEventScheduled) {
                 isMessageEventScheduled = true;
                 window.postMessage(messageKey, '*');

@@ -34,11 +34,11 @@ var IDLE_PRIORITY = maxSigned31BitInt;
 // Callbacks are stored as a circular, doubly linked list.
 // 回调函数被存储双向循环链表中
 var firstCallbackNode = null;
-//过期标志
+//当前的过期标志
 var currentDidTimeout = false;
 //当前优先级
 var currentPriorityLevel = NormalPriority;
-//当前事件开始时间
+//当前事件开始时间？？？
 var currentEventStartTime = -1;
 //当前事件到期时间
 var currentExpirationTime = -1;
@@ -47,7 +47,7 @@ var currentExpirationTime = -1;
 // 是否正在执行最高优先级的回调函数的标记
 var isExecutingCallback = false;
 
-//是否已经安排回调？？？
+//是否已经安排回调
 var isHostCallbackScheduled = false;
 
 var hasNativePerformanceNow =
@@ -62,24 +62,30 @@ function ensureHostCallbackIsScheduled() {
   // Schedule the host callback using the earliest expiration in the list.
   //  获取最小的到期时间
   var expirationTime = firstCallbackNode.expirationTime;
-  //还没有安排回调
+  //当前空闲时间还没有安排回调
   if (!isHostCallbackScheduled) {
     //将标志置为true
     isHostCallbackScheduled = true;
   } else {
-    //如果已经安排回调，则清空任务队列，重新
+    //如果已经安排回调，则清除任务执行器，到期时间以及是否是否安排了Message事件的标记
     // Cancel the existing host callback.
     cancelHostCallback();
   }
-  //重新设置任务执行器，并立即执行任务或者稍后执行任务
+  //传入第一个节点的到期时间，重新设置任务执行器，并在requestHostCallback函数中调用postMessage触发Message事件
+  // 在回调函数idleTick中立即执行任务执行器或者执行requestAnimationFrameWithTimeout将任务执行器的执行与否放到下一帧来判断
   requestHostCallback(flushWork, expirationTime);
 }
 
+// 执行第一个节点的回调函数，并从链表中删除当前的第一个节点，
+// 如果回调函数返回的是一个函数，则利用这个函数创建一个新节点，
+// 由于新节点的到期时间与原第一个节点的到期时间一样，所以新节点将会替代原第一个节点的位置。
 function flushFirstCallback() {
+  //将firstCallbackNode赋值给flushedNode，作为当前需要被执行的任务节点
   var flushedNode = firstCallbackNode;
 
   // Remove the node from the list before calling the callback. That way the
   // list is in a consistent state even if the callback throws.
+  //  从链表中删除第一个节点firstCallbackNode，原firstCallbackNode的后一个节点作为第一个节点
   var next = firstCallbackNode.next;
   if (firstCallbackNode === next) {
     // This is the last callback in the list.
@@ -90,27 +96,31 @@ function flushFirstCallback() {
     firstCallbackNode = lastCallbackNode.next = next;
     next.previous = lastCallbackNode;
   }
-
+  //将当前需要被执行的任务节点的next与previous置null，断开与链表的链接
   flushedNode.next = flushedNode.previous = null;
 
   // Now it's safe to call the callback.
-  var callback = flushedNode.callback;
-  var expirationTime = flushedNode.expirationTime;
-  var priorityLevel = flushedNode.priorityLevel;
-  var previousPriorityLevel = currentPriorityLevel;
-  var previousExpirationTime = currentExpirationTime;
-  currentPriorityLevel = priorityLevel;
-  currentExpirationTime = expirationTime;
+  var callback = flushedNode.callback;//该任务的回调函数
+  var expirationTime = flushedNode.expirationTime;//该任务的到期时间
+  var priorityLevel = flushedNode.priorityLevel;//该任务的优先级
+  var previousPriorityLevel = currentPriorityLevel;//保存当前优先级
+  var previousExpirationTime = currentExpirationTime;//保存当前到期时间
+  currentPriorityLevel = priorityLevel;//利用该任务的优先级刷新当前优先级
+  currentExpirationTime = expirationTime;//利用该任务的到期时间刷新当前到期时间
   var continuationCallback;
   try {
-    continuationCallback = callback();
+    continuationCallback = callback();//执行该任务的回调函数，返回值保存在continuationCallback
   } finally {
+    //注意如果callback是异步的，这里finally的子句不会等callback执行完在执行
+    //  try...finally是同步的
+    //  调用了回调函数之后恢复原有的当前优先级与当前到期时间
     currentPriorityLevel = previousPriorityLevel;
     currentExpirationTime = previousExpirationTime;
   }
 
   // A callback may return a continuation. The continuation should be scheduled
   // with the same priority and expiration as the just-finished callback.
+  //  如果回调函数返回的是一个函数，则再创建一个任务节点
   if (typeof continuationCallback === 'function') {
     var continuationNode: CallbackNode = {
       callback: continuationCallback,
@@ -124,10 +134,14 @@ function flushFirstCallback() {
     // almost the same as the code in `scheduleCallback`, except the callback
     // is inserted into the list *before* callbacks of equal expiration instead
     // of after.
+    //  将新生成的节点依照到期时间插入到链表中，与scheduleCallback函数中的区别是，
+    //  如果遇到相同的到期时间，则插入到其前面而不是后面
     if (firstCallbackNode === null) {
       // This is the first callback in the list.
+      //  如果此时任务队列为空，则该新节点为链表唯一的节点
       firstCallbackNode = continuationNode.next = continuationNode.previous = continuationNode;
     } else {
+
       var nextAfterContinuation = null;
       var node = firstCallbackNode;
       do {
@@ -146,6 +160,8 @@ function flushFirstCallback() {
         nextAfterContinuation = firstCallbackNode;
       } else if (nextAfterContinuation === firstCallbackNode) {
         // The new callback is the highest priority callback in the list.
+        //  如果返回的函数构成的节点优先级是最高的，那么需要将该节点单独设置为一个任务队列
+          // 调用ensureHostCallbackIsScheduled重新设置任务执行器，并立即执行任务或者稍后执行任务
         firstCallbackNode = continuationNode;
         ensureHostCallbackIsScheduled();
       }
@@ -158,15 +174,22 @@ function flushFirstCallback() {
   }
 }
 
+//执行任务队列中所有立即执行任务(最高优先级)的回调函数
 function flushImmediateWork() {
   if (
     // Confirm we've exited the outer most event handler
+    //  currentEventStartTime表示当前事件触发的开始时间
+    //如果firstCallbackNode任务具备最高优先级，则执行回调函数
     currentEventStartTime === -1 &&
     firstCallbackNode !== null &&
     firstCallbackNode.priorityLevel === ImmediatePriority
   ) {
+    //一个锁，用于标记是否正在执行最高优先级的任务
     isExecutingCallback = true;
     try {
+        //执行第一个节点的回调函数，直到第一个节点的优先级不是最高优先级（立即执行）
+      //  由于链表是按照到期时间排序，而最高优先级对应的到期时间最小，所以都会被安排在链表前面
+      //  因此这里就是执行队列中所有的立即执行任务的回调函数
       do {
         flushFirstCallback();
       } while (
@@ -175,62 +198,88 @@ function flushImmediateWork() {
         firstCallbackNode.priorityLevel === ImmediatePriority
       );
     } finally {
+      //调用完所有的最高优先级节点的回调函数之后，将isExecutingCallback设置为false，表示现在没有执行最高优先级任务
       isExecutingCallback = false;
       if (firstCallbackNode !== null) {
         // There's still work remaining. Request another callback.
+        // 重新设置任务执行器
         ensureHostCallbackIsScheduled();
       } else {
+        //队列为空，空闲时间没有安排任务
         isHostCallbackScheduled = false;
       }
     }
   }
 }
 
+//传入的参数didTimeout为true，表示任务队列最小到期时间对应的任务已经过期了，需要立即执行
+//为false，表示当前帧有空余时间
 function flushWork(didTimeout) {
-  isExecutingCallback = true;
-  const previousDidTimeout = currentDidTimeout;
-  currentDidTimeout = didTimeout;
+  isExecutingCallback = true;//表示正在执行回调
+  const previousDidTimeout = currentDidTimeout;//保存当前的过期标志到previousDidTimeout
+  currentDidTimeout = didTimeout;//重新设置当前的过期标志
   try {
     if (didTimeout) {
       // Flush all the expired callbacks without yielding.
+        //如果过期了
       while (firstCallbackNode !== null) {
+          // 第一个节点不为空，并且第一个节点过期了，则一直循环，直到第一个节点为空或者没有过期。
         // Read the current time. Flush all the callbacks that expire at or
         // earlier than that time. Then read the current time again and repeat.
         // This optimizes for as few performance.now calls as possible.
+        //  刷新当前时间
         var currentTime = getCurrentTime();
         if (firstCallbackNode.expirationTime <= currentTime) {
+          //如果第一个节点的到期时间小于当前时间，过期了
           do {
+            //flushFirstCallback()：执行第一个节点的回调函数，并从链表中删除当前的第一个节点
             flushFirstCallback();
           } while (
+            //  直到第一个节点为空或者第一个节点没有过期
             firstCallbackNode !== null &&
             firstCallbackNode.expirationTime <= currentTime
           );
+          //第一个节点为空或者第一个节点没有过期
           continue;
         }
+          //第一个节点为不为空但是第一个节点没有过期，则退出while(firstCallbackNode !== null)
         break;
       }
     } else {
       // Keep flushing callbacks until we run out of time in the frame.
+        // 第一个节点不为空
       if (firstCallbackNode !== null) {
+        //一直循环flushFirstCallback();
+          // 直到当前帧没有空余时间可用
+          // 或者第一个节点为空，即任务队列为空，则停止刷新第一个节点
         do {
           flushFirstCallback();
         } while (firstCallbackNode !== null && !shouldYieldToHost());
       }
     }
   } finally {
+    //最终将回调正在执行的标记置为false
     isExecutingCallback = false;
+    //恢复之前的过期标志
     currentDidTimeout = previousDidTimeout;
     if (firstCallbackNode !== null) {
+      // 如果第一个节点不为空，表示是因为当前帧没有空余时间了，而停止了回调的执行
+      //  这个时候请求下一次的回调，继续执行剩下的任务队列
       // There's still work remaining. Request another callback.
       ensureHostCallbackIsScheduled();
     } else {
+      //如果都已经执行完了，任务队列为空的情况，则设置标记isHostCallbackScheduled为false，
+      // 空闲时间的使用权可以交给其他的任务队列
       isHostCallbackScheduled = false;
     }
     // Before exiting, flush all the immediate work that was scheduled.
+    // 最后刷新所有的立即执行任务
     flushImmediateWork();
   }
 }
 
+//传入优先级priorityLevel与事件处理函数eventHandler
+//返回值为eventHandler()的值
 function unstable_runWithPriority(priorityLevel, eventHandler) {
   switch (priorityLevel) {
     case ImmediatePriority:
@@ -243,11 +292,15 @@ function unstable_runWithPriority(priorityLevel, eventHandler) {
       priorityLevel = NormalPriority;
   }
 
+  //保护现场：保存当前优先级currentPriorityLevel与当前事件开始时间currentEventStartTime
   var previousPriorityLevel = currentPriorityLevel;
   var previousEventStartTime = currentEventStartTime;
+  //设置当前优先级
   currentPriorityLevel = priorityLevel;
+  //将currentEventStartTime设置为当前时间
   currentEventStartTime = getCurrentTime();
 
+  //执行传入的事件处理函数，恢复现场，并调用flushImmediateWork刷新被安排的所有的立即执行任务
   try {
     return eventHandler();
   } finally {
@@ -255,13 +308,17 @@ function unstable_runWithPriority(priorityLevel, eventHandler) {
     currentEventStartTime = previousEventStartTime;
 
     // Before exiting, flush all the immediate work that was scheduled.
+    //   执行任务队列中所有立即执行任务(最高优先级)的回调函数
     flushImmediateWork();
   }
 }
 
 function unstable_wrapCallback(callback) {
+  //闭包中的内部变量，不gc，用于存储当前优先级
   var parentPriorityLevel = currentPriorityLevel;
+  //返回一个被包裹的回调函数，执行该函数会执行回调函数
   return function() {
+    //与runWithPriority逻辑一样，都是保护现场，执行回调然后恢复现场。
     // This is a fork of runWithPriority, inlined for performance.
     var previousPriorityLevel = currentPriorityLevel;
     var previousEventStartTime = currentEventStartTime;
@@ -278,8 +335,11 @@ function unstable_wrapCallback(callback) {
   };
 }
 
+//传入的参数deprecated_options.timeout可以用来指定callback执行的优先级
+//也就是可以影响插入到已有的任务链表的位置
 function unstable_scheduleCallback(callback, deprecated_options) {
-  //计算开始时间
+  //只有unstable_wrapCallback和unstable_runWithPriority会改变currentEventStartTime
+  // 因此在初始状态，currentEventStartTime=-1，所以startTime = getCurrentTime()
   var startTime =
     currentEventStartTime !== -1 ? currentEventStartTime : getCurrentTime();
 
@@ -295,6 +355,7 @@ function unstable_scheduleCallback(callback, deprecated_options) {
     expirationTime = startTime + deprecated_options.timeout;
   } else {
     //根据当前优先级确定过期时间
+    //   初始状态下为currentPriorityLevel为NormalPriority,
     switch (currentPriorityLevel) {
       case ImmediatePriority:
         expirationTime = startTime + IMMEDIATE_PRIORITY_TIMEOUT;
@@ -328,10 +389,12 @@ function unstable_scheduleCallback(callback, deprecated_options) {
   // equal expiration.
   // 将当前包含回调函数的节点按照到期时间从firstNode开始以小到大的顺序插入到双向循环链表中，
   if (firstCallbackNode === null) {
+    //如果任务队列为空，则将新节点组成一个双向循环链表，并执行ensureHostCallbackIsScheduled，开始调度
     // This is the first callback in the list.
     firstCallbackNode = newNode.next = newNode.previous = newNode;
     ensureHostCallbackIsScheduled();
   } else {
+    //如果任务队列不为空，将新节点插入循环链表，
     var next = null;
     var node = firstCallbackNode;
     do {
@@ -344,11 +407,17 @@ function unstable_scheduleCallback(callback, deprecated_options) {
     } while (node !== firstCallbackNode);
 
     if (next === null) {
+      //如果新节点的到期时间是最大的，则应该处于链表的末端
+      //对于双向循环链表而言，新节点的next为链表的第一个节点。
       // No callback with a later expiration was found, which means the new
       // callback has the latest expiration in the list.
       next = firstCallbackNode;
     } else if (next === firstCallbackNode) {
       // The new callback has the earliest expiration in the entire list.
+      //  如果新节点的到期时间最小，则新节点就应该是链表的第一个节点
+      //  在插入之前，先执行ensureHostCallbackIsScheduled()进行调度
+      //  由于ensureHostCallbackIsScheduled的函数作用域链中最终是通过回调函数来调用flushWork函数来执行任务链表中的回调函数的，
+      //  属于异步事件，因此if外部的代码先于ensureHostCallbackIsScheduled()执行
       firstCallbackNode = newNode;
       ensureHostCallbackIsScheduled();
     }
@@ -362,33 +431,50 @@ function unstable_scheduleCallback(callback, deprecated_options) {
   return newNode;
 }
 
+//传入一个需要取消执行的节点，该节点是双向循环链表firstCallbackNode中的某一个节点
+//即传入的节点的回调函数将被取消不会被执行。
+//流程
 function unstable_cancelCallback(callbackNode) {
   var next = callbackNode.next;
   if (next === null) {
+    //因为双向循环链表只有一个节点的时候，其next指向自己，
+    //当这个双向循环链表中的某个节点的next为nul，说明该双向循环链表为空
+    //即任务队列已经取消了，直接返回
     // Already cancelled.
     return;
   }
 
   if (next === callbackNode) {
+    //如果双向链表只有传入的节点，直接清除双向链表firstCallbackNode即可
     // This is the only scheduled callback. Clear the list.
     firstCallbackNode = null;
   } else {
     // Remove the callback from its position in the list.
+    //  如果传入的需要取消回调的节点是第一个节点，那么直接将该节点的next当做链表的第一个节点
+    //  该节点还存在于该链表，没有删除
     if (callbackNode === firstCallbackNode) {
       firstCallbackNode = next;
     }
+    //如果传入的不是第一个节点，则将该节点从链表中删除。
     var previous = callbackNode.previous;
     previous.next = next;
     next.previous = previous;
   }
 
+  //将该节点next与previous清除，但是该节点还是存在于链表中，只是不能通过该节点访问链表其他节点
+  //  其他节点可以访问到该节点
   callbackNode.next = callbackNode.previous = null;
 }
 
+//获取当前的优先级currentPriorityLevel
 function unstable_getCurrentPriorityLevel() {
   return currentPriorityLevel;
 }
 
+// 返回的boolean为false用于表示以下情况：
+// 1、帧截止时间过期并且任务最小到期时间过期、
+// 2、当前帧截止时间没有过期并且任务为空
+// 3、当前帧截止时间没有过期并且任务最小到期时间小于当前执行的任务节点的到期时间
 function unstable_shouldYield() {
   return (
     !currentDidTimeout &&
@@ -545,7 +631,7 @@ if (typeof window !== 'undefined' && window._schedMock) {
 
   var isAnimationFrameScheduled = false;//用于标记是否已经执行了requestAnimationFrameWithTimeout
 
-  var isFlushingHostCallback = false;//标记是否需要立即刷新callback执行任务
+  var isFlushingHostCallback = false;//标记正在执行任务执行器，该标记相当于一个锁。
 
   var frameDeadline = 0;
   // We start out assuming that we run at 30fps but then the heuristic tracking
@@ -559,7 +645,7 @@ if (typeof window !== 'undefined' && window._schedMock) {
   };
 
   // We use the postMessage trick to defer idle work until after the repaint.
-  //  使用postMessage将空闲的操作放到重绘之后
+    //安全检查
   var messageKey =
     '__reactIdleCallback$' +
     Math.random()
@@ -571,7 +657,7 @@ if (typeof window !== 'undefined' && window._schedMock) {
       return;
     }
 
-    isMessageEventScheduled = false; //用于判断是否已经postMessage，false为没有
+    isMessageEventScheduled = false;  //animationTick中执行postMessage之前将其置为true，只有在执行了Message回调函数idleTick中才会将其置为false。
 
     var prevScheduledCallback = scheduledHostCallback;
     var prevTimeoutTime = timeoutTime;
@@ -582,16 +668,17 @@ if (typeof window !== 'undefined' && window._schedMock) {
     //获取当前时间
     var currentTime = getCurrentTime();
 
-    //标记是否过期
+    //标记任务队列最小的到期时间的节点以及当前帧截止时间是否过期
     var didTimeout = false;
     if (frameDeadline - currentTime <= 0) {
-      // frameDeadline表示这一帧结束，准备刷新下一帧的时刻
+      // frameDeadline表示当前帧截止时间
       // currentTime 表示当前时刻
-      // 如果当前时刻大于frameDeadline，说明
+      // 如果当前时刻大于frameDeadline，说明发生了阻塞，已经丢失了一帧
+      //  如果小于，说明当前帧没有空闲时间，
       // There's no time left in this idle period. Check if the callback has
       // a timeout and whether it's been exceeded.
       if (prevTimeoutTime !== -1 && prevTimeoutTime <= currentTime) {
-        //说明已经过期，将其标志置为true
+        //任务队列最小的到期时间小于当前时间，说明已经过期，将其标志置为true
         // Exceeded the timeout. Invoke the callback even though there's no
         // time left.
         didTimeout = true;
@@ -600,7 +687,7 @@ if (typeof window !== 'undefined' && window._schedMock) {
         // No timeout.
         if (!isAnimationFrameScheduled) {
           //没有设置requestAnimationFrameWithTimeout，将其标志isAnimationFrameScheduled置为true
-          //并调用requestAnimationFrameWithTimeout，下一帧屏幕刷新之前执行animationTick
+          //并调用requestAnimationFrameWithTimeout
           // Schedule another animation callback so we retry later.
           isAnimationFrameScheduled = true;
           requestAnimationFrameWithTimeout(animationTick);
@@ -613,9 +700,10 @@ if (typeof window !== 'undefined' && window._schedMock) {
       }
     }
 
-    //如果当前队列中最小的到期时间已经过期了，就说明应该立即执行队列中的任务
+    //如果当前帧还有空闲时间，就执行执行器，此时执行器中的didTimeout=false，表示没有过期（此处有疑问，难道能确保最小到期时间小于当前时间？）
+    //如果当前队列中最小的到期时间已经过期了，就说明应该立即执行队列中的该任务
     if (prevScheduledCallback !== null) {
-      //标记是否需要立即刷新callback执行任务
+      //标记正在执行任务执行器，该标记相当于一个锁。作用是isFlushingHostCallback参与决定是否允许postMessage
       isFlushingHostCallback = true;
       try {
         //执行任务执行器中的逻辑
@@ -635,7 +723,7 @@ if (typeof window !== 'undefined' && window._schedMock) {
 
   var animationTick = function(rafTime) {
     if (scheduledHostCallback !== null) {
-      //如果任务队列不为空，则在下一帧继续执行animationTick回调函数
+      //如果任务执行器不为空，则在下一帧继续执行animationTick回调函数
       // Eagerly schedule the next animation callback at the beginning of the
       // frame. If the scheduler queue is not empty at the end of the frame, it
       // will continue flushing inside that callback. If the queue *is* empty,
@@ -653,7 +741,7 @@ if (typeof window !== 'undefined' && window._schedMock) {
     }
 
     //经过几次屏幕刷新之后，动态计算出正确的刷新频率
-    //下一帧的时间 = 当前时间 - 当前帧的时间 + 每一帧的渲染时间
+    //  下一帧的时间 = 当前时间 - 当前帧截止时间 + 时间间隔
     //  如果浏览器刷新频率刚好是30hz，则nextFrameTime为0
     //  如果刷新频率高于30hz，
     var nextFrameTime = rafTime - frameDeadline + activeFrameTime;
@@ -679,15 +767,15 @@ if (typeof window !== 'undefined' && window._schedMock) {
     } else {
       previousFrameTime = nextFrameTime;
     }
-    //下一帧应该渲染的时间 = 当前时间 + 渲染一帧的时间
+    //当前帧截止时间 = 当前时间 + 调整后的时间间隔
     frameDeadline = rafTime + activeFrameTime;
-    if (!isMessageEventScheduled) {
+        if (!isMessageEventScheduled) {
       isMessageEventScheduled = true;//标记已经执行了postMessage
       window.postMessage(messageKey, '*');
     }
   };
 
-  //用于设置任务执行器，与到期时间
+  //用于设置任务执行器，与到期时间，该函数可以打断任务执行器的执行，重新运行新的任务执行器
   requestHostCallback = function(callback, absoluteTimeout) {
     //给scheduledHostCallback任务执行器设置相应的执行逻辑
     scheduledHostCallback = callback;
@@ -709,7 +797,7 @@ if (typeof window !== 'undefined' && window._schedMock) {
     }
   };
 
-  //清空执行器，到期时间以及是否执行了postMessage的标记
+  //清空执行器，到期时间以及是否是否安排了Message事件的标记
   cancelHostCallback = function() {
     scheduledHostCallback = null;
     isMessageEventScheduled = false;

@@ -140,7 +140,7 @@ console.log("ReactFragment1",<React.Fragment/>)
 
 function testPortal(){
     const app = document.getElementById('app');
-    const Portal = ReactDOM.createPortal(<div>"portal"</div>, app);
+    const Portal = ReactDOM.createPortal(<div onClick={() => {console.log("click")}}>"portal"</div>, app);
     console.log("Portal",Portal)
     ReactDOM.render(
         Portal,
