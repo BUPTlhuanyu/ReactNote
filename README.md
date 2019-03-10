@@ -8,6 +8,7 @@
     - [ ] react-reconciler  React调制器
     - [ ] react-dom  DOM渲染
     - [ ] events 合成事件系统
+    - [ ] 各类型组件的运行机制
 - [x] react-router4各个API的使用与源码分析
 - [ ] react-transition-group
     - [x] 基本组件：Transition组件分析，结合生命周期详细分析该组件实现动画的原理

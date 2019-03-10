@@ -6,6 +6,8 @@
  *
  * @flow
  */
+// 🙋🙋🙋🙋🙋🙋🙋🙋
+
 
 import type {Fiber} from './ReactFiber';
 
@@ -66,7 +68,6 @@ export function getStackByFiberInDevAndProd(workInProgress: Fiber): string {
 export let current: Fiber | null = null;
 export let phase: LifeCyclePhase | null = null;
 
-// 🙋
 //在开发环境下获取当前fiber._debugOwner的组件名
 export function getCurrentFiberOwnerNameInDevOrNull(): string | null {
   if (__DEV__) {
@@ -81,7 +82,7 @@ export function getCurrentFiberOwnerNameInDevOrNull(): string | null {
   return null;
 }
 
-//
+//开发环境下获取当前fiber以及其所有祖先fiber的信息
 export function getCurrentFiberStackInDev(): string {
   if (__DEV__) {
     if (current === null) {
@@ -94,6 +95,7 @@ export function getCurrentFiberStackInDev(): string {
   return '';
 }
 
+//开发环境下清空当前fiber
 export function resetCurrentFiber() {
   if (__DEV__) {
     ReactDebugCurrentFrame.getCurrentStack = null;
@@ -102,6 +104,7 @@ export function resetCurrentFiber() {
   }
 }
 
+//开发环境下设置当前fiber
 export function setCurrentFiber(fiber: Fiber) {
   if (__DEV__) {
     ReactDebugCurrentFrame.getCurrentStack = getCurrentFiberStackInDev;
@@ -110,6 +113,7 @@ export function setCurrentFiber(fiber: Fiber) {
   }
 }
 
+//开发环境下设置当前生命周期字段
 export function setCurrentPhase(lifeCyclePhase: LifeCyclePhase | null) {
   if (__DEV__) {
     phase = lifeCyclePhase;

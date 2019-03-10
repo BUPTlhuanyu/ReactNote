@@ -6,6 +6,7 @@
  *
  * @flow
  */
+// 🙋🙋🙋🙋🙋🙋🙋🙋
 
 import type {Fiber} from './ReactFiber';
 import type {FiberRoot} from './ReactFiberRoot';
@@ -18,6 +19,7 @@ let onCommitFiberRoot = null;
 let onCommitFiberUnmount = null;
 let hasLoggedError = false;
 
+//将传入的函数封装成一个具备特定waring的函数，并返回
 function catchErrors(fn) {
   return function(arg) {
     try {
