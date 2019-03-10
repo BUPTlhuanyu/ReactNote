@@ -26,6 +26,7 @@ const ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
 
 type LifeCyclePhase = 'render' | 'getChildContext';
 
+//根据传入fiber的tag属性表示的组件类型，输出fiber对应组件所在位置以及log信息在文件中的位置。
 function describeFiber(fiber: Fiber): string {
   switch (fiber.tag) {
     case IndeterminateComponent:
@@ -48,9 +49,13 @@ function describeFiber(fiber: Fiber): string {
   }
 }
 
+//传入的参数：workInProgress为当前正在处理的fiber对象
+//workInProgress.return为workInProgress对应组件的父组件对应的fiber
+//返回workInProgress以及其所有祖先fiber的信息
 export function getStackByFiberInDevAndProd(workInProgress: Fiber): string {
   let info = '';
   let node = workInProgress;
+  //从workInProgress开始向上遍历fiber树，并将每个祖先fiber的信息组合到info变量上，并返回该信息
   do {
     info += describeFiber(node);
     node = node.return;
@@ -61,6 +66,8 @@ export function getStackByFiberInDevAndProd(workInProgress: Fiber): string {
 export let current: Fiber | null = null;
 export let phase: LifeCyclePhase | null = null;
 
+// 🙋
+//在开发环境下获取当前fiber._debugOwner的组件名
 export function getCurrentFiberOwnerNameInDevOrNull(): string | null {
   if (__DEV__) {
     if (current === null) {
@@ -74,6 +81,7 @@ export function getCurrentFiberOwnerNameInDevOrNull(): string | null {
   return null;
 }
 
+//
 export function getCurrentFiberStackInDev(): string {
   if (__DEV__) {
     if (current === null) {
