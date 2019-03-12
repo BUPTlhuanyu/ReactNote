@@ -19271,6 +19271,7 @@
     }
 
     function createContainer(containerInfo, isConcurrent, hydrate) {
+        console.dir(containerInfo);
         return createFiberRoot(containerInfo, isConcurrent, hydrate);
     }
 

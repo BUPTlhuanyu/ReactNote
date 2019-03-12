@@ -99,6 +99,11 @@ export type FiberRoot = {
   ...ProfilingOnlyFiberRootProperties,
 };
 
+//传入一个container节点如：<div id="root"></div>
+//创建一个fiber节点uninitializedFiber
+//返回一个root，其中root.current = uninitializedFiber
+//uninitializedFiber.stateNode = root
+//uninitializedFiber与root具有循环引用的关系
 export function createFiberRoot(
   containerInfo: any,
   isConcurrent: boolean,

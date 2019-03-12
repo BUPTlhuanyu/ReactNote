@@ -181,6 +181,7 @@ function testLazyComponent(){
             )
         }
     }
+    console.log("React.Component.prototype",React.Component.prototype)
     ReactDOM.render(
         <div>
             <Content>

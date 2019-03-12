@@ -1573,39 +1573,49 @@ function computeUniqueAsyncExpiration(): ExpirationTime {
   return lastUniqueAsyncExpiration;
 }
 
+//一些更新策略：初始化根节点的render阶段，expirationTime = Sync
+//🙋🙋🙋
 function computeExpirationForFiber(currentTime: ExpirationTime, fiber: Fiber) {
   let expirationTime;
   if (expirationContext !== NoWork) {
     // An explicit expiration context was set;
+    //   已设置显式过期上下文
     expirationTime = expirationContext;
   } else if (isWorking) {
     if (isCommitting) {
       // Updates that occur during the commit phase should have sync priority
       // by default.
+      //   默认情况下，在提交阶段发生的更新应该具有同步优先级。
       expirationTime = Sync;
     } else {
       // Updates during the render phase should expire at the same time as
       // the work that is being rendered.
+      // render阶段的更新应与正在render的任务同时过期
       expirationTime = nextRenderExpirationTime;
     }
   } else {
     // No explicit expiration context was set, and we're not currently
     // performing work. Calculate a new expiration time.
+    //  没有设置显示过期上下文，并且没有任务在执行，则重新计算到期时间
     if (fiber.mode & ConcurrentMode) {
       if (isBatchingInteractiveUpdates) {
         // This is an interactive update
+        //  如果是交互动作的更新，则执行computeInteractiveExpiration根据当前到期时间计算交互任务的到期时间
         expirationTime = computeInteractiveExpiration(currentTime);
       } else {
         // This is an async update
+        //  如果是异步更新，则调用computeAsyncExpiration根据当前到期时间计算出对应的异步到期时间
         expirationTime = computeAsyncExpiration(currentTime);
       }
       // If we're in the middle of rendering a tree, do not update at the same
       // expiration time that is already rendering.
+      //  如果处于正在render一个树的阶段，则不要在当前同一个到期时间更新
       if (nextRoot !== null && expirationTime === nextRenderExpirationTime) {
         expirationTime -= 1;
       }
     } else {
       // This is a sync update
+      //  同步渲染
       expirationTime = Sync;
     }
   }
@@ -1613,6 +1623,7 @@ function computeExpirationForFiber(currentTime: ExpirationTime, fiber: Fiber) {
     // This is an interactive update. Keep track of the lowest pending
     // interactive expiration time. This allows us to synchronously flush
     // all interactive updates when needed.
+    // 这是一个交互式更新。跟踪最低交互过期时间。这允许我们在需要时同步刷新所有交互式更新。
     if (
       lowestPriorityPendingInteractiveExpirationTime === NoWork ||
       expirationTime < lowestPriorityPendingInteractiveExpirationTime
@@ -1901,8 +1912,13 @@ const NESTED_UPDATE_LIMIT = 50;
 let nestedUpdateCount: number = 0;
 let lastCommittedRootDuringThisBatch: FiberRoot | null = null;
 
+// now在不同的渲染环境下不同，
+// 在react-dom\src\client\ReactDOMHostConfig.js中可见now为unstable_now
 function recomputeCurrentRendererTime() {
+  // 当前时间为当前document已经存在的时长-最初执行该js模块document存在的时长
+  // 因此该当前时间表示为现在执行该函数到最初执行该js模块的时长
   const currentTimeMs = now() - originalStartTimeMs;
+  // 将ms单位的当前时间转换成到期时间
   currentRendererTime = msToExpirationTime(currentTimeMs);
 }
 
@@ -1993,36 +2009,44 @@ function onCommit(root, expirationTime) {
   root.finishedWork = null;
 }
 
+//计算到期时间，
 function requestCurrentTime() {
   // requestCurrentTime is called by the scheduler to compute an expiration
   // time.
-  //
+
   // Expiration times are computed by adding to the current time (the start
   // time). However, if two updates are scheduled within the same event, we
   // should treat their start times as simultaneous, even if the actual clock
   // time has advanced between the first and second call.
-
+  //
+  //  到期时间决定了更新是如何被分批处理的，react希望在同一个时间中所有的更新都是相同
+  //  的到期时间
   // In other words, because expiration times determine how updates are batched,
   // we want all updates of like priority that occur within the same event to
   // receive the same expiration time. Otherwise we get tearing.
-  //
+  //  react会跟踪两个时间，渲染器的时间以及调度器的时间
+  //  任何时候都可以更新渲染器的时间，其存在的原因是减少performance.now的调用次数
   // We keep track of two separate times: the current "renderer" time and the
   // current "scheduler" time. The renderer time can be updated whenever; it
   // only exists to minimize the calls performance.now.
-  //
+  //  调度器的时间只有在没有任务挂起的时候被更新
   // But the scheduler time can only be updated if there's no pending work, or
   // if we know for certain that we're not in the middle of an event.
 
   if (isRendering) {
+    //如果正在render，则返回最近获取的时间
     // We're already rendering. Return the most recently read time.
     return currentSchedulerTime;
   }
   // Check if there's pending work.
+  //  找到最高优先级root
   findHighestPriorityRoot();
   if (
     nextFlushedExpirationTime === NoWork ||
     nextFlushedExpirationTime === Never
   ) {
+    //  nextFlushedExpirationTime === NoWork表示没有任务挂起等待执行，则重新计算当前时间。
+    //  即当前到最初执行该react-dom的时长
     // If there's no pending work, or if the pending work is offscreen, we can
     // read the current time without risk of tearing.
     recomputeCurrentRendererTime();
@@ -2034,6 +2058,8 @@ function requestCurrentTime() {
   // within the same event to receive different expiration times, leading to
   // tearing. Return the last read time. During the next idle callback, the
   // time will be updated.
+  //  如果有任务被挂起等待执行，说明浏览器处于事件触发期间，所以返回上一次获取的时间
+  //  在调用idle回调函数的时候，会更新这个时间。
   return currentSchedulerTime;
 }
 
@@ -2091,17 +2117,19 @@ function addRootToSchedule(root: FiberRoot, expirationTime: ExpirationTime) {
   }
 }
 
+//获取调度队列中最高优先级的root节点，同时从双向循环调度队列中删除优先级最低也就是没有任务需要执行的节点。
 function findHighestPriorityRoot() {
   let highestPriorityWork = NoWork;
   let highestPriorityRoot = null;
   if (lastScheduledRoot !== null) {
+    //lastScheduledRoot说明存在调度队列，是需要对队列进行重新判断，重新调度的
     let previousScheduledRoot = lastScheduledRoot;
     let root = firstScheduledRoot;
     while (root !== null) {
       const remainingExpirationTime = root.expirationTime;
       if (remainingExpirationTime === NoWork) {
         // This root no longer has work. Remove it from the scheduler.
-
+        // 该root已经没有任务需要执行，因此需要将其从调度器中删除，也就是双向循环链表中删除
         // TODO: This check is redudant, but Flow is confused by the branch
         // below where we set lastScheduledRoot to null, even though we break
         // from the loop right after.
@@ -2112,46 +2140,61 @@ function findHighestPriorityRoot() {
         );
         if (root === root.nextScheduledRoot) {
           // This is the only root in the list.
+          //  如果循环双向链表只有一个节点root，则将链表以及节点清空为null
           root.nextScheduledRoot = null;
           firstScheduledRoot = lastScheduledRoot = null;
           break;
         } else if (root === firstScheduledRoot) {
           // This is the first root in the list.
+          // 将双向循环链表中删除第一个节点。
           const next = root.nextScheduledRoot;
           firstScheduledRoot = next;
           lastScheduledRoot.nextScheduledRoot = next;
           root.nextScheduledRoot = null;
         } else if (root === lastScheduledRoot) {
           // This is the last root in the list.
+          // 确保lastScheduledRoot以及lastScheduledRoot.nextScheduledRoot与之前一样
+          //  并将root.nextScheduledRoot = null
           lastScheduledRoot = previousScheduledRoot;
           lastScheduledRoot.nextScheduledRoot = firstScheduledRoot;
           root.nextScheduledRoot = null;
           break;
         } else {
+          //如果root是中间的节点，则将first到root的所有节点从链表中断开。
           previousScheduledRoot.nextScheduledRoot = root.nextScheduledRoot;
           root.nextScheduledRoot = null;
         }
+        //最后更改root为previousScheduledRoot.nextScheduledRoot，继续while循环
         root = previousScheduledRoot.nextScheduledRoot;
       } else {
+        //如果该root还存在任务需要执行
         if (remainingExpirationTime > highestPriorityWork) {
           // Update the priority, if it's higher
+          // 存在更高优先级，则更新highestPriorityWork为最高优先级对应的过期时间
+          //  更新最高优先级的root
           highestPriorityWork = remainingExpirationTime;
           highestPriorityRoot = root;
         }
         if (root === lastScheduledRoot) {
+          //如果root优先级不是最低，并且是链表最后一个节点，除了上一个if的更新之外，此处会退出循环，
           break;
         }
         if (highestPriorityWork === Sync) {
           // Sync is highest priority by definition so
           // we can stop searching.
+          //  同步是最高优先级，直接退出循环
           break;
         }
+        // 如果不是最低优先级，并且不是是链表最后一个节点，或者不是同步这种最高优先级，
+        // 则将root保存到previousScheduledRoot，
+        // 并且更新root为root的下一个节点。
         previousScheduledRoot = root;
         root = root.nextScheduledRoot;
       }
     }
   }
-
+  //将获取到的最高优先级root(一个fiber节点)以及最高优先级work（一个到期时间）
+    // 分别保存到nextFlushedRoot以及nextFlushedExpirationTime。
   nextFlushedRoot = highestPriorityRoot;
   nextFlushedExpirationTime = highestPriorityWork;
 }

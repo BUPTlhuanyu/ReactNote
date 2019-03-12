@@ -6,6 +6,7 @@
  *
  * @flow
  */
+//维护两个栈：valueStack  fiberStack
 
 import type {Fiber} from './ReactFiber';
 
@@ -22,7 +23,7 @@ let fiberStack: Array<Fiber | null>;
 if (__DEV__) {
   fiberStack = [];
 }
-
+//index用于指示栈中元素的数量
 let index = -1;
 
 function createCursor<T>(defaultValue: T): StackCursor<T> {
@@ -30,11 +31,13 @@ function createCursor<T>(defaultValue: T): StackCursor<T> {
     current: defaultValue,
   };
 }
-
+//判断栈是否为空
 function isEmpty(): boolean {
   return index === -1;
 }
-
+//将valueStack栈顶的值弹出到cursor.current
+//开发环境下如果fiberStack栈顶的fiber与需要pop出来的fiber不同，则报错。否则弹出。
+//index--
 function pop<T>(cursor: StackCursor<T>, fiber: Fiber): void {
   if (index < 0) {
     if (__DEV__) {
@@ -59,7 +62,10 @@ function pop<T>(cursor: StackCursor<T>, fiber: Fiber): void {
 
   index--;
 }
-
+//增加index
+//将cursor.current的值push到valueStack中
+//开发环境下将传入的fiber push到fiberStack
+//传入的value赋值给cursor.current
 function push<T>(cursor: StackCursor<T>, value: T, fiber: Fiber): void {
   index++;
 
@@ -72,6 +78,7 @@ function push<T>(cursor: StackCursor<T>, value: T, fiber: Fiber): void {
   cursor.current = value;
 }
 
+// 开发环境下判断stack是否是空
 function checkThatStackIsEmpty() {
   if (__DEV__) {
     if (index !== -1) {
@@ -83,6 +90,7 @@ function checkThatStackIsEmpty() {
   }
 }
 
+// 开发环境下将valueStack与fiberStack置空
 function resetStackAfterFatalErrorInDev() {
   if (__DEV__) {
     index = -1;

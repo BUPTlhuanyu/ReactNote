@@ -284,6 +284,7 @@ function FiberNode(
 //    is faster.
 // 5) It should be easy to port this to a C struct and keep a C implementation
 //    compatible.
+// 创建一个FiberNode实例
 const createFiber = function(
   tag: WorkTag,
   pendingProps: mixed,
@@ -294,11 +295,12 @@ const createFiber = function(
   return new FiberNode(tag, pendingProps, key, mode);
 };
 
+//  判断传入的组件是否是react组件
 function shouldConstruct(Component: Function) {
   const prototype = Component.prototype;
   return !!(prototype && prototype.isReactComponent);
 }
-
+//判断是否是函数组件
 export function isSimpleFunctionComponent(type: any) {
   return (
     typeof type === 'function' &&
@@ -306,7 +308,7 @@ export function isSimpleFunctionComponent(type: any) {
     type.defaultProps === undefined
   );
 }
-
+// 🙋🙋🙋
 export function resolveLazyComponentTag(Component: Function): WorkTag {
   if (typeof Component === 'function') {
     return shouldConstruct(Component) ? ClassComponent : FunctionComponent;
@@ -398,16 +400,28 @@ export function createWorkInProgress(
   return workInProgress;
 }
 
+//确定mode模式是并发模式还是严格模式或者分析模式
+//然后调用
 export function createHostRootFiber(isConcurrent: boolean): Fiber {
+  //  isConcurrent默认为false，因此mode默认为0b000
+  //  否则mode为0b001|0b010 = 3
   let mode = isConcurrent ? ConcurrentMode | StrictMode : NoContext;
 
+  // 在react-master\scripts\rollup\build.js中找到如下代码，表示构建过程中全局__PROFILE__的取值
+  // isProfiling表明处于profile状态，isProduction表示在生产环境
+  // __PROFILE__: isProfiling || !isProduction ? 'true' : 'false'
+  // __PROFILE__为true
+
+  // isDevToolsPresent表示是否存在devtool
+  // isDevToolsPresent =
+  // typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined';
   if (enableProfilerTimer && isDevToolsPresent) {
     // Always collect profile timings when DevTools are present.
     // This enables DevTools to start capturing timing at any point–
     // Without some nodes in the tree having empty base times.
     mode |= ProfileMode;
   }
-
+  //HostRoot = 3表示创建fiber树的根节点的工作模式
   return createFiber(HostRoot, null, null, mode);
 }
 

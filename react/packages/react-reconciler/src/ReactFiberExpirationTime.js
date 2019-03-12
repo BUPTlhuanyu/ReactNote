@@ -11,23 +11,26 @@ import MAX_SIGNED_31_BIT_INT from './maxSigned31BitInt';
 
 export type ExpirationTime = number;
 
-export const NoWork = 0;
-export const Never = 1;
-export const Sync = MAX_SIGNED_31_BIT_INT;
+export const NoWork = 0;// 该节点没有任务等待处理，优先级最低
+export const Never = 1;//
+export const Sync = MAX_SIGNED_31_BIT_INT;//同步模式，优先级最高，根据后面的计算可知其到期时间会很小
 
-const UNIT_SIZE = 10;
-const MAGIC_NUMBER_OFFSET = MAX_SIGNED_31_BIT_INT - 1;
+const UNIT_SIZE = 10;// 过期时间单元（ms）
+const MAGIC_NUMBER_OFFSET = MAX_SIGNED_31_BIT_INT - 1;// 到期时间偏移量
+
 
 // 1 unit of expiration time represents 10ms.
+//将传入真实的时间换算成定义单位的到期时间
+//一单位到期时间等于10ms
 export function msToExpirationTime(ms: number): ExpirationTime {
   // Always add an offset so that we don't clash with the magic number for NoWork.
   return MAGIC_NUMBER_OFFSET - ((ms / UNIT_SIZE) | 0);
 }
-
+//将到期时间换算成ms
 export function expirationTimeToMs(expirationTime: ExpirationTime): number {
   return (MAGIC_NUMBER_OFFSET - expirationTime) * UNIT_SIZE;
 }
-
+//向上取整（整数单位到期执行时间）
 function ceiling(num: number, precision: number): number {
   return (((num / precision) | 0) + 1) * precision;
 }
@@ -46,9 +49,10 @@ function computeExpirationBucket(
   );
 }
 
+//异步任务的到期时间
 export const LOW_PRIORITY_EXPIRATION = 5000;
 export const LOW_PRIORITY_BATCH_SIZE = 250;
-
+//计算异步到期时间
 export function computeAsyncExpiration(
   currentTime: ExpirationTime,
 ): ExpirationTime {
@@ -59,6 +63,7 @@ export function computeAsyncExpiration(
   );
 }
 
+//交互动作的到期时间
 // We intentionally set a higher expiration time for interactive updates in
 // dev than in production.
 //

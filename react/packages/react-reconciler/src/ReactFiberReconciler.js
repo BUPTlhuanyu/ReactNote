@@ -86,7 +86,8 @@ if (__DEV__) {
   didWarnAboutNestedUpdates = false;
   didWarnAboutFindNodeInStrictMode = {};
 }
-
+//初始化条件下返回空对象emptyContextObject
+//🙋🙋🙋
 function getContextForSubtree(
   parentComponent: ?React$Component<any, any>,
 ): Object {
@@ -107,6 +108,7 @@ function getContextForSubtree(
   return parentContext;
 }
 
+//🙋🙋🙋
 function scheduleRootUpdate(
   current: Fiber,
   element: ReactNodeList,
@@ -165,6 +167,7 @@ export function updateContainerAtExpirationTime(
   const current = container.current;
 
   if (__DEV__) {
+    //开发环境下如果存在debugTool,根据条件执行onMountContainer，onUnmountContainer，onUpdateContainer
     if (ReactFiberInstrumentation.debugTool) {
       if (current.alternate === null) {
         ReactFiberInstrumentation.debugTool.onMountContainer(container);
@@ -177,12 +180,13 @@ export function updateContainerAtExpirationTime(
   }
 
   const context = getContextForSubtree(parentComponent);
+  //初始状态下，container.context = {}
   if (container.context === null) {
     container.context = context;
   } else {
     container.pendingContext = context;
   }
-
+  //开始调度root的更新
   return scheduleRootUpdate(current, element, expirationTime, callback);
 }
 
@@ -281,8 +285,11 @@ export function updateContainer(
   parentComponent: ?React$Component<any, any>,
   callback: ?Function,
 ): ExpirationTime {
+  //  container.current为container对应的fiber对象
   const current = container.current;
+  //通过当前时间计算出一个到期时间返回并存入currentTime
   const currentTime = requestCurrentTime();
+  //为fiber计算到期时间
   const expirationTime = computeExpirationForFiber(currentTime, current);
   return updateContainerAtExpirationTime(
     element,
