@@ -9904,7 +9904,10 @@
 //    compatible.
     var createFiber = function (tag, pendingProps, key, mode) {
         // $FlowFixMe: the shapes are exact here but Flow doesn't like constructors
-        return new FiberNode(tag, pendingProps, key, mode);
+        let newFiber = new FiberNode(tag, pendingProps, key, mode);
+        console.log("newFiber",newFiber)
+        window.fiberStackTest.push(newFiber)
+        return newFiber
     };
 
     function shouldConstruct(Component) {
@@ -10250,6 +10253,7 @@
 
 
     function createFiberRoot(containerInfo, isConcurrent, hydrate) {
+        console.log("1")
         // Cyclic construction. This cheats the type system right now because
         // stateNode is any.
         var uninitializedFiber = createHostRootFiber(isConcurrent);
@@ -15520,13 +15524,13 @@
             }
         };
         updateHostContainer = function (workInProgress) {
-            var portalOrRoot = workInProgress.stateNode;
+            var portalOrRoocreateContainert = workInProgress.stateNode;
             var childrenUnchanged = workInProgress.firstEffect === null;
             if (childrenUnchanged) {
                 // No changes, just reuse the existing instance.
             } else {
                 var container = portalOrRoot.containerInfo;
-                var newChildSet = createContainerChildSet(container);
+                var newChildSet = ChildSet(container);
                 // If children might have changed, we have to add them all to the set.
                 appendAllChildrenToContainer(newChildSet, workInProgress, false, false);
                 portalOrRoot.pendingChildren = newChildSet;
@@ -19271,6 +19275,7 @@
     }
 
     function createContainer(containerInfo, isConcurrent, hydrate) {
+        window.containerInfoStack.push(containerInfo);
         console.dir(containerInfo);
         return createFiberRoot(containerInfo, isConcurrent, hydrate);
     }
@@ -19529,6 +19534,7 @@
 
     function ReactRoot(container, isConcurrent, hydrate) {
         var root = createContainer(container, isConcurrent, hydrate);
+        window.globalContainer.push(root);
         this._internalRoot = root;
     }
     ReactRoot.prototype.render = function (children, callback) {

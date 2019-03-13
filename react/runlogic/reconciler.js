@@ -1,3 +1,7 @@
+window.globalContainer = [];
+window.containerInfoStack = [];
+window.fiberStackTest = []
+
 class ProductCategoryRow extends React.Component {
     render() {
         return (<tr><th colSpan="2">{this.props.category}</th></tr>);
@@ -79,7 +83,6 @@ class SearchBar extends React.Component {
                         checked={this.props.inStockOnly}
                         onChange={this.handleInStockInputChange}
                     />
-                    {' '}
                     Only show products in stock
                 </p>
             </form>
@@ -144,3 +147,8 @@ ReactDOM.render(
     <FilterableProductTable products={PRODUCTS} />,
     document.getElementById('root')
 );
+
+
+console.log("globalContainer",window.globalContainer)
+console.log("containerInfoStack",window.containerInfoStack)
+console.log("fiberStackTest",window.fiberStackTest)
