@@ -109,6 +109,7 @@ function getContextForSubtree(
 }
 
 //🙋🙋🙋
+//调度root开始更新
 function scheduleRootUpdate(
   current: Fiber,
   element: ReactNodeList,
