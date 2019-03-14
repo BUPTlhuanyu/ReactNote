@@ -400,8 +400,9 @@ export function createWorkInProgress(
   return workInProgress;
 }
 
+//执行一次ReactDOM.render，只会创建一个fiberTree，也就是createHostRootFiber只会执行一次
 //确定mode模式是并发模式还是严格模式或者分析模式
-//然后调用
+//然后调用createFiber(HostRoot, null, null, mode)创建HostRoot对应的fiber
 export function createHostRootFiber(isConcurrent: boolean): Fiber {
   //  isConcurrent默认为false，因此mode默认为0b000
   //  否则mode为0b001|0b010 = 3

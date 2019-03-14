@@ -72,7 +72,11 @@ if (__DEV__) {
     );
   }
 
+  //对此次render进行一些检查，并显示错误，
+    // 比如不推荐body作为组件的直接容器，
+  //  判断容器是否是通过ReactDOM.unmountComponentAtNode清除组件的
   topLevelUpdateWarnings = (container: DOMContainer) => {
+    // 判断挂载在容器中的组件是否是通过ReactDOM.unmountComponentAtNode清空的，如果不是则报错
     if (container._reactRootContainer && container.nodeType !== COMMENT_NODE) {
       const hostInstance = DOMRenderer.findHostInstanceWithNoPortals(
         container._reactRootContainer._internalRoot.current,
@@ -87,11 +91,15 @@ if (__DEV__) {
         );
       }
     }
+
     const isRootRenderedBySomeReact = !!container._reactRootContainer;
     const rootEl = getReactRootElementInContainer(container);
     const hasNonRootReactChild = !!(
+      //  如果node[internalInstanceKey].tag为HostComponent或者HostText，getInstanceFromNode返回node[internalInstanceKey]
+      //  否则返回null
       rootEl && ReactDOMComponentTree.getInstanceFromNode(rootEl)
     );
+    //🙋🙋🙋
     warningWithoutStack(
       !hasNonRootReactChild || isRootRenderedBySomeReact,
       'render(...): Replacing React-rendered children with a new root ' +
@@ -99,6 +107,7 @@ if (__DEV__) {
         'you should instead have the existing children update their state ' +
         'and render the new components instead of calling ReactDOM.render.',
     );
+    //不建议将react组件直接挂载在body标签上
     warningWithoutStack(
       container.nodeType !== ELEMENT_NODE ||
         !((container: any): Element).tagName ||
@@ -327,6 +336,8 @@ ReactWork.prototype._onCommit = function(): void {
   }
 };
 
+//根据传入的container创建fiber树的root
+// 执行一次ReactDOM.render，只会创建一个fiberTree，也就是ReactRoot只会执行一次
 function ReactRoot(
   container: Container,
   isConcurrent: boolean,
@@ -440,8 +451,10 @@ function getReactRootElementInContainer(container: any) {
   }
 
   if (container.nodeType === DOCUMENT_NODE) {
+    //document.documentElement整个html的文档节点
     return container.documentElement;
   } else {
+    //返回DOM的第一个子节点
     return container.firstChild;
   }
 }
@@ -463,6 +476,7 @@ ReactGenericBatching.setBatchingImplementation(
 
 let warnedAboutHydrateAPI = false;
 
+//从container创建root
 function legacyCreateRootFromDOMContainer(
   container: DOMContainer,
   forceHydrate: boolean,
@@ -473,6 +487,8 @@ function legacyCreateRootFromDOMContainer(
   if (!shouldHydrate) {
     let warned = false;
     let rootSibling;
+    //  Node.removeChild() 方法从DOM中删除一个子节点。返回删除的节点
+    //  此处用于删除container中的所有子节点，并在开发环境下对每个子节点进行ssr的一些相关处理
     while ((rootSibling = container.lastChild)) {
       if (__DEV__) {
         if (
@@ -516,12 +532,12 @@ function legacyRenderSubtreeIntoContainer(
   callback: ?Function,
 ) {
   // TODO: Ensure all entry points contain this check
-  //
+  //  对不符合规定的container报错
   invariant(
     isValidContainer(container),
     'Target container is not a DOM element.',
   );
-
+  //对container是否是body等等进行一些检查
   if (__DEV__) {
     topLevelUpdateWarnings(container);
   }

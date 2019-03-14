@@ -9936,6 +9936,7 @@
 
 // This is used to create an alternate fiber to do work on.
     function createWorkInProgress(current, pendingProps, expirationTime) {
+        console.log("createWorkInProgress")
         var workInProgress = current.alternate;
         if (workInProgress === null) {
             // We use a double buffering pooling technique because we know that we'll
@@ -10001,7 +10002,6 @@
         return workInProgress;
     }
 
-    //一般对于SPA来说只会执行一次
     function createHostRootFiber(isConcurrent) {
         console.log("createHostRootFiber")
         var mode = isConcurrent ? ConcurrentMode | StrictMode : NoContext;
@@ -10255,7 +10255,7 @@
 
 
     function createFiberRoot(containerInfo, isConcurrent, hydrate) {
-        console.log("1")
+        console.log("createFiberRoot")
         // Cyclic construction. This cheats the type system right now because
         // stateNode is any.
         var uninitializedFiber = createHostRootFiber(isConcurrent);
@@ -19534,7 +19534,9 @@
         }
     };
 
+    //
     function ReactRoot(container, isConcurrent, hydrate) {
+        console.log("ReactRoot")
         var root = createContainer(container, isConcurrent, hydrate);
         window.globalContainer.push(root);
         this._internalRoot = root;

@@ -271,6 +271,7 @@ function findHostInstanceWithWarning(
   return findHostInstance(component);
 }
 
+// 调用createFiberRoot，根据container为fiber树创建fiberRoot
 export function createContainer(
   containerInfo: Container,
   isConcurrent: boolean,

@@ -99,82 +99,86 @@ export type FiberRoot = {
   ...ProfilingOnlyFiberRootProperties,
 };
 
+//执行一次ReactDOM.render，只会创建一个fiberTree，也就是createFiberRoot只会执行一次
 //传入一个container节点如：<div id="root"></div>
 //创建一个fiber节点uninitializedFiber
 //返回一个root，其中root.current = uninitializedFiber
 //uninitializedFiber.stateNode = root
 //uninitializedFiber与root具有循环引用的关系
 export function createFiberRoot(
-  containerInfo: any,
-  isConcurrent: boolean,
-  hydrate: boolean,
+    containerInfo: any,
+    isConcurrent: boolean,
+    hydrate: boolean,
 ): FiberRoot {
-  // Cyclic construction. This cheats the type system right now because
-  // stateNode is any.
-  const uninitializedFiber = createHostRootFiber(isConcurrent);
+    // Cyclic construction. This cheats the type system right now because
+    // stateNode is any.
+    //  创建一个为hostroot类型的未初始化的fiber
+    const uninitializedFiber = createHostRootFiber(isConcurrent);
+    //利用传入的containerInfo即container对应的DOM元素初始化根节点root
+    //  root.current ：DOM元素对应的fiber
+    //  containerInfo ： container对应的DOM元素
+    let root;
+    if (enableSchedulerTracing) {
+        root = ({
+            current: uninitializedFiber,
+            containerInfo: containerInfo,
+            pendingChildren: null,
 
-  let root;
-  if (enableSchedulerTracing) {
-    root = ({
-      current: uninitializedFiber,
-      containerInfo: containerInfo,
-      pendingChildren: null,
+            earliestPendingTime: NoWork,
+            latestPendingTime: NoWork,
+            earliestSuspendedTime: NoWork,
+            latestSuspendedTime: NoWork,
+            latestPingedTime: NoWork,
 
-      earliestPendingTime: NoWork,
-      latestPendingTime: NoWork,
-      earliestSuspendedTime: NoWork,
-      latestSuspendedTime: NoWork,
-      latestPingedTime: NoWork,
+            didError: false,
 
-      didError: false,
+            pendingCommitExpirationTime: NoWork,
+            finishedWork: null,
+            timeoutHandle: noTimeout,
+            context: null,
+            pendingContext: null,
+            hydrate,
+            nextExpirationTimeToWorkOn: NoWork,
+            expirationTime: NoWork,
+            firstBatch: null,
+            nextScheduledRoot: null,
 
-      pendingCommitExpirationTime: NoWork,
-      finishedWork: null,
-      timeoutHandle: noTimeout,
-      context: null,
-      pendingContext: null,
-      hydrate,
-      nextExpirationTimeToWorkOn: NoWork,
-      expirationTime: NoWork,
-      firstBatch: null,
-      nextScheduledRoot: null,
+            interactionThreadID: unstable_getThreadID(),
+            memoizedInteractions: new Set(),
+            pendingInteractionMap: new Map(),
+        }: FiberRoot);
+    } else {
+        root = ({
+            current: uninitializedFiber,
+            containerInfo: containerInfo,
+            pendingChildren: null,
 
-      interactionThreadID: unstable_getThreadID(),
-      memoizedInteractions: new Set(),
-      pendingInteractionMap: new Map(),
-    }: FiberRoot);
-  } else {
-    root = ({
-      current: uninitializedFiber,
-      containerInfo: containerInfo,
-      pendingChildren: null,
+            earliestPendingTime: NoWork,
+            latestPendingTime: NoWork,
+            earliestSuspendedTime: NoWork,
+            latestSuspendedTime: NoWork,
+            latestPingedTime: NoWork,
 
-      earliestPendingTime: NoWork,
-      latestPendingTime: NoWork,
-      earliestSuspendedTime: NoWork,
-      latestSuspendedTime: NoWork,
-      latestPingedTime: NoWork,
+            didError: false,
 
-      didError: false,
+            pendingCommitExpirationTime: NoWork,
+            finishedWork: null,
+            timeoutHandle: noTimeout,
+            context: null,
+            pendingContext: null,
+            hydrate,
+            nextExpirationTimeToWorkOn: NoWork,
+            expirationTime: NoWork,
+            firstBatch: null,
+            nextScheduledRoot: null,
+        }: BaseFiberRootProperties);
+    }
+    //利用创建的root初始化fiber，该fiber存储在root.current
+    uninitializedFiber.stateNode = root;
 
-      pendingCommitExpirationTime: NoWork,
-      finishedWork: null,
-      timeoutHandle: noTimeout,
-      context: null,
-      pendingContext: null,
-      hydrate,
-      nextExpirationTimeToWorkOn: NoWork,
-      expirationTime: NoWork,
-      firstBatch: null,
-      nextScheduledRoot: null,
-    }: BaseFiberRootProperties);
-  }
-
-  uninitializedFiber.stateNode = root;
-
-  // The reason for the way the Flow types are structured in this file,
-  // Is to avoid needing :any casts everywhere interaction tracing fields are used.
-  // Unfortunately that requires an :any cast for non-interaction tracing capable builds.
-  // $FlowFixMe Remove this :any cast and replace it with something better.
-  return ((root: any): FiberRoot);
+    // The reason for the way the Flow types are structured in this file,
+    // Is to avoid needing :any casts everywhere interaction tracing fields are used.
+    // Unfortunately that requires an :any cast for non-interaction tracing capable builds.
+    // $FlowFixMe Remove this :any cast and replace it with something better.
+    return ((root: any): FiberRoot);
 }

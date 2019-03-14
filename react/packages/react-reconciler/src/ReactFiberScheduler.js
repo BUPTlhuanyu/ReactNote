@@ -2495,6 +2495,8 @@ function batchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
 
 // TODO: Batching should be implemented at the renderer level, not inside
 // the reconciler.
+//isBatchingUpdates: 正在批处理更新任务
+//isUnbatchingUpdates: 正在解除批处理更新任务
 function unbatchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
   if (isBatchingUpdates && !isUnbatchingUpdates) {
     isUnbatchingUpdates = true;
