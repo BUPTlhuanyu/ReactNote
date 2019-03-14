@@ -10001,7 +10001,9 @@
         return workInProgress;
     }
 
+    //一般对于SPA来说只会执行一次
     function createHostRootFiber(isConcurrent) {
+        console.log("createHostRootFiber")
         var mode = isConcurrent ? ConcurrentMode | StrictMode : NoContext;
 
         if (enableProfilerTimer && isDevToolsPresent) {

@@ -417,6 +417,12 @@ ReactRoot.prototype.createBatch = function(): Batch {
  * @return {boolean} True if the DOM is a valid DOM node.
  * @internal
  */
+// 判断node是否是一个符合规定的DOM元素
+// 符合规定的DOM元素的几种dom：
+//    element类型
+//    document类型
+//    documentFragment类型
+//    其注释内容为' react-mount-point-unstable '的Comment类型
 function isValidContainer(node) {
   return !!(
     node &&
@@ -510,6 +516,7 @@ function legacyRenderSubtreeIntoContainer(
   callback: ?Function,
 ) {
   // TODO: Ensure all entry points contain this check
+  //
   invariant(
     isValidContainer(container),
     'Target container is not a DOM element.',
@@ -631,6 +638,9 @@ const ReactDOM: Object = {
     );
   },
 
+  //  一般react项目入口文件调用的ReactDOM.render方法的实现
+  //  传入的参数为：element为整个项目的根组件，container为react应用挂载到的包裹DOM元素，callback用于挂载之后的回调函数。
+  //  调用legacyRenderSubtreeIntoContainer
   render(
     element: React$Element<any>,
     container: DOMContainer,
