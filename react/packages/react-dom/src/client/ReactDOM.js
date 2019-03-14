@@ -524,6 +524,9 @@ function legacyCreateRootFromDOMContainer(
   return new ReactRoot(container, isConcurrent, shouldHydrate);
 }
 
+//首先创建一个container对应的root，root.current为该container对应的fiber
+//然后执行root.render即ReactRoot.prototype.render,其中会执行reconciler中的updateContainer用于更新Container
+//最后返回reconciler中的getPublicRootInstance，返回实例的root
 function legacyRenderSubtreeIntoContainer(
   parentComponent: ?React$Component<any, any>,
   children: ReactNodeList,
@@ -559,6 +562,8 @@ function legacyRenderSubtreeIntoContainer(
       };
     }
     // Initial mount should not be batched.
+    //  执行传入的函数，parentComponent为null的时候该函数会执行root.render
+    //  即ReactRoot.prototype.render，该函数调用updateContainer
     DOMRenderer.unbatchedUpdates(() => {
       if (parentComponent != null) {
         root.legacy_renderSubtreeIntoContainer(
