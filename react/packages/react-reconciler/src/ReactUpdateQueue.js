@@ -186,12 +186,13 @@ function cloneUpdateQueue<State>(
   return queue;
 }
 
+//传入一个到期时间，返回一个对象
 export function createUpdate(expirationTime: ExpirationTime): Update<*> {
   return {
-    expirationTime: expirationTime,
+    expirationTime: expirationTime,//到期时间
 
-    tag: UpdateState,
-    payload: null,
+    tag: UpdateState,//对于state的处理类型为更新state
+    payload: null,//载荷，◔ ‸◔?
     callback: null,
 
     next: null,

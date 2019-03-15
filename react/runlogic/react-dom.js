@@ -18860,7 +18860,6 @@
         // Keep working on roots until there's no more work, or until there's a higher
         // priority event.
         findHighestPriorityRoot();
-
         if (isYieldy) {
             recomputeCurrentRendererTime();
             currentSchedulerTime = currentRendererTime;
@@ -18883,7 +18882,6 @@
                 findHighestPriorityRoot();
             }
         }
-
         // We're done flushing work. Either we ran out of time in this callback,
         // or there's no more work left with sufficient priority.
 
@@ -19692,6 +19690,7 @@
                 if (parentComponent != null) {
                     root.legacy_renderSubtreeIntoContainer(parentComponent, children, callback);
                 } else {
+                    console.log("legacyRenderSubtreeIntoContainer",root)
                     root.render(children, callback);
                 }
             });
@@ -19710,6 +19709,7 @@
                 root.render(children, callback);
             }
         }
+        console.log("legacyRenderSubtreeIntoContainer",root)
         return getPublicRootInstance(root._internalRoot);
     }
 

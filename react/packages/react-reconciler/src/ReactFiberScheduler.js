@@ -574,6 +574,7 @@ function markLegacyErrorBoundaryAsFailed(instance: mixed) {
   }
 }
 
+// ◔ ‸◔?
 function flushPassiveEffects() {
   if (passiveEffectCallback !== null) {
     Schedule_cancelCallback(passiveEffectCallbackHandle);
@@ -1721,6 +1722,7 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
   }
 
   // Update the source fiber's expiration time
+  //  更新原fiber的到期时间
   if (fiber.expirationTime < expirationTime) {
     fiber.expirationTime = expirationTime;
   }
@@ -1797,6 +1799,7 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
 }
 
 function scheduleWork(fiber: Fiber, expirationTime: ExpirationTime) {
+  //  用于更新fiber的到期时间...
   const root = scheduleWorkToRoot(fiber, expirationTime);
   if (root === null) {
     if (__DEV__) {

@@ -296,6 +296,7 @@ type Work = {
   _didCommit: boolean,
 };
 
+//给实例添加属性
 function ReactWork() {
   this._callbacks = null;
   this._didCommit = false;
@@ -359,7 +360,9 @@ ReactRoot.prototype.render = function(
   if (callback !== null) {
     work.then(callback);
   }
+  //开始构建fiber树
   DOMRenderer.updateContainer(children, root, null, work._onCommit);
+  //最终返回实例work
   return work;
 };
 ReactRoot.prototype.unmount = function(callback: ?() => mixed): Work {
@@ -525,8 +528,8 @@ function legacyCreateRootFromDOMContainer(
 }
 
 //首先创建一个container对应的root，root.current为该container对应的fiber
-//然后执行root.render即ReactRoot.prototype.render,其中会执行reconciler中的updateContainer用于更新Container
-//最后返回reconciler中的getPublicRootInstance，返回实例的root
+//然后执行root.render即ReactRoot.prototype.render,该render函数会执行reconciler中的updateContainer用于更新Container
+//最后执行reconciler中的getPublicRootInstance，返回实例的root
 function legacyRenderSubtreeIntoContainer(
   parentComponent: ?React$Component<any, any>,
   children: ReactNodeList,
