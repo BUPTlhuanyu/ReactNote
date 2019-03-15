@@ -29,6 +29,7 @@ export function markPendingPriorityLevel(
   const earliestPendingTime = root.earliestPendingTime;
   if (earliestPendingTime === NoWork) {
     // No other pending updates.
+    //  没有其挂起的更新，则将传入的到期时间赋值为root.earliestPendingTime以及root.latestPendingTime
     root.earliestPendingTime = root.latestPendingTime = expirationTime;
   } else {
     if (earliestPendingTime < expirationTime) {
@@ -245,6 +246,7 @@ export function didExpireAtExpirationTime(
   }
 }
 
+//查找下一个到期时间
 function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
   const earliestSuspendedTime = root.earliestSuspendedTime;
   const latestSuspendedTime = root.latestSuspendedTime;
@@ -253,6 +255,7 @@ function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
 
   // Work on the earliest pending time. Failing that, work on the latest
   // pinged time.
+  //  earliestPendingTime不等于0则返回earliestPendingTime，否则返回latestPingedTime
   let nextExpirationTimeToWorkOn =
     earliestPendingTime !== NoWork ? earliestPendingTime : latestPingedTime;
 
