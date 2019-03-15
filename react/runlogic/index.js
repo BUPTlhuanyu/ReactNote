@@ -2,6 +2,10 @@
  * Created by lhy on 2018/12/6.
  */
 
+window.globalContainer = [];
+window.containerInfoStack = [];
+window.fiberStackTest = []
+
 // function testFragment(){
 //     let ReactFragment1 = React.cloneElement(<React.Fragment children={["child","child","child"]}/>,{xxx:"这会被添加到React.Fragment的props上"})
 //     console.log("ReactFragment1",ReactFragment1)
@@ -149,12 +153,29 @@
 // }
 // testPortal()
 
+
+
 function testLazyComponent(){
+    const goodList = [1,2,3,4]
     class Header extends React.Component{
+
+        changeData= () => {
+            console.log("changeData this",this)
+        };
         render(){
             return (
                 <div>
                     this is header
+                    <ul>
+                        {
+                            goodList.map((item, index) => {
+                                return (
+                                    <li key={index} onClick={() => { this.changeData(item) } } >
+                                    </li>
+                                );
+                            })
+                        }
+                    </ul>
                 </div>
             )
         }
@@ -184,6 +205,7 @@ function testLazyComponent(){
     console.log("React.Component.prototype",React.Component.prototype)
     ReactDOM.render(
         <div>
+            <Header/>
             <Content>
              <Header>
                  <Footer/>
