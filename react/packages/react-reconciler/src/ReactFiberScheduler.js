@@ -368,6 +368,8 @@ if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
   };
 }
 
+//用于记录render阶段Fiber树遍历过程中下一个需要执行的节点。
+//指向workInProgress
 function resetStack() {
   if (nextUnitOfWork !== null) {
     let interruptedWork = nextUnitOfWork.return;
@@ -1722,37 +1724,47 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
   }
 
   // Update the source fiber's expiration time
-  //  更新原fiber的到期时间
+  //  如果传入的expirationTime比原来fiber上的大，则更新原fiber的到期时间
+  //  expirationTime越大，优先级越高
   if (fiber.expirationTime < expirationTime) {
     fiber.expirationTime = expirationTime;
   }
+  //如上逻辑,更新fiber.alternate上的expirationTime
   let alternate = fiber.alternate;
   if (alternate !== null && alternate.expirationTime < expirationTime) {
     alternate.expirationTime = expirationTime;
   }
   // Walk the parent path to the root and update the child expiration time.
-  let node = fiber.return;
+  //
+  let node = fiber.return; //父节点fiber node
   let root = null;
   if (node === null && fiber.tag === HostRoot) {
+      // 如果传入的fiber没有父fiber并且当前fiber是hostroot，则返回的root为当前fiber.stateNode
     root = fiber.stateNode;
   } else {
+      // expirationTime为当前传入的fiber的到期时间，即发生更新的子节点的到期时间
+      // 如果传入的fiber是fiber树中的非根节点，则用子节点的到期时间更新
     while (node !== null) {
       alternate = node.alternate;
       if (node.childExpirationTime < expirationTime) {
+        // 如果子节点的到期时间比当前遍历到的父节点上的childExpirationTime大，则更新父组件中存储的childExpirationTime
         node.childExpirationTime = expirationTime;
         if (
           alternate !== null &&
           alternate.childExpirationTime < expirationTime
         ) {
+          //以同样的逻辑处理当前遍历到的父节点的副本alternate，在workinprogress世界中的副本
           alternate.childExpirationTime = expirationTime;
         }
       } else if (
         alternate !== null &&
         alternate.childExpirationTime < expirationTime
       ) {
+          //以同样的逻辑处理当前遍历到的父节点的副本alternate，在workinprogress世界中的副本
         alternate.childExpirationTime = expirationTime;
       }
       if (node.return === null && node.tag === HostRoot) {
+        //循环直到遍历到的父节点为根节点，不再有父节点了，就将当前遍历到的父节点作为root，退出循环
         root = node.stateNode;
         break;
       }
@@ -1760,6 +1772,7 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
     }
   }
 
+  //如果允许跟踪，则执行
   if (enableSchedulerTracing) {
     if (root !== null) {
       const interactions = __interactionsRef.current;
@@ -1795,6 +1808,7 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
       }
     }
   }
+  //返回hostroot对应的root
   return root;
 }
 
@@ -1817,13 +1831,17 @@ function scheduleWork(fiber: Fiber, expirationTime: ExpirationTime) {
     }
     return;
   }
-
+  //isWorking：代表是否正在工作，在开始renderRoot和commitRoot的时候会设置为 true，也就是在render和commit两个阶段都会为true
+  //nextRenderExpirationTime：下一个要渲染的任务的到期时间
+  //  expirationTime：当前更新的到期时间
   if (
     !isWorking &&
     nextRenderExpirationTime !== NoWork &&
     expirationTime > nextRenderExpirationTime
   ) {
     // This is an interruption. (Used for performance tracking.)
+    // 如果当前更新的优先级比下一个要渲染的任务的优先级高，并且下一个要渲染的任务优先级不是最低的，并且不处于render以及commit阶段
+    // 则打断之前的任务，并且执行resetStack()将被中断的任务队列清空
     interruptedBy = fiber;
     resetStack();
   }

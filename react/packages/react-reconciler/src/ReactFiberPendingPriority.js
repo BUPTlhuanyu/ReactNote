@@ -16,6 +16,7 @@ import {NoWork} from './ReactFiberExpirationTime';
 // suspended inside an offscreen subtree should be able to ping at the priority
 // of the outer render.
 
+//利用传入的expirationTime更新[earliestPendingTime,latestPendingTime]区间
 export function markPendingPriorityLevel(
   root: FiberRoot,
   expirationTime: ExpirationTime,
@@ -247,6 +248,9 @@ export function didExpireAtExpirationTime(
 }
 
 //查找下一个到期时间
+// root.nextExpirationTimeToWorkOn：
+// 决定那些更新要在当前周期中被执行
+// 通过跟每个节点的expirationTime比较决定该节点是否可以直接bailout（跳过）
 function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
   const earliestSuspendedTime = root.earliestSuspendedTime;
   const latestSuspendedTime = root.latestSuspendedTime;

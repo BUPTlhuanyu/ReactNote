@@ -422,6 +422,7 @@ function unwindWork(
   }
 }
 
+//根据被中断任务的fiber的类型，将fiber弹出对应的栈
 function unwindInterruptedWork(interruptedWork: Fiber) {
   switch (interruptedWork.tag) {
     case ClassComponent: {
