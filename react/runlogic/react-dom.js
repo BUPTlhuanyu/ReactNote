@@ -18859,6 +18859,7 @@
     function performWork(minExpirationTime, isYieldy) {
         // Keep working on roots until there's no more work, or until there's a higher
         // priority event.
+        console.log("performWork")
         findHighestPriorityRoot();
         if (isYieldy) {
             recomputeCurrentRendererTime();

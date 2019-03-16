@@ -2271,11 +2271,17 @@ function performSyncWork() {
   performWork(Sync, false);
 }
 
+//performWork通过两种方式调用:performAsyncWork异步方式,performSyncWork 同步方式
+//performWork 首先要通过findHighestPriorityRoot找到下一个需要操作的root，会设置两个全局变量
+//传入的参数isYieldy：true表示是异步的，false表示是同步的。
 function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
   // Keep working on roots until there's no more work, or until there's a higher
   // priority event.
+    //在一个页面调用多次ReactDOM.render的时候会存在多个root，这些root会被编成一个双向循环队列
+    // 获取调度队列中最高优先级的root节点，同时从双向循环调度队列中删除没有任务需要执行的节点。
   findHighestPriorityRoot();
 
+  //isYieldy为true表示异步performWork
   if (isYieldy) {
     recomputeCurrentRendererTime();
     currentSchedulerTime = currentRendererTime;
@@ -2286,17 +2292,27 @@ function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
       stopRequestCallbackTimer(didExpire, timeout);
     }
 
+    //循环停止的条件是：所有root都perform完成，或者没有空闲时间并且下一个任务没有过期。
     while (
       nextFlushedRoot !== null &&
       nextFlushedExpirationTime !== NoWork &&
       minExpirationTime <= nextFlushedExpirationTime &&
       !(didYield && currentRendererTime > nextFlushedExpirationTime)
     ) {
+      //  下一个需要执行任务的root存在，并且其过期时间不是NoWork（说明当前节点有任务需要执行）
+      //  同时下一个需要执行任务的root的到期时间（优先级）大于（高于）传入的到期时间（优先级），
+      //  另外!(didYield && currentRendererTime > nextFlushedExpirationTime)表示有空闲时间或者下一个节点的任务已经过期
+      //  上述三个条件满足则继续while循环，执行performWorkOnRoot。
+        // currentRendererTime > nextFlushedExpirationTime表示当前渲染时间大于下一个节点的任务的到期时间，说明下一个节点的任务还没有过期了
+        // didYield表示当前animation frame 是否有空闲时间，true表示有空闲时间，false表示没有空余时间
       performWorkOnRoot(
         nextFlushedRoot,
         nextFlushedExpirationTime,
-        currentRendererTime > nextFlushedExpirationTime,
+        currentRendererTime > nextFlushedExpirationTime,//为true表示还没有过期，说明是异步的。即performWorkOnRoot(root,expirationTime,isYieldy)中isYieldy为true
       );
+        //在一个页面调用多次ReactDOM.render的时候会存在多个root，这些root会被编成一个双向循环队列
+        //获取调度队列中最高优先级的root节点，同时从双向循环调度队列中删除没有任务需要执行的节点。
+      //  利用优先级最高节点的到期时间设置nextFlushedExpirationTime
       findHighestPriorityRoot();
       recomputeCurrentRendererTime();
       currentSchedulerTime = currentRendererTime;
@@ -2316,12 +2332,15 @@ function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
   // or there's no more work left with sufficient priority.
 
   // If we're inside a callback, set this to false since we just completed it.
+  //  如果在一个回调中，则将刚才完成的设置为false
   if (isYieldy) {
     callbackExpirationTime = NoWork;
     callbackID = null;
   }
   // If there's work left over, schedule a new callback.
+  //  对于没有空闲时间并且下一个任务没有过期的情况，需要重新进行一次异步调度，在下一次animation frame中执行节点的任务。
   if (nextFlushedExpirationTime !== NoWork) {
+    //scheduleCallbackWithExpirationTime为scheduler中的unstable-scheduleCallback
     scheduleCallbackWithExpirationTime(
       ((nextFlushedRoot: any): FiberRoot),
       nextFlushedExpirationTime,
@@ -2386,7 +2405,7 @@ function performWorkOnRoot(
     'performWorkOnRoot was called recursively. This error is likely caused ' +
       'by a bug in React. Please file an issue.',
   );
-
+  //处于正在渲染阶段的标记
   isRendering = true;
 
   // Check if this is async work or sync/expired work.
@@ -2395,22 +2414,28 @@ function performWorkOnRoot(
     // TODO: Non-yieldy work does not necessarily imply expired work. A renderer
     // may want to perform some work without yielding, but also without
     // requiring the root to complete (by triggering placeholders).
-
+    // 该root上的任务是同步的，不允许被中断
+    // root.finishedWork：已经完成的任务的FiberRoot对象，如果你只有一个Root，那他永远只可能是这个Root对应的Fiber，或者是null，在commit阶段只会处理这个值对应的任务
     let finishedWork = root.finishedWork;
     if (finishedWork !== null) {
       // This root is already complete. We can commit it.
+      //  如果该root上的finishedWork不是null，说明该root的任务已经完成了，可以直接commit这个root
       completeRoot(root, finishedWork, expirationTime);
     } else {
+      //如果等于null，确保root.finishedWork = null;
       root.finishedWork = null;
       // If this root previously suspended, clear its existing timeout, since
       // we're about to try rendering again.
+      //  如果这个root之前被挂起了，清除现有的timout标记，因为将会再次尝试渲染。
       const timeoutHandle = root.timeoutHandle;
       if (timeoutHandle !== noTimeout) {
         root.timeoutHandle = noTimeout;
         // $FlowFixMe Complains noTimeout is not a TimeoutID, despite the check above
         cancelTimeout(timeoutHandle);
       }
+      //再次渲染
       renderRoot(root, isYieldy);
+      //判断是否完成，如果渲染阶段该节点任务完成了，进入提交阶段
       finishedWork = root.finishedWork;
       if (finishedWork !== null) {
         // We've completed the root. Commit it.
@@ -2424,6 +2449,9 @@ function performWorkOnRoot(
       // This root is already complete. We can commit it.
       completeRoot(root, finishedWork, expirationTime);
     } else {
+      //该root为异步任务
+      //与上面if的逻辑基本一致，不同的是在任务完成之后，需要判断animation frame是否还有空闲时间，
+        // 如果还有就提交，没有就中断，并标记这个root已经完成了任务，等下一次animation frame提交。
       root.finishedWork = null;
       // If this root previously suspended, clear its existing timeout, since
       // we're about to try rendering again.
