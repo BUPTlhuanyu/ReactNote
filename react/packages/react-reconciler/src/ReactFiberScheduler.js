@@ -1943,6 +1943,8 @@ function recomputeCurrentRendererTime() {
   currentRendererTime = msToExpirationTime(currentTimeMs);
 }
 
+//异步进行root任务调度就是通过这个方法来做的，这里最主要的就是调用了scheduler的scheduleDeferredCallback方法
+// 传入的的是回调函数performAsyncWork，以及一个包含timeout超时事件的对象
 function scheduleCallbackWithExpirationTime(
   root: FiberRoot,
   expirationTime: ExpirationTime,
@@ -2235,6 +2237,10 @@ function shouldYieldToRenderer() {
   return false;
 }
 
+// performAsyncWork 异步方式
+// 异步情况给performWork设置的minExpirationTime是NoWork，并且会判断dl.didTimeout，
+// 这个值是指任务的expirationTime是否已经超时，
+// 如果超时了，则直接设置newExpirationTimeToWorkOn为当前时间，表示这个任务直接执行就行了，不需要判断是否超过了帧时间
 function performAsyncWork() {
   try {
     if (!shouldYieldToRenderer()) {
@@ -2259,6 +2265,8 @@ function performAsyncWork() {
   }
 }
 
+// performSyncWork 同步方式
+// 直接执行performWork
 function performSyncWork() {
   performWork(Sync, false);
 }
