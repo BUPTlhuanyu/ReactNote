@@ -5,7 +5,7 @@
     - [x] react   核心代码，react定义、reactElement类型对象的构建过程、ReactChildren对react树的操作原理等等
     - [x] react-is  梳理react框架中两大类型：ReactElement以及Portal类型。梳理React.memo，Ref等类型的构建成ReactElementd的过程
     - [x] scheduler 规划 React 初始化，更新等等
-    - [ ] react-reconciler  React调制器
+    - [x] react-reconciler  React调制器
     - [ ] react-dom  DOM渲染
     - [ ] events 合成事件系统
     - [ ] 各类型组件的运行机制
@@ -58,7 +58,8 @@
 - [2-3、react源码浅析(六)：调度入口函数scheduleWork](http://note.youdao.com/noteshare?id=f0b46b71cf9d0fdc2567c71e73e219cd&sub=13597B790FE74888A94E9A637F47ACA5)
 - [2-4、react源码浅析(六)：performWork调度root双向循环链表](http://note.youdao.com/noteshare?id=1ddf559cc188cd1f903801df9ea13c06&sub=C79AC4EE17354E7C8C81F54E46DD9F10)
 - [2-5、react源码浅析(六)：performWorkOnRoot调度某个root的fiber树](http://note.youdao.com/noteshare?id=82c1def09e9ab49dc1f7ab12670c077d&sub=461FD4B88C714C4F86F8503DE9236B23)
-
+- [2-6、react源码浅析(六)：渲染阶段renderRoot](http://note.youdao.com/noteshare?id=478f1a3b421050d8f1b72e3b221cca59&sub=169BA6CA7850481BBA68BC53379E26D1)
+- [2-7、react源码浅析(六)：提交阶段completeRoot](http://note.youdao.com/noteshare?id=825ff368c0ecd1d1b8526d5d6c3048b5&sub=B99E2F7CE96F4FC495F009DD212DF07C)
 
 
 ### react-router
