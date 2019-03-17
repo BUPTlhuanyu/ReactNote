@@ -65,6 +65,9 @@ class SearchBar extends React.Component {
     }
 
     handleInStockInputChange(e) {
+        // for(var i=0;i<=5000;i++){
+        //     console.log("1")
+        // }
         this.props.onInStockInput(e.target.checked);
     }
 
@@ -149,6 +152,15 @@ ReactDOM.render(
 );
 
 
-console.log("globalContainer",window.globalContainer)
-console.log("containerInfoStack",window.containerInfoStack)
-console.log("fiberStackTest",window.fiberStackTest)
+
+// console.log("globalContainer",window.globalContainer)
+// console.log("containerInfoStack",window.containerInfoStack)
+// console.log("fiberStackTest",window.fiberStackTest)
+
+
+
+
+// ReactDOM.render(
+//     <FilterableProductTable products={PRODUCTS} />,
+//     document.getElementById('root2')
+// );

@@ -249,7 +249,7 @@ export function didExpireAtExpirationTime(
 
 //查找下一个到期时间
 // root.nextExpirationTimeToWorkOn：
-// 决定那些更新要在当前周期中被执行
+// 决定哪些更新要在当前周期中被执行
 // 通过跟每个节点的expirationTime比较决定该节点是否可以直接bailout（跳过）
 function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
   const earliestSuspendedTime = root.earliestSuspendedTime;
@@ -259,12 +259,19 @@ function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
 
   // Work on the earliest pending time. Failing that, work on the latest
   // pinged time.
-  //  earliestPendingTime不等于0则返回earliestPendingTime，否则返回latestPingedTime
-  let nextExpirationTimeToWorkOn =
+  //  root.earliestPendingTime & root.lastestPendingTime用来记录当前root的子树中需要进行渲染的更新的expirationTime的区间
+  //  区间为[latestPendingTime，earliestPendingTime]，latestPendingTime值小于等于earliestPendingTime，
+    // 因此earliestPendingTime会先于latestPendingTime过期，原因是react的时间是从1073741823开始随着时间的推移而减少的
+    // 下面对nextExpirationTimeToWorkOn赋值的逻辑是：如果earliestPendingTime不等于0则返回earliestPendingTime，否则返回latestPingedTime
+    // 将nextExpirationTimeToWorkOn设置为当前root对应fiber树中更新任务的最先过期的到期时间
+    let nextExpirationTimeToWorkOn =
     earliestPendingTime !== NoWork ? earliestPendingTime : latestPingedTime;
 
   // If there is no pending or pinged work, check if there's suspended work
   // that's lower priority than what we just completed.
+  //  如果最先过期的到期时间为0说明当前fiber树没有任务需要执行，
+    // 并且如果存在被挂起的任务中最低优先级小于刚完成任务的优先级，说明所有挂起任务还不需要执行，
+    // 因此将这个最低优先级任务到期时间赋值给nextExpirationTimeToWorkOn，也就是下一次渲染用到的到期时间
   if (
     nextExpirationTimeToWorkOn === NoWork &&
     (completedExpirationTime === NoWork ||
@@ -276,6 +283,7 @@ function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
     nextExpirationTimeToWorkOn = latestSuspendedTime;
   }
 
+  //下一次渲染存在任务并且优先级小于挂起的任务的最高优先级，则将当前渲染的到期时间设置为该优先级。
   let expirationTime = nextExpirationTimeToWorkOn;
   if (expirationTime !== NoWork && earliestSuspendedTime > expirationTime) {
     // Expire using the earliest known expiration time.

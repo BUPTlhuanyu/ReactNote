@@ -18013,6 +18013,10 @@
         }
 
         var expirationTime = root.nextExpirationTimeToWorkOn;
+        console.log('\n',expirationTime,nextRenderExpirationTime,`\n${expirationTime!==nextRenderExpirationTime?"expirationTime!==nextRenderExpirationTime":"expirationTime===nextRenderExpirationTime"}`)
+        console.log('\n',root,nextRoot,`\n${root!==nextRoot?"root!==nextRoot":"root===nextRoot"}`)
+        console.log("nextUnitOfWork",nextUnitOfWork)
+        console.log('\n')
 
         // Check if we're starting from a fresh stack, or if we're resuming from
         // previously yielded work.

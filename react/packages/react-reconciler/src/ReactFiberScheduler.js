@@ -1187,6 +1187,7 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
   return next;
 }
 
+//判断是否需要调用performUnitOfWork
 function workLoop(isYieldy) {
   if (!isYieldy) {
     // Flush work without yielding
@@ -1208,10 +1209,13 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
       'by a bug in React. Please file an issue.',
   );
 
+  //处理副作用
   flushPassiveEffects();
 
   isWorking = true;
   if (enableHooks) {
+    //如果允许使用hooks，则将react提供的hook api设置到ReactCurrentOwner.currentDispatcher
+    //  ReactCurrentOwner： packages\react\src\ReactCurrentOwner.js
     ReactCurrentOwner.currentDispatcher = Dispatcher;
   } else {
     ReactCurrentOwner.currentDispatcher = DispatcherWithoutHooks;
@@ -1221,6 +1225,9 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
 
   // Check if we're starting from a fresh stack, or if we're resuming from
   // previously yielded work.
+  //  root !== nextRoot ：在只有一个root情况下fiber树有更新，nextRoot会在发生致命错误或者渲染阶段结束的时候将其设置为null。所以只要有更新都会进入到if中
+  //  expirationTime !== nextRenderExpirationTime ：初次执行reactDOM.render的时候成立，大部分都是不成立的，其他情况未知。
+  //  nextUnitOfWork === null ： 表示之前空闲时间将所有的任务够执行完了，因此nextUnitOfWork === null。如果不为null，表明之前还有没有完成的任务。
   if (
     expirationTime !== nextRenderExpirationTime ||
     root !== nextRoot ||
