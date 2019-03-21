@@ -17,7 +17,7 @@
 
 ## 📖react16.6
 
-<i>源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，打log分析react对不同组件的处理逻辑等等运行机制</i>
+###### <i>源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，打log分析react对不同组件的处理逻辑等等运行机制</i>
 
 #### 🍺D1 项目目录
 <details>
@@ -52,7 +52,7 @@
 
 #### 🍺D4 react-is
 
-<i>梳理react中的类型，两大类型的构建过程</i>
+###### <i>梳理react中的类型，两大类型的构建过程</i>
 
 <details>
 <summary>View contents</summary>
@@ -62,9 +62,9 @@
 
 #### 🍺D5 scheduler
 
-<i>scheduler调度器原理，大致基本流程已给出图示，以后再给出更详细具体的调度解析，其实知道了设计思想，往后的内容都基本没问题了。</i>
+###### <i>scheduler调度器原理，大致基本流程已给出图示，以后再给出更详细具体的调度解析，其实知道了设计思想，往后的内容都基本没问题了。</i>
 
-<i>tracing及其TracingSubscriptions实现的是一个订阅监听者设计模式，暂时不对其总结</i>
+###### <i>tracing及其TracingSubscriptions实现的是一个订阅监听者设计模式，暂时不对其总结</i>
 
 <details>
 <summary>View contents</summary>
