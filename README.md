@@ -20,7 +20,7 @@
 <details>
 <summary>View contents</summary>
 
-###### <i>源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，打log分析react对不同组件的处理逻辑等等运行机制</i>
+###### <i style="font-size: smaller">源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，打log分析react对不同组件的处理逻辑等等运行机制</i>
 
 <details>
 <summary>🍺D1 项目目录</summary>
@@ -58,12 +58,13 @@
 - [react源码浅析(四)：react-is](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D4/react%e6%ba%90%e7%a0%81%e6%b5%85%e6%9e%90(%e5%9b%9b)%ef%bc%9areact-is.md)
 </details>
 
-###### <i>scheduler调度器原理，大致基本流程已给出图示，以后再给出更详细具体的调度解析，其实知道了设计思想，往后的内容都基本没问题了。</i>
-
-###### <i>tracing及其TracingSubscriptions实现的是一个订阅监听者设计模式，暂时不对其总结</i>
 
 <details>
 <summary>🍺D5 scheduler</summary>
+
+<i>scheduler调度器原理，大致基本流程已给出图示，以后再给出更详细具体的调度解析，其实知道了设计思想，往后的内容都基本没问题了。</i>
+
+<i>tracing及其TracingSubscriptions实现的是一个订阅监听者设计模式，暂时不对其总结</i>
 
 - [react源码浅析(五)：scheduler](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D5/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%BA%94)%EF%BC%9Ascheduler.md)
 - [react源码浅析(五)：scheduler之Tracing.js](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D5/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%BA%94)%EF%BC%9Ascheduler%E4%B9%8BTracing.js.md)
@@ -72,12 +73,10 @@
 
 
 
-#### 🍺D6 react-reconciler
-
-###### <i>react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件</i>
-
 <details>
-<summary>View contents</summary>
+<summary>🍺D6 react-reconciler</summary>
+
+<i>react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件</i>
 
 - [1、react源码浅析(六)：react的fiber树与页面节点树的关系](http://note.youdao.com/noteshare?id=0f7455578064b5f29fe3078ac8250a52&sub=E75C32B93D164C029A960640C40454A2)
 - [2-1、react源码浅析(六)：创建container对应的root](http://note.youdao.com/noteshare?id=5f5fc67ba5ea237fe3c66ffa5f08d6f8&sub=38872ACF66C44A11AAA6D9303AA23523)
@@ -97,10 +96,9 @@
 <details>
 <summary>View contents</summary>
 
-#### 🍺D1
 
 <details>
-<summary>View contents</summary>
+<summary>🍺D1</summary>
 
 - [react-router4源码浅析(一) ：matchPath](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react-router/packages/react-router/blog/D1/react-router4%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%B8%80)%20%EF%BC%9AmatchPath.md)
 - [react-router4源码浅析(二) ：Route](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react-router/packages/react-router/blog/D1/react-router4%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%BA%8C)%20%EF%BC%9ARoute.md)
@@ -120,10 +118,9 @@
 <details>
 <summary>View contents</summary>
 
-#### 🍺D1
 
 <details>
-<summary>View contents</summary>
+<summary>🍺D1</summary>
 
 - [react-transition-group源码浅析(一)：Transition](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react-transition-group/blog/D1/react-transition-group%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%B8%80)%EF%BC%9ATransition.md)
 </details>
