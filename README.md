@@ -52,7 +52,7 @@
 
 #### 🍺D4 react-is
 
-*梳理react中的类型，两大类型的构建过程
+<i>梳理react中的类型，两大类型的构建过程</i>
 
 <details>
 <summary>View contents</summary>
@@ -62,9 +62,9 @@
 
 #### 🍺D5 scheduler
 
-*scheduler调度器原理，大致基本流程已给出图示，以后再给出更详细具体的调度解析，其实知道了设计思想，往后的内容都基本没问题了。
+<i>scheduler调度器原理，大致基本流程已给出图示，以后再给出更详细具体的调度解析，其实知道了设计思想，往后的内容都基本没问题了。</i>
 
-*tracing及其TracingSubscriptions实现的是一个订阅监听者设计模式，暂时不对其总结
+<i>tracing及其TracingSubscriptions实现的是一个订阅监听者设计模式，暂时不对其总结</i>
 
 <details>
 <summary>View contents</summary>
@@ -78,7 +78,7 @@
 
 #### 🍺D6 react-reconciler
 
-*react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件
+<i>react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件</i>
 
 <details>
 <summary>View contents</summary>
