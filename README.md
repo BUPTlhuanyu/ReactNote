@@ -17,8 +17,8 @@
 
 ## 📖react16.6
 
-<details>
-## <summary>View contents</summary>
+## <details>
+<summary>View contents</summary>
 
 ###### <i>源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，打log分析react对不同组件的处理逻辑等等运行机制</i>
 
