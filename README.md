@@ -78,7 +78,7 @@
 
 #### 🍺D6 react-reconciler
 
-<i>react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件</i>
+###### <i>react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件</i>
 
 <details>
 <summary>View contents</summary>
