@@ -15,18 +15,18 @@
     - [ ] TransitionGroup组件：对children中Transition或者CSSTransition组件的动画的管理
 - [ ] redux-saga：管理react副作用，尽可能使组件为纯函数
 
-## react16.6
+## 📖react16.6
 
 *源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，打log分析react对不同组件的处理逻辑等等运行机制*
 
-#### D1 项目目录
+#### 🍺D1 项目目录
 <details>
 <summary>View contents</summary>
 
 * [1、react源码浅析(一)：项目目录](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D1/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%B8%80)%EF%BC%9A%E9%A1%B9%E7%9B%AE%E7%9B%AE%E5%BD%95.md)
 </details>
 
-#### D2 shared
+#### 🍺D2 shared
 <details>
 <summary>View contents</summary>
 
@@ -34,7 +34,7 @@
 - [2、react源码浅析(二)：shared文件夹之ReactTreeTraversal](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D2/react%e6%ba%90%e7%a0%81%e6%b5%85%e6%9e%90(%e4%ba%8c)%ef%bc%9ashared%e6%96%87%e4%bb%b6%e5%a4%b9%e4%b9%8bReactTreeTraversal.md)
 </details>
 
-#### D3 react
+#### 🍺D3 react
 <details>
 <summary>View contents</summary>
 
@@ -50,7 +50,7 @@
 </details>
 
 
-#### D4 react-is
+#### 🍺D4 react-is
 
 *梳理react中的类型，两大类型的构建过程
 
@@ -60,7 +60,7 @@
 - [react源码浅析(四)：react-is](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D4/react%e6%ba%90%e7%a0%81%e6%b5%85%e6%9e%90(%e5%9b%9b)%ef%bc%9areact-is.md)
 </details>
 
-#### D5 scheduler
+#### 🍺D5 scheduler
 
 *scheduler调度器原理，大致基本流程已给出图示，以后再给出更详细具体的调度解析，其实知道了设计思想，往后的内容都基本没问题了。
 
@@ -76,7 +76,7 @@
 
 
 
-#### D6 react-reconciler
+#### 🍺D6 react-reconciler
 
 *react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件
 
@@ -95,9 +95,9 @@
 
 
 
-## react-router
+## 📖react-router
 
-#### D1
+#### 🍺D1
 
 <details>
 <summary>View contents</summary>
@@ -114,9 +114,9 @@
 </details>
 
 
-## react-transition-group
+## 📖react-transition-group
 
-#### D1
+#### 🍺D1
 
 <details>
 <summary>View contents</summary>
