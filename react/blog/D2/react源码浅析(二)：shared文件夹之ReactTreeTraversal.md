@@ -116,6 +116,8 @@ graph TD
     C --- |fn_E_| E((E))
 ```
 
+![](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D2/reactTreeTraverse.png)
+
 上述过程，当执行`traverseEnterLeave(E, B, fn, argFrom, argTo)`函数的时候，类似鼠标从节点from(即E节点)移入到节点to(即B节点)，这个时候会依次调用
 
     fn(E, 'bubbled', argFrom) --> fn(C, 'bubbled', argFrom) --> fn(B, 'captured', argTo)
