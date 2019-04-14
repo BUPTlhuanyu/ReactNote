@@ -1,5 +1,6 @@
 ### getParent ###
-在react树中获取当前实例节点的父节点实例
+在react树中获取当前实例节点的父节点实例（该父节点只能是真实DOM对应的react节点实例，不能是text或者类组件或者函数组件等等）。
+具体查看react\packages\shared\ReactWorkTags.js
 
 	//HostComponent组件对应的DOM，比如App的tag=3, 表示为类组件，其child为tag=5对应div元素。
 	function getParent(inst) {
@@ -103,7 +104,23 @@
 	}
 
 ### traverseEnterLeave ###
-当关注点从from节点移出然后移入to节点的时候,在from执行执行类似移入移出的操作,from节点
+当关注点从from节点移出然后移入to节点的时候,在from执行执行类似移入移出的操作
+
+流程图如下：
+
+```
+graph TD
+    A((A)) --- |fn_B_| B((B))
+    A --- |fn_C_| C((C))
+    C --- D((D))
+    C --- |fn_E_| E((E))
+```
+
+上述过程，当执行`traverseEnterLeave(E, B, fn, argFrom, argTo)`函数的时候，类似鼠标从节点from(即E节点)移入到节点to(即B节点)，这个时候会依次调用
+
+    fn(E, 'bubbled', argFrom) --> fn(C, 'bubbled', argFrom) --> fn(B, 'captured', argTo)
+
+这样的一个过程是从节点E冒泡到最低公共祖先节点A然后向下捕获直到节点B。过程中会依次调用fn。但是不会对最低公共祖先节点执行fn
 
 	export function traverseEnterLeave(from, to, fn, argFrom, argTo) {
 	  const common = from && to ? getLowestCommonAncestor(from, to) : null;
