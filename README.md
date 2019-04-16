@@ -5,7 +5,10 @@
     - [x] react   核心代码，react定义、reactElement类型对象的构建过程、ReactChildren对react树的操作原理等等
     - [x] react-is  梳理react框架中两大类型：ReactElement以及Portal类型。梳理React.memo，Ref等类型的构建成ReactElementd的过程
     - [x] scheduler 规划 React 初始化，更新等等
-    - [x] react-reconciler  React调制器
+    - [x] react-reconciler  React调度器
+        - [ ] 到期时间是如何确定的，调度器时间以及渲染器时间与更新动作的关系
+        - [ ] context的实现机制
+        - [ ] ...
     - [ ] react-dom  DOM渲染
     - [ ] events 合成事件系统
     - [ ] 各类型组件的运行机制
