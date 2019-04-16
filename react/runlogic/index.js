@@ -124,6 +124,25 @@ window.fiberStackTest = []
 //     );
 // }
 //
+function testCLassComponent(){
+    class Footer extends React.Component{
+        constructor(props){
+            super(props)
+        }
+        render(){
+            return (
+                <div>
+                    this is Footer {this.props.children}
+                </div>
+            )
+        }
+    }
+    ReactDOM.render(
+        <Footer />,
+        document.getElementById('app')
+    );
+}
+testCLassComponent()
 // function testMemo(){
 //     const MyComponent = React.memo(function MyComponent(props) {
 //         return (
@@ -139,7 +158,7 @@ window.fiberStackTest = []
 //         document.getElementById('app')
 //     );
 // }
-// // testMemo()
+// testMemo()
 // console.log("ReactFragment1",<React.Fragment/>)
 
 // function testPortal(){
@@ -155,65 +174,65 @@ window.fiberStackTest = []
 
 
 
-function testLazyComponent(){
-    const goodList = [1,2,3,4]
-    class Header extends React.Component{
-
-        changeData= () => {
-            console.log("changeData this",this)
-        };
-        render(){
-            return (
-                <div>
-                    this is header
-                    <ul>
-                        {
-                            goodList.map((item, index) => {
-                                return (
-                                    <li key={index} onClick={() => { this.changeData(item) } } >
-                                    </li>
-                                );
-                            })
-                        }
-                    </ul>
-                </div>
-            )
-        }
-    }
-    class Content extends React.Component{
-        render(){
-            console.log("Content props",this.props)
-            return (
-                <div>
-                    this is Content
-                </div>
-            )
-        }
-    }
-    class Footer extends React.Component{
-        constructor(props){
-            super(props)
-        }
-        render(){
-            return (
-                <div>
-                    this is Footer {this.props.children}
-                </div>
-            )
-        }
-    }
-    console.log("React.Component.prototype",React.Component.prototype)
-    ReactDOM.render(
-        <div>
-            <Header/>
-            <Content>
-             <Header>
-                 <Footer/>
-             </Header>
-            </Content>
-        </div>,
-        document.getElementById('app')
-    );
-}
-
-testLazyComponent()
+// function testLazyComponent(){
+//     const goodList = [1,2,3,4]
+//     class Header extends React.Component{
+//
+//         changeData= () => {
+//             console.log("changeData this",this)
+//         };
+//         render(){
+//             return (
+//                 <div>
+//                     this is header
+//                     <ul>
+//                         {
+//                             goodList.map((item, index) => {
+//                                 return (
+//                                     <li key={index} onClick={() => { this.changeData(item) } } >
+//                                     </li>
+//                                 );
+//                             })
+//                         }
+//                     </ul>
+//                 </div>
+//             )
+//         }
+//     }
+//     class Content extends React.Component{
+//         render(){
+//             console.log("Content props",this.props)
+//             return (
+//                 <div>
+//                     this is Content
+//                 </div>
+//             )
+//         }
+//     }
+//     class Footer extends React.Component{
+//         constructor(props){
+//             super(props)
+//         }
+//         render(){
+//             return (
+//                 <div>
+//                     this is Footer {this.props.children}
+//                 </div>
+//             )
+//         }
+//     }
+//     console.log("React.Component.prototype",React.Component.prototype)
+//     ReactDOM.render(
+//         <div>
+//             <Header/>
+//             <Content>
+//              <Header>
+//                  <Footer/>
+//              </Header>
+//             </Content>
+//         </div>,
+//         document.getElementById('app')
+//     );
+// }
+//
+// testLazyComponent()
