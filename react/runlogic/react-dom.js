@@ -8691,6 +8691,7 @@
     }
 
     function createInstance(type, props, rootContainerInstance, hostContext, internalInstanceHandle) {
+        console.log("createInstance")
         var parentNamespace = void 0;
         {
             // TODO: take namespace into account when validating.
@@ -14362,6 +14363,7 @@
         // Push context providers early to prevent context stack mismatches.
         // During mounting we don't know the child context yet as the instance doesn't exist.
         // We will invalidate the child context in finishClassComponent() right after rendering.
+        console.log("updateClassComponent",Component)
         var hasContext = void 0;
         if (isContextProvider(Component)) {
             hasContext = true;
@@ -14658,6 +14660,7 @@
     }
 
     function mountIndeterminateComponent(_current, workInProgress, Component, renderExpirationTime) {
+        console.log("mountIndeterminateComponent",Component)
         if (_current !== null) {
             // An indeterminate component only mounts if it suspended inside a non-
             // concurrent tree, in an inconsistent state. We want to treat it like

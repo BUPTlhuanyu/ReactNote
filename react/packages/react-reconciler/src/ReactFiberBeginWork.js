@@ -1515,7 +1515,9 @@ function beginWork(
   const updateExpirationTime = workInProgress.expirationTime;
 
   if (current !== null) {
+    //上一次渲染完成之后的props
     const oldProps = current.memoizedProps;
+    //新的变动带来的新的props
     const newProps = workInProgress.pendingProps;
     if (
       oldProps === newProps &&

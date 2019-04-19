@@ -125,11 +125,56 @@ window.fiberStackTest = []
 // }
 //
 function testCLassComponent(){
-    class Footer extends React.Component{
+    function TestIndeterminateComponent() {
+        return {
+            componentDidMount() {
+                console.log('invoker')
+            },
+            render() {
+                return <span>aaa</span>
+            },
+        }
+    }
+    class APP extends React.Component{
+        static getDerivedStateFromProps(){
+            console.log('APP getDerivedStateFromProps');
+            return {}
+        }
         constructor(props){
             super(props)
+            this.state = {
+
+            }
+        }
+        componentDidMount(){
+            console.log('APP componentDidMount');
         }
         render(){
+            console.log("APP render")
+            return (
+                <div>
+                    <Footer/>
+                </div>
+            )
+        }
+    }
+
+    class Footer extends React.Component{
+        static getDerivedStateFromProps(){
+            console.log('Footer getDerivedStateFromProps');
+            return {}
+        }
+        constructor(props){
+            super(props)
+            this.state = {
+
+            }
+        }
+        componentDidMount(){
+            console.log('Footer componentDidMount');
+        }
+        render(){
+            console.log("Footer render")
             return (
                 <div>
                     this is Footer {this.props.children}
@@ -138,7 +183,7 @@ function testCLassComponent(){
         }
     }
     ReactDOM.render(
-        <Footer />,
+        <APP/>,
         document.getElementById('app')
     );
 }

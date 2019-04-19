@@ -1187,7 +1187,8 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
   return next;
 }
 
-//判断是否需要调用performUnitOfWork
+//同步的情况下performUnitOfWork不允许被中断
+//异步情况下performUnitOfWork允许被高优先级的事件中断
 function workLoop(isYieldy) {
   if (!isYieldy) {
     // Flush work without yielding
@@ -1209,7 +1210,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
       'by a bug in React. Please file an issue.',
   );
 
-  //处理副作用
+  //处理副作用???
   flushPassiveEffects();
 
   isWorking = true;
@@ -1225,6 +1226,8 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
 
   // Check if we're starting from a fresh stack, or if we're resuming from
   // previously yielded work.
+  //  判断是否是开始新的一次渲染阶段，还是返回到之前被中断的工作中。任意一个条件成立表示开始新的一次渲染阶段。
+  //  nextRenderExpirationTime : 下一个渲染阶段到期时间
   //  root !== nextRoot ：在只有一个root情况下fiber树有更新，nextRoot会在发生致命错误或者渲染阶段结束的时候将其设置为null。所以只要有更新都会进入到if中
   //  expirationTime !== nextRenderExpirationTime ：初次执行reactDOM.render的时候成立，大部分都是不成立的，其他情况未知。
   //  nextUnitOfWork === null ： 表示之前空闲时间将所有的任务够执行完了，因此nextUnitOfWork === null。如果不为null，表明之前还有没有完成的任务。
