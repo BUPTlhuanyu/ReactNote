@@ -153,6 +153,7 @@ function testCLassComponent(){
             console.log("APP render")
             return (
                 <div>
+                    <Header/>
                     <Footer/>
                 </div>
             )
@@ -182,10 +183,38 @@ function testCLassComponent(){
             )
         }
     }
+    class Header extends React.Component{
+        static getDerivedStateFromProps(){
+            console.log('Header getDerivedStateFromProps');
+            return {}
+        }
+        constructor(props){
+            super(props)
+            this.state = {
+
+            }
+        }
+        componentDidMount(){
+            console.log('Header componentDidMount');
+        }
+        render(){
+            console.log("Header render")
+            return (
+                <div>
+                    this is Header {this.props.children}
+                </div>
+            )
+        }
+    }
     ReactDOM.render(
         <APP/>,
         document.getElementById('app')
     );
+    //hosttext
+    // ReactDOM.render(
+    //     "APP",
+    //     document.getElementById('app')
+    // );
 }
 testCLassComponent()
 // function testMemo(){

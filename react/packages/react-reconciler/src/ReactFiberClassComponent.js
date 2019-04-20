@@ -783,6 +783,7 @@ function mountClassInstance(
 
   let updateQueue = workInProgress.updateQueue;
   if (updateQueue !== null) {
+    //计算得到新的state
     processUpdateQueue(
       workInProgress,
       updateQueue,
@@ -795,6 +796,7 @@ function mountClassInstance(
 
   const getDerivedStateFromProps = ctor.getDerivedStateFromProps;
   if (typeof getDerivedStateFromProps === 'function') {
+    //调用getDerivedStateFromProps钩子，计算得到新的state，并保存到实例的state属性上
     applyDerivedStateFromProps(
       workInProgress,
       ctor,

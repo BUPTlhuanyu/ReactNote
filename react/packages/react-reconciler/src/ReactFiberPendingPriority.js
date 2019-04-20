@@ -247,7 +247,7 @@ export function didExpireAtExpirationTime(
   }
 }
 
-//查找下一个到期时间
+// 查找下一个到期时间
 // root.nextExpirationTimeToWorkOn：
 // 决定哪些更新要在当前周期中被执行
 // 通过跟每个节点的expirationTime比较决定该节点是否可以直接bailout（跳过）

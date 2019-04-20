@@ -447,6 +447,8 @@ function updateClassComponent(
   const instance = workInProgress.stateNode;
   let shouldUpdate;
   if (instance === null) {
+    // 在首次渲染的时候，没有对类组件实例化，
+      // 因此需要对其进行实例化，也就是调用类的构造函数
     if (current !== null) {
       // An class component without an instance only mounts if it suspended
       // inside a non- concurrent tree, in an inconsistent state. We want to
