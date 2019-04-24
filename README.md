@@ -23,7 +23,7 @@
 <details>
 <summary>View contents</summary>
 
-###### <i>源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，断点分析react对不同组件的处理逻辑等等运行机制</i>
+###### <i>源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，断点分析(console.log不是一快照的方式打印结果，对引用对象的调试会不和预期)react对不同组件的处理逻辑等等运行机制</i>
 
 <details>
 <summary>🍺D1 项目目录</summary>
