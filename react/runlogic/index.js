@@ -191,16 +191,34 @@ function testCLassComponent(){
         constructor(props){
             super(props)
             this.state = {
-
+                a : 1
             }
         }
+
+        clickHandler(){
+            this.setState({
+                a : 2
+            })
+            this.setState({
+                a : 3
+            })
+            this.setState({
+                a : 4
+            })
+            this.setState({
+                a : 5
+            })
+        }
+
         componentDidMount(){
             console.log('Header componentDidMount');
         }
         render(){
+            console.log(this.state.a)
             console.log("Header render")
             return (
-                <div>
+                <div onClick={this.clickHandler.bind(this)}>
+                    <span>{this.state.a}</span>
                     this is Header {this.props.children}
                 </div>
             )
