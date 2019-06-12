@@ -192,7 +192,7 @@ export function createUpdate(expirationTime: ExpirationTime): Update<*> {
     expirationTime: expirationTime,//到期时间
 
     tag: UpdateState,//对于state的处理类型为更新state
-    payload: null,//载荷，◔ ‸◔?
+    payload: null,//setState中新的state对象
     callback: null,
 
     next: null,
@@ -224,6 +224,7 @@ export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
     queue1 = fiber.updateQueue;
     queue2 = null;
     if (queue1 === null) {
+      //如果当前组件没有等待setState的队列则创建一个
       queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
     }
   } else {

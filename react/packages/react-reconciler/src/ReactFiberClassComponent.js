@@ -188,21 +188,28 @@ export function applyDerivedStateFromProps(
 const classComponentUpdater = {
   isMounted,
   enqueueSetState(inst, payload, callback) {
+    //获取实例对应的fiber
     const fiber = ReactInstanceMap.get(inst);
+    //scheduler计算的到期时间:react确保了在同一个时间中所有的更新都是相同的到期时间
     const currentTime = requestCurrentTime();
+    //根据fiber重新计算到期时间
     const expirationTime = computeExpirationForFiber(currentTime, fiber);
-
+    //传入一个到期时间，返回一个对象，见packages\react-reconciler\src\ReactUpdateQueue.js
     const update = createUpdate(expirationTime);
+    //利用新的state修改update.payload
     update.payload = payload;
+    //利用callback修改update.callback
     if (callback !== undefined && callback !== null) {
       if (__DEV__) {
         warnOnInvalidCallback(callback, 'setState');
       }
       update.callback = callback;
     }
-
+    //？？？存疑，调用scheduler删除当前某个任务，这里先不讨论
     flushPassiveEffects();
+    //开始调度setState带来的更新
     enqueueUpdate(fiber, update);
+    //开始调度新的当前fiber子树
     scheduleWork(fiber, expirationTime);
   },
   enqueueReplaceState(inst, payload, callback) {
