@@ -216,6 +216,7 @@ function appendUpdateToQueue<State>(
 
 export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
   // Update queues are created lazily.
+  // 使用alternate属性双向连接一个当前fiber和其work-in-progress，当前fiber实例的alternate属性指向其work-in-progress，work-in-progress的alternate属性指向当前稳定fiber。
   const alternate = fiber.alternate;
   let queue1;
   let queue2;
@@ -224,26 +225,32 @@ export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
     queue1 = fiber.updateQueue;
     queue2 = null;
     if (queue1 === null) {
-      //如果当前组件没有等待setState的队列则创建一个
+      //如果当前组件没有等待setState的队列则创建一个，
+        // 利用fiber当前已经记录并需要整合的state存储到queue1与fiber.updateQueue
       queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
     }
   } else {
     // There are two owners.
+    // 如果fiber树以及workinprogress树都存在，下面的逻辑则会同步两个树的update队列
     queue1 = fiber.updateQueue;
     queue2 = alternate.updateQueue;
+    // 当两个树的队列至少有一个不存在的时候执行队列创建或者复制操作
     if (queue1 === null) {
       if (queue2 === null) {
         // Neither fiber has an update queue. Create new ones.
+        //  两个队列都没有则根据各自的memoizedState创建update队列
         queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
         queue2 = alternate.updateQueue = createUpdateQueue(
           alternate.memoizedState,
         );
       } else {
+        // 如果有一个没有则复制另一个队列给它
         // Only one fiber has an update queue. Clone to create a new one.
         queue1 = fiber.updateQueue = cloneUpdateQueue(queue2);
       }
     } else {
       if (queue2 === null) {
+        // 如果有一个没有则复制另一个队列给它
         // Only one fiber has an update queue. Clone to create a new one.
         queue2 = alternate.updateQueue = cloneUpdateQueue(queue1);
       } else {
@@ -251,15 +258,19 @@ export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
       }
     }
   }
+
   if (queue2 === null || queue1 === queue2) {
     // There's only a single queue.
+    // 如果只有一个树，或者两棵树队列是同一个，则将传入的更新对象添加到第一个队列中
     appendUpdateToQueue(queue1, update);
   } else {
     // There are two queues. We need to append the update to both queues,
     // while accounting for the persistent structure of the list — we don't
     // want the same update to be added multiple times.
+    //  如果两个队列存在，则将更新任务加入两个队列中，并避免被添加多次
     if (queue1.lastUpdate === null || queue2.lastUpdate === null) {
       // One of the queues is not empty. We must add the update to both queues.
+      //  有一个队列不为空，将update添加到两个队列
       appendUpdateToQueue(queue1, update);
       appendUpdateToQueue(queue2, update);
     } else {
@@ -371,6 +382,7 @@ function getStateFromUpdate<State>(
     case UpdateState: {
       const payload = update.payload;
       let partialState;
+      //两种不同的setState方式：第一个参数是一个对象或者一个函数
       if (typeof payload === 'function') {
         // Updater function
         if (__DEV__) {
@@ -389,9 +401,11 @@ function getStateFromUpdate<State>(
       }
       if (partialState === null || partialState === undefined) {
         // Null and undefined are treated as no-ops.
+        // 如果合并后的state为null或者undefined则返回之前的state
         return prevState;
       }
       // Merge the partial state and the previous state.
+      // 合并state，并返回，Object.assign这里是第一层深拷贝，如果state比较复杂，就会存在深层属性浅拷贝的现象
       return Object.assign({}, prevState, partialState);
     }
     case ForceUpdate: {

@@ -196,19 +196,58 @@ function testCLassComponent(){
         }
 
         clickHandler(){
+            for(let i=0;i<10000;i++){
+                (function(){})()
+            }
             this.setState({
                 a : 2
             })
+            for(let i=0;i<10000;i++){
+                (function(){})()
+            }
             this.setState({
                 a : 3
             })
+            for(let i=0;i<10000;i++){
+                (function(){})()
+            }
             this.setState({
                 a : 4
             })
+            for(let i=0;i<10000;i++){
+                (function(){})()
+            }
             this.setState({
                 a : 5
             })
         }
+
+        // clickHandler(){
+        //     for(let i=0;i<5000;i++){
+        //         (function(){})()
+        //     }
+        //     this.setState((prevState, nextProps) => {
+        //         return {a:prevState.a + 1};
+        //     })
+        //     for(let i=0;i<5000;i++){
+        //         (function(){})()
+        //     }
+        //     this.setState((prevState, nextProps) => {
+        //         return {a:prevState.a + 1};
+        //     })
+        //     for(let i=0;i<5000;i++){
+        //         (function(){})()
+        //     }
+        //     this.setState((prevState, nextProps) => {
+        //         return {a:prevState.a + 1};
+        //     })
+        //     for(let i=0;i<5000;i++){
+        //         (function(){})()
+        //     }
+        //     this.setState((prevState, nextProps) => {
+        //         return {a:prevState.a + 1};
+        //     })
+        // }
 
         componentDidMount(){
             console.log('Header componentDidMount');

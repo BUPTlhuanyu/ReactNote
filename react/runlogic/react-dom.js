@@ -11164,6 +11164,7 @@
     }
 
     function processUpdateQueue(workInProgress, queue, props, instance, renderExpirationTime) {
+        console.log("processUpdateQueue")
         hasForceUpdate = false;
 
         queue = ensureWorkInProgressQueueIsAClone(workInProgress, queue);
@@ -11182,6 +11183,8 @@
         var resultState = newBaseState;
         while (update !== null) {
             var updateExpirationTime = update.expirationTime;
+            console.log("updateExpirationTime",updateExpirationTime)
+            console.log("renderExpirationTime",renderExpirationTime)
             if (updateExpirationTime < renderExpirationTime) {
                 // This update does not have sufficient priority. Skip it.
                 if (newFirstUpdate === null) {
