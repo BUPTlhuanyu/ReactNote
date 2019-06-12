@@ -95,7 +95,7 @@
 - [2-7-1、react源码浅析(六)：提交阶段执行getSnapshotBeforeUpdate生命周期函数](http://note.youdao.com/noteshare?id=ad1926f61ab12c474298a160cd92d4fa&sub=EFC96133F0CF4F67AE228D41B555B9F3)
 - [2-7-2、react源码浅析(六)：提交HostComponent原生HTML标签上的effect](http://note.youdao.com/noteshare?id=58e52744ed8dda929ae070b3952d688b&sub=81C6EC81F70B4EF0AC4109F3BB2A7CB7)
 - [2-7-3、react源码浅析(六)：最后提交阶段，执行剩余生命周期钩子](http://note.youdao.com/noteshare?id=1401779d0c87c389ae95e1b1c4570e72&sub=5E9DF42F619B4269ADEB473A02A8604F)
-- [2-8、react源码浅析(六)：多次执行setState的更新机制](http://note.youdao.com/noteshare?id=9883e4d7026c97098783d8db39c4fcc7&sub=B9006133C70142328B9EBDBD421EFE5D)
+- [2-8、react源码浅析(六)：多次执行setState的更新机制](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E5%85%AD)%EF%BC%9A%E5%A4%9A%E6%AC%A1%E6%89%A7%E8%A1%8CsetState%E7%9A%84%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6.md)
 </details>
 
 
