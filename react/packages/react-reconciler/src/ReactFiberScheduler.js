@@ -2052,7 +2052,7 @@ function requestCurrentTime() {
   // should treat their start times as simultaneous, even if the actual clock
   // time has advanced between the first and second call.
   //
-  //  到期时间决定了更新是如何被分批处理的，react希望在同一个时间中所有的更新都是相同
+  //  到期时间决定了更新是如何被分批处理的，react希望在同一个事件中所有的更新都是相同
   //  的到期时间
   // In other words, because expiration times determine how updates are batched,
   // we want all updates of like priority that occur within the same event to
@@ -2062,7 +2062,7 @@ function requestCurrentTime() {
   // We keep track of two separate times: the current "renderer" time and the
   // current "scheduler" time. The renderer time can be updated whenever; it
   // only exists to minimize the calls performance.now.
-  //  调度器的时间只有在没有任务挂起的时候被更新
+  //  调度器的时间只有在没有任务挂起的时候被更新或者我们确切的知道不在事件触发的过程中
   // But the scheduler time can only be updated if there's no pending work, or
   // if we know for certain that we're not in the middle of an event.
 
