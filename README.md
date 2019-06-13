@@ -9,8 +9,8 @@
         - [x] 到期时间是如何确定的
         - [ ] context的实现机制
         - [ ] ...
-    - [ ] react-dom  DOM渲染
     - [ ] events 合成事件系统
+    - [ ] react-dom  DOM渲染
     - [ ] 各类型组件的运行机制
 - [x] react-router4各个API的使用与源码分析
 - [ ] react-transition-group
