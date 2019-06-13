@@ -190,9 +190,9 @@ const classComponentUpdater = {
   enqueueSetState(inst, payload, callback) {
     //获取实例对应的fiber
     const fiber = ReactInstanceMap.get(inst);
-    //scheduler计算的到期时间:react确保了在同一个时间中所有的更新都是相同的到期时间
+    //计算的当前时间:react确保了在同一个时间中所有的更新都是相同的到期时间
     const currentTime = requestCurrentTime();
-    //根据fiber重新计算到期时间
+    //根据当前时间与fiber计算到期时间
     const expirationTime = computeExpirationForFiber(currentTime, fiber);
     //传入一个到期时间，返回一个对象，见packages\react-reconciler\src\ReactUpdateQueue.js
     const update = createUpdate(expirationTime);

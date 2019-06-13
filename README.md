@@ -6,7 +6,7 @@
     - [x] react-is  梳理react框架中两大类型：ReactElement以及Portal类型。梳理React.memo，Ref等类型的构建成ReactElementd的过程
     - [x] scheduler 规划 React 初始化，更新等等
     - [x] react-reconciler  React调度器
-        - [ ] 到期时间是如何确定的，调度器时间以及渲染器时间与更新动作的关系
+        - [x] 到期时间是如何确定的
         - [ ] context的实现机制
         - [ ] ...
     - [ ] react-dom  DOM渲染
@@ -95,7 +95,8 @@
 - [2-7-1、react源码浅析(六)：提交阶段执行getSnapshotBeforeUpdate生命周期函数](http://note.youdao.com/noteshare?id=ad1926f61ab12c474298a160cd92d4fa&sub=EFC96133F0CF4F67AE228D41B555B9F3)
 - [2-7-2、react源码浅析(六)：提交HostComponent原生HTML标签上的effect](http://note.youdao.com/noteshare?id=58e52744ed8dda929ae070b3952d688b&sub=81C6EC81F70B4EF0AC4109F3BB2A7CB7)
 - [2-7-3、react源码浅析(六)：最后提交阶段，执行剩余生命周期钩子](http://note.youdao.com/noteshare?id=1401779d0c87c389ae95e1b1c4570e72&sub=5E9DF42F619B4269ADEB473A02A8604F)
-- [2-8、react源码浅析(六)：多次执行setState的更新机制](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E5%85%AD)%EF%BC%9A%E5%A4%9A%E6%AC%A1%E6%89%A7%E8%A1%8CsetState%E7%9A%84%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6.md)
+- [2-8-1、react源码浅析(六)：多次执行setState的更新机制](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E5%85%AD)%EF%BC%9A%E5%A4%9A%E6%AC%A1%E6%89%A7%E8%A1%8CsetState%E7%9A%84%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6.md)
+- [2-8-2、react源码浅析(六)：到期时间的计算规则](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/react%e6%ba%90%e7%a0%81%e6%b5%85%e6%9e%90(%e5%85%ad)%ef%bc%9a%e5%88%b0%e6%9c%9f%e6%97%b6%e9%97%b4%e7%9a%84%e8%ae%a1%e7%ae%97%e8%a7%84%e5%88%99.md)
 </details>
 
 

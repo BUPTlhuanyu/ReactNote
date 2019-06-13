@@ -1595,6 +1595,8 @@ function computeExpirationForFiber(currentTime: ExpirationTime, fiber: Fiber) {
     //   已设置显式过期上下文
     expirationTime = expirationContext;
   } else if (isWorking) {
+    //在renderRoot与commitRoot阶段isWorking = true，结束之后都会是false
+    //  下面就判断是哪个阶段
     if (isCommitting) {
       // Updates that occur during the commit phase should have sync priority
       // by default.
@@ -1632,7 +1634,7 @@ function computeExpirationForFiber(currentTime: ExpirationTime, fiber: Fiber) {
       expirationTime = Sync;
     }
   }
-  if (isBatchingInteractiveUpdates) {
+  if (isBatchingInteractiveUpdates){
     // This is an interactive update. Keep track of the lowest pending
     // interactive expiration time. This allows us to synchronously flush
     // all interactive updates when needed.
@@ -2042,7 +2044,7 @@ function onCommit(root, expirationTime) {
   root.finishedWork = null;
 }
 
-//计算到期时间，
+//计算当前时间，
 function requestCurrentTime() {
   // requestCurrentTime is called by the scheduler to compute an expiration
   // time.
@@ -2415,7 +2417,7 @@ function performWorkOnRoot(
     'performWorkOnRoot was called recursively. This error is likely caused ' +
       'by a bug in React. Please file an issue.',
   );
-  //处于正在渲染阶段的标记
+  //处于正在渲染的标记，由渲染阶段和提交阶段构成，这期间会经历挂载或者更新或者卸载的生命周期
   isRendering = true;
 
   // Check if this is async work or sync/expired work.

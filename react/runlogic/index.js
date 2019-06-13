@@ -250,6 +250,9 @@ function testCLassComponent(){
         // }
 
         componentDidMount(){
+            this.setState({
+                a : 100
+            })
             console.log('Header componentDidMount');
         }
         render(){

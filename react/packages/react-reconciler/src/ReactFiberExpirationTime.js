@@ -7,6 +7,10 @@
  * @flow
  */
 
+// Max 31 bit integer. The max integer size in V8 for 32-bit systems.
+// Math.pow(2, 30) - 1
+// 0b111111111111111111111111111111
+// MAX_SIGNED_31_BIT_INT = 1073741823;
 import MAX_SIGNED_31_BIT_INT from './maxSigned31BitInt';
 
 export type ExpirationTime = number;
@@ -30,11 +34,11 @@ export function msToExpirationTime(ms: number): ExpirationTime {
 export function expirationTimeToMs(expirationTime: ExpirationTime): number {
   return (MAGIC_NUMBER_OFFSET - expirationTime) * UNIT_SIZE;
 }
-//向上取整（整数单位到期执行时间）
+//向上取整，间隔在precision内的两个num最终得到的相同的值
 function ceiling(num: number, precision: number): number {
   return (((num / precision) | 0) + 1) * precision;
 }
-
+//根据到期时间与单位为ms的时间之间的转换关系，定制ceiling来得到到期时间
 function computeExpirationBucket(
   currentTime,
   expirationInMs,
