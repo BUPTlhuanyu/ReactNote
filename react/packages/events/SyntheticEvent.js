@@ -78,6 +78,7 @@ function SyntheticEvent(
   this._targetInst = targetInst;
   this.nativeEvent = nativeEvent;
 
+  //文件开头定义了EventInterface对象，并给该对象自定义了一些属性
   const Interface = this.constructor.Interface;
   for (const propName in Interface) {
     if (!Interface.hasOwnProperty(propName)) {
@@ -86,11 +87,15 @@ function SyntheticEvent(
     if (__DEV__) {
       delete this[propName]; // this has a getter/setter for warnings
     }
+    // normalize为EventInterface对象上自身的属性值
     const normalize = Interface[propName];
     if (normalize) {
+      //如果这个自身属性值不是null则是一个函数，因此将原生事件作为参数传入，并返回结果给对应属性
+      //  用于设置curreTarget与相关的时间
       this[propName] = normalize(nativeEvent);
     } else {
       if (propName === 'target') {
+        //如果自身属性是'target',则将原生事件对应的DOM存储在合成事件的target属性上
         this.target = nativeEventTarget;
       } else {
         this[propName] = nativeEvent[propName];

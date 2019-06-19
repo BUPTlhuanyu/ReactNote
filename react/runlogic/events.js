@@ -18,15 +18,19 @@ function testEvents(){
 
     class Header extends React.Component{
         clickHandler(){
-            console.log("click")
+            alert("click")
         }
         render(){
             return (
                 <div>
-                    <div onClick={this.clickHandler.bind(this)}>
-                        this is Header
+                    <div onClick={this.clickHandler.bind(this)} a={1}>
+                        <div onClick={this.clickHandler.bind(this)} a={1}>
+                            <div onClick={this.clickHandler.bind(this)} a={1}>
+                                this is Header
+                            </div>
+                        </div>
                     </div>
-                    <p onClick={this.clickHandler.bind(this)}>
+                    <p onClick={this.clickHandler.bind(this)} a={1}>
                         this is Header
                     </p>
                 </div>
