@@ -111,6 +111,7 @@ if (__DEV__) {
       // Create an event handler for our fake event. We will synchronously
       // dispatch our fake event using `dispatchEvent`. Inside the handler, we
       // call the user-provided callback.
+      //  类数组对象转换成数组
       const funcArgs = Array.prototype.slice.call(arguments, 3);
       // 对传入的func包装，将didError标志位为false，表示错误没有发生，
       // 当func函数执行的时候发生错误，window.error事件触发，

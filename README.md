@@ -10,6 +10,8 @@
         - [ ] context的实现机制
         - [ ] ...
     - [x] events 合成事件系统
+    - [ ] react的错误处理机制
+        - [ ] 从invokeGuardedCallbackAndCatchFirstError，invokeGuardedCallback，invokeGuardedCallbackImpl看是如何对错误进行处理的
     - [ ] react-dom  DOM渲染
     - [ ] 各类型组件的运行机制
     - [ ] 总结

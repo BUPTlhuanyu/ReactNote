@@ -171,6 +171,7 @@ Object.assign(SyntheticEvent.prototype, {
   /**
    * `PooledClass` looks for `destructor` on each instance it releases.
    */
+  // 清除该合成事件对象上的所有属性
   destructor: function() {
     const Interface = this.constructor.Interface;
     for (const propName in Interface) {
@@ -322,14 +323,16 @@ function getPooledEvent(dispatchConfig, targetInst, nativeEvent, nativeInst) {
     nativeInst,
   );
 }
-
+//重置event上的属性值，并添加到事件对象池的空余位置
 function releasePooledEvent(event) {
   const EventConstructor = this;
   invariant(
     event instanceof EventConstructor,
     'Trying to release an event instance into a pool of a different type.',
   );
+  //重置合成事件对象实例
   event.destructor();
+  //如果对象池还有空闲位置，添加到其中
   if (EventConstructor.eventPool.length < EVENT_POOL_SIZE) {
     EventConstructor.eventPool.push(event);
   }

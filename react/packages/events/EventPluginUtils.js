@@ -65,6 +65,7 @@ if (__DEV__) {
  */
 function executeDispatch(event, listener, inst) {
   const type = event.type || 'unknown-event';
+  //获取当前fiber对应的真实DOM
   event.currentTarget = getNodeFromInstance(inst);
   invokeGuardedCallbackAndCatchFirstError(type, listener, undefined, event);
   event.currentTarget = null;

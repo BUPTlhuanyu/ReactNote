@@ -183,15 +183,19 @@ function extractEvents(
   return events;
 }
 
+//将新的合成事件对象添加到原来的对象队列中，然后进入下一个处理环节forEachAccumulated
+//可见react的每个函数的缜密，每一步都添加了对应的错误处理机制
 export function runEventsInBatch(
   events: Array<ReactSyntheticEvent> | ReactSyntheticEvent | null,
 ) {
   if (events !== null) {
+    // 将当前生成的合成事件对象或者合成事件对象数组添加到之前的合成事件对象队列中，构成新的队列
     eventQueue = accumulateInto(eventQueue, events);
   }
 
   // Set `eventQueue` to null before processing it so that we can tell if more
   // events get enqueued while processing.
+  //  将新的合成事件对象队列eventQueue作为正在处理的队列processingEventQueue，并将前者清空
   const processingEventQueue = eventQueue;
   eventQueue = null;
 
@@ -199,6 +203,7 @@ export function runEventsInBatch(
     return;
   }
 
+  //进入下一步
   forEachAccumulated(processingEventQueue, executeDispatchesAndReleaseTopLevel);
   invariant(
     !eventQueue,
