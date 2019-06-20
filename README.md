@@ -107,8 +107,8 @@
 
 ###### <i>react事件系统是一个非常值得深入分析的部分,猜想跨平台开发框架对不同平台的事件的兼容方案莫过于此吧</i>
 
-- [事件绑定](http://note.youdao.com/noteshare?id=2fb29ea5f93463f95c6502b4e9c59b55&sub=73C6FD9926AA4E159858AC6C7A43B73F)
-- [事件触发](http://note.youdao.com/noteshare?id=b0fbfb9b83a428e28ce1a6cfd38aef49&sub=B011A09FA4E0447E9565A21D67D83FAE)
+- [事件绑定](https://juejin.im/post/5d0af976e51d454fbf540a0f)
+- [事件触发](https://juejin.im/post/5d0afbd2e51d4510bf1d6690)
 </details>
 
 </details>
