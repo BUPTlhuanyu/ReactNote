@@ -18,6 +18,13 @@ function testEvents(){
 
     class Header extends React.Component{
         clickHandler(){
+            function makeError () {
+                var name = "geoff"
+                var msg = "Hi, " + Name
+                console.log(msg)
+            }
+
+            makeError()
             alert("click")
         }
         render(){

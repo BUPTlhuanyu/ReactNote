@@ -56,6 +56,7 @@ if (__DEV__) {
     typeof document !== 'undefined' &&
     typeof document.createEvent === 'function'
   ) {
+    //创建一个dom
     const fakeNode = document.createElement('react');
 
     const invokeGuardedCallbackDev = function<A, B, C, D, E, F, Context>(
@@ -186,24 +187,28 @@ if (__DEV__) {
       const evtType = `react-${name ? name : 'invokeguardedcallback'}`;
 
       // Attach our event handlers
+      //  为windows添加error事件以及事件处理函数
       window.addEventListener('error', handleWindowError);
+      //为fakeNode添加一个自定义的事件以及事件处理函数
       fakeNode.addEventListener(evtType, callCallback, false);
 
       // Synchronously dispatch our fake event. If the user-provided function
       // errors, it will trigger our global error handler.
         // 初始化一个evtType事件，不可以冒泡，无法被取消
       evt.initEvent(evtType, false, false);
-      //触发evtType事件，调用callCallback，执行传入的func函数
+        //手动触发fakeNode上的自定义事件evtType，调用callCallback
       fakeNode.dispatchEvent(evt);
 
+      //恢复windows.event的属性描述器
       if (windowEventDescriptor) {
         Object.defineProperty(window, 'event', windowEventDescriptor);
       }
 
+      //开始对函数func产生的错误进行报错
       if (didError) {
         //回调函数func执行了，并且发生了错误
         if (!didSetError) {
-          // 回调函数func执行了，并且发生了错误，但是error事件没有触发，handleWindowError没有执行
+          // 回调函数func执行了，并且发生了错误，但是并没有被window上的error捕获，即window.error事件没有触发，handleWindowError没有执行
           error = new Error(
             'An error was thrown inside one of your components, but React ' +
               "doesn't know what it was. This is likely due to browser " +

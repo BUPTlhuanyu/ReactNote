@@ -10,8 +10,9 @@
         - [ ] context的实现机制
         - [ ] ...
     - [x] events 合成事件系统
-    - [ ] react的错误处理机制
-        - [ ] 从invokeGuardedCallbackAndCatchFirstError，invokeGuardedCallback，invokeGuardedCallbackImpl看是如何对错误进行处理的
+    - [x] react的错误处理机制
+        - [x] 从invokeGuardedCallbackAndCatchFirstError，invokeGuardedCallback，invokeGuardedCallbackImpl看是如何对错误进行处理的
+        - [ ] ...
     - [ ] react-dom  DOM渲染
     - [ ] 各类型组件的运行机制
     - [ ] 总结
@@ -110,6 +111,13 @@
 - [事件绑定](https://juejin.im/post/5d0af976e51d454fbf540a0f)
 - [事件触发](https://juejin.im/post/5d0afbd2e51d4510bf1d6690)
 </details>
+
+<details>
+<summary>🍺D8 错误处理机制</summary>
+
+- [react中的错误处理](https://juejin.im/post/5d0c8f34e51d45590a445b4c)
+</details>
+
 
 </details>
 
