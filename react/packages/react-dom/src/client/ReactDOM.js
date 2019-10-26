@@ -448,6 +448,10 @@ function isValidContainer(node) {
   );
 }
 
+/**
+ * 如果传入的container是document则返回document.documentElement
+ * 否则返回container的第一个子节点
+ */
 function getReactRootElementInContainer(container: any) {
   if (!container) {
     return null;
@@ -462,6 +466,9 @@ function getReactRootElementInContainer(container: any) {
   }
 }
 
+/**
+ * 获取应用的rootElement并通过该对象上的 Attribute 以及 nodetype来判断是否是服务端渲染
+ */
 function shouldHydrateDueToLegacyHeuristic(container) {
   const rootElement = getReactRootElementInContainer(container);
   return !!(
@@ -651,6 +658,7 @@ const ReactDOM: Object = {
     return DOMRenderer.findHostInstance(componentOrElement);
   },
 
+  // 服务端渲染的时候会用到，第四个参数为true会复用DOM
   hydrate(element: React$Node, container: DOMContainer, callback: ?Function) {
     // TODO: throw or warn if we couldn't hydrate?
     return legacyRenderSubtreeIntoContainer(
