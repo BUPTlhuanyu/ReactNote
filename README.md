@@ -87,6 +87,7 @@
 
 - [1、react源码浅析(六)：react的fiber树与页面节点树的关系](http://note.youdao.com/noteshare?id=0f7455578064b5f29fe3078ac8250a52&sub=E75C32B93D164C029A960640C40454A2)
 - [ReactDOM.render小结.png](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/ReactDOM.render%e5%b0%8f%e7%bb%93.png)
+- [2-0、ReactDOM.render流程概览](http://note.youdao.com/noteshare?id=5e12da11b23563c692013814b0054267&sub=F7BD738C7A944112855BD0F9B1AF5BD0)
 - [2-1、react源码浅析(六)：创建container对应的root](http://note.youdao.com/noteshare?id=5f5fc67ba5ea237fe3c66ffa5f08d6f8&sub=38872ACF66C44A11AAA6D9303AA23523)
 - [2-2、react源码浅析(六)：创建root下的fiber树并开始初始调度](http://note.youdao.com/noteshare?id=9e044ed4ed7575202c88b3cfc219fd78&sub=4F5BBFC31A9A417BB16AD3A905941346)
 - [2-3、react源码浅析(六)：调度入口函数scheduleWork](http://note.youdao.com/noteshare?id=f0b46b71cf9d0fdc2567c71e73e219cd&sub=13597B790FE74888A94E9A637F47ACA5)
