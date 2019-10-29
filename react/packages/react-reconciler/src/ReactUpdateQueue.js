@@ -192,7 +192,7 @@ export function createUpdate(expirationTime: ExpirationTime): Update<*> {
     expirationTime: expirationTime,//到期时间
 
     tag: UpdateState,//对于state的处理类型为更新state
-    payload: null,//setState中新的state对象
+    payload: null,//setState中新的state对象或者初始化时候的container下第一个节点fiber
     callback: null,
 
     next: null,
