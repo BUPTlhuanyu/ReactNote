@@ -214,6 +214,10 @@ function appendUpdateToQueue<State>(
   }
 }
 
+/**
+ * fiber: 发生更新的fiber对象
+ * update： 当前fiber对应的更新器
+ */
 export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
   // Update queues are created lazily.
   // 使用alternate属性双向连接一个当前fiber和其work-in-progress，当前fiber实例的alternate属性指向其work-in-progress，work-in-progress的alternate属性指向当前稳定fiber。
@@ -221,10 +225,12 @@ export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
   let queue1;
   let queue2;
   if (alternate === null) {
+    // 初次渲染的时候alternate === null
     // There's only one fiber.
     queue1 = fiber.updateQueue;
     queue2 = null;
     if (queue1 === null) {
+      // 当前fiber上没有更新队列，则创建更新队列
       //如果当前组件没有等待setState的队列则创建一个，
         // 利用fiber当前已经记录并需要整合的state存储到queue1与fiber.updateQueue
       queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
