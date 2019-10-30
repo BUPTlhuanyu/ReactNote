@@ -1896,6 +1896,7 @@ function deferredUpdates<A>(fn: () => A): A {
   }
 }
 
+// 这里的fn通常是setState函数，syncUpdates会将expirationContext设置为sync，然后调用setState
 function syncUpdates<A, B, C0, D, R>(
   fn: (A, B, C0, D) => R,
   a: A,
