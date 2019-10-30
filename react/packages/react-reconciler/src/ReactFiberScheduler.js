@@ -2070,6 +2070,8 @@ function requestCurrentTime() {
 
   if (isRendering) {
     //如果正在render，则返回最近获取的时间
+    //如果在render那么这个时候来的更新时间是最近获取的时间，这个时间已经到期了，因此会在当前render阶段执行，不会等到下轮更新执行？
+    // 简单的说就是在当前render过程中产生的更新会在当前render阶段被执行
     // We're already rendering. Return the most recently read time.
     return currentSchedulerTime;
   }
