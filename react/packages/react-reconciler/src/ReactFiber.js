@@ -212,6 +212,7 @@ if (__DEV__) {
   debugCounter = 1;
 }
 
+// 深度优先遍历结构
 function FiberNode(
   tag: WorkTag,
   pendingProps: mixed,
@@ -226,9 +227,9 @@ function FiberNode(
   this.stateNode = null;
 
   // Fiber
-  this.return = null;
-  this.child = null;
-  this.sibling = null;
+  this.return = null; // 父级fiber
+  this.child = null; //  第一个子级fiber
+  this.sibling = null; // 第一个兄弟fiber
   this.index = 0;
 
   this.ref = null;
@@ -251,7 +252,7 @@ function FiberNode(
   this.expirationTime = NoWork;
   this.childExpirationTime = NoWork;
 
-  this.alternate = null;
+  this.alternate = null; // 指向work-in-progress，双缓冲队列
 
   if (enableProfilerTimer) {
     this.actualDuration = 0;

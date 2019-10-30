@@ -151,15 +151,15 @@ if (__DEV__) {
 
 export function createUpdateQueue<State>(baseState: State): UpdateQueue<State> {
   const queue: UpdateQueue<State> = {
-    baseState,
-    firstUpdate: null,
-    lastUpdate: null,
-    firstCapturedUpdate: null,
-    lastCapturedUpdate: null,
-    firstEffect: null,
-    lastEffect: null,
-    firstCapturedEffect: null,
-    lastCapturedEffect: null,
+    baseState, // 之前的state
+    firstUpdate: null, // 指向第一个更新器
+    lastUpdate: null, // 指向最后一个更新器
+    firstCapturedUpdate: null, // 发生错误的时候捕获的第一个更新器
+    lastCapturedUpdate: null, // 发生错误的时候捕获的最后一个更新器
+    firstEffect: null,// 指向第一个副作用
+    lastEffect: null,//指向最后一个副作用
+    firstCapturedEffect: null,// 发生错误的时候捕获的第一个副作用
+    lastCapturedEffect: null,// 发生错误的时候捕获的最后一个副作用
   };
   return queue;
 }
@@ -193,10 +193,10 @@ export function createUpdate(expirationTime: ExpirationTime): Update<*> {
 
     tag: UpdateState,//对于state的处理类型为更新state
     payload: null,//setState中新的state对象或者初始化时候的container下第一个节点fiber
-    callback: null,
+    callback: null, // 更新之后的回调函数
 
-    next: null,
-    nextEffect: null,
+    next: null, // 指向下一个update
+    nextEffect: null, // 下一个副作用
   };
 }
 
