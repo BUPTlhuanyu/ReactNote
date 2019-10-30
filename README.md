@@ -86,7 +86,6 @@
 ###### <i>react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件</i>
 
 - [1、react源码浅析(六)：react的fiber树与页面节点树的关系](http://note.youdao.com/noteshare?id=0f7455578064b5f29fe3078ac8250a52&sub=E75C32B93D164C029A960640C40454A2)
-- [ReactDOM.render小结.png](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/ReactDOM.render%e5%b0%8f%e7%bb%93.png)
 - [2-0、ReactDOM.render流程概览](http://note.youdao.com/noteshare?id=5e12da11b23563c692013814b0054267&sub=F7BD738C7A944112855BD0F9B1AF5BD0)
 - [2-1、react源码浅析(六)：创建container对应的root](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/2-1%e3%80%81%e5%88%9b%e5%bb%bacontainer%e5%af%b9%e5%ba%94%e7%9a%84root.md)
 - [2-2、react源码浅析(六)：创建root下的fiber树并开始初始调度](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/2-2%e3%80%81%e5%88%9b%e5%bb%baroot%e4%b8%8b%e7%9a%84fiber%e6%a0%91%e5%b9%b6%e5%bc%80%e5%a7%8b%e5%88%9d%e5%a7%8b%e8%b0%83%e5%ba%a6.md)
