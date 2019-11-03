@@ -1725,6 +1725,11 @@ function retrySuspendedRoot(
   }
 }
 
+/**
+ * 将发生的更新事件的到期时间更新到整个fiber树上，返回FiberRoot
+ * @param {*} fiber 发生更新的当前fiber节点 ：具体？
+ * @param {*} expirationTime 发生更新的到期时间
+ */
 function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
   recordScheduleUpdate();
 
@@ -1752,34 +1757,37 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
   let root = null;
   if (node === null && fiber.tag === HostRoot) {
       // 如果传入的fiber没有父fiber并且当前fiber是hostroot，则返回的root为当前fiber.stateNode
+      // 也就是当前的fiber为rootFiber，而在调用reactDOM.render的时候rootFiber.stateNode保存的就是fiberRoot。
     root = fiber.stateNode;
   } else {
       // expirationTime为当前传入的fiber的到期时间，即发生更新的子节点的到期时间
       // 如果传入的fiber是fiber树中的非根节点，则用子节点的到期时间更新
+      // 这里需要注意： 到期时间大的优先级会更高，fiber.childExpirationTime存储的是整个root树中优先级最高的更新事件对应的到期时间
     while (node !== null) {
       alternate = node.alternate;
       if (node.childExpirationTime < expirationTime) {
-        // 如果子节点的到期时间比当前遍历到的父节点上的childExpirationTime大，则更新父组件中存储的childExpirationTime
+        // 如果当前发生的更新事件优先级高于整个root树中最高优先级的更新，那么将遍历到的fiber.childExpirationTime更新为当前更新的到期时间
         node.childExpirationTime = expirationTime;
         if (
           alternate !== null &&
           alternate.childExpirationTime < expirationTime
         ) {
-          //以同样的逻辑处理当前遍历到的父节点的副本alternate，在workinprogress世界中的副本
+          //以同样的逻辑处理当前遍的节点的副本alternate，在workinprogress世界中的副本
           alternate.childExpirationTime = expirationTime;
         }
       } else if (
         alternate !== null &&
         alternate.childExpirationTime < expirationTime
       ) {
-          //以同样的逻辑处理当前遍历到的父节点的副本alternate，在workinprogress世界中的副本
+          //保存着当前状态的fiber树的节点的更新时间不需要更新，但是workinprogress-fiber需要更新最高优先级更新事件的到期时间
         alternate.childExpirationTime = expirationTime;
       }
       if (node.return === null && node.tag === HostRoot) {
-        //循环直到遍历到的父节点为根节点，不再有父节点了，就将当前遍历到的父节点作为root，退出循环
+        //循环直到遍历到的父节点为根节点，不再有父节点了，就将当前遍历到的节点的fiberRoor作为root，并退出循环
         root = node.stateNode;
         break;
       }
+      // 向上遍历父fiber
       node = node.return;
     }
   }
