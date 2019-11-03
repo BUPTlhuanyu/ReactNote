@@ -97,7 +97,7 @@ PS： 真心给react粉丝们一个非常好的订阅号，react status，这个
 ###### <i>react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件</i>
 
 - [1、react源码浅析(六)：react的fiber树与页面节点树的关系](http://note.youdao.com/noteshare?id=f7dd4b24a921544728a001b9b02b3b38)
-- [2-0、react源码浅析(六)：ReactDOM.render流程概览](http://note.youdao.com/noteshare?id=5e12da11b23563c692013814b0054267&sub=F7BD738C7A944112855BD0F9B1AF5BD0)
+- [2-0、react源码浅析(六)：ReactDOM.render流程概览](http://note.youdao.com/noteshare?id=eb7d384912d170e1af6716c2df47a24a)
 - [2-1、react源码浅析(六)：创建container对应的root](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/2-1%e3%80%81%e5%88%9b%e5%bb%bacontainer%e5%af%b9%e5%ba%94%e7%9a%84root.md)
 - [2-2、react源码浅析(六)：创建root下的fiber树并开始初始调度](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/2-2%e3%80%81%e5%88%9b%e5%bb%baroot%e4%b8%8b%e7%9a%84fiber%e6%a0%91%e5%b9%b6%e5%bc%80%e5%a7%8b%e5%88%9d%e5%a7%8b%e8%b0%83%e5%ba%a6.md)
 - [3-3、react源码浅析(六)：调度入口函数scheduleWork](http://note.youdao.com/noteshare?id=f0b46b71cf9d0fdc2567c71e73e219cd&sub=13597B790FE74888A94E9A637F47ACA5)
