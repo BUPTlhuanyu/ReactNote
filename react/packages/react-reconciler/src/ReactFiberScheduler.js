@@ -1860,11 +1860,14 @@ function scheduleWork(fiber: Fiber, expirationTime: ExpirationTime) {
     expirationTime > nextRenderExpirationTime
   ) {
     // This is an interruption. (Used for performance tracking.)
-    // 如果当前更新的优先级比下一个要渲染的任务的优先级高，并且下一个要渲染的任务优先级不是最低的，并且不处于render以及commit阶段
+    // 如果当前更新的优先级比下一个要渲染的任务的优先级高，并且之前执行过任务(下一个要渲染的任务优先级不是0)，并且不处于render以及commit阶段（当前没有任务正在执行）
     // 则打断之前的任务，并且执行resetStack()将被中断的任务队列清空
+    // 每一次更新都会有一个任务队列，当一个时间片有时间的时候才会执行，否则交给浏览器渲染页面
+    // 在这个任务队列中，如果优先级更高的更新发生了，那么这个更新任务会打断当前的任务队列的执行，所以会调用resetStack清空这个任务队列
     interruptedBy = fiber;
     resetStack();
   }
+  // 利用expirationTime来更新fiberRoot上记录的所有子节点更新任务到期时间的区间[earliestPendingTime,latestPendingTime]
   markPendingPriorityLevel(root, expirationTime);
   if (
     // If we're in the render phase, we don't need to schedule this root

@@ -16,7 +16,8 @@ import {NoWork} from './ReactFiberExpirationTime';
 // suspended inside an offscreen subtree should be able to ping at the priority
 // of the outer render.
 
-//利用传入的expirationTime更新[earliestPendingTime,latestPendingTime]区间
+// 利用传入的expirationTime更新[earliestPendingTime,latestPendingTime]区间
+// 这个区间是root树上的更新的到期时间的区间
 export function markPendingPriorityLevel(
   root: FiberRoot,
   expirationTime: ExpirationTime,
