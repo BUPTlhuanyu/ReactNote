@@ -35,9 +35,6 @@ PS： 真心给react粉丝们一个非常好的订阅号，react status，这个
 
 ## 📖react16.6
 
-<details>
-<summary>View contents</summary>
-
 ###### <i>源码实例分析：可见[runlogic文件夹](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/runlogic/index.js)下的代码，断点分析(console.log不是一快照的方式打印结果，对引用对象的调试会不和预期)react对不同组件的处理逻辑等等运行机制</i>
 
 <details>
@@ -131,12 +128,7 @@ PS： 真心给react粉丝们一个非常好的订阅号，react status，这个
 </details>
 
 
-</details>
-
 ## 📖react-router
-
-<details>
-<summary>View contents</summary>
 
 
 <details>
@@ -153,20 +145,12 @@ PS： 真心给react粉丝们一个非常好的订阅号，react status，这个
 - [react-router4源码浅析(九) ：Link](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react-router/packages/react-router/blog/D1/react-router4%E6%BA%90%E7%A0%81(%E4%B9%9D)%20%EF%BC%9ALink.md)
 </details>
 
-</details>
-
 ## 📖react-transition-group
-
-<details>
-<summary>View contents</summary>
-
 
 <details>
 <summary>🍺D1</summary>
 
 - [react-transition-group源码浅析(一)：Transition](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react-transition-group/blog/D1/react-transition-group%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%B8%80)%EF%BC%9ATransition.md)
-</details>
-
 </details>
 
 ## 📖表单
