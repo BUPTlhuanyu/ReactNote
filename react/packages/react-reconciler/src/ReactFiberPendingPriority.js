@@ -237,6 +237,10 @@ export function findEarliestOutstandingPriorityLevel(
   return earliestExpirationTime;
 }
 
+/**
+ * 将当前时间与root上的到期时间进行对比，如果root上的到期时间比当前时间大，说明这个root上的更新任务过期了，需要立即执行
+ * 然后将当前时间设置为root上的nextExpirationTimeToWorkOn，该时间决定哪些节点的更新要在当前周期中被执行
+ */
 export function didExpireAtExpirationTime(
   root: FiberRoot,
   currentTime: ExpirationTime,

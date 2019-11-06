@@ -2251,7 +2251,9 @@ function findHighestPriorityRoot() {
 // TODO: This wrapper exists because many of the older tests (the ones that use
 // flushDeferredPri) rely on the number of times `shouldYield` is called. We
 // should get rid of it.
+// didYield表示当前animation frame 是否有空闲时间，true表示有空闲时间，false表示没有空余时间
 let didYield: boolean = false;
+// 返回false表示scheduler返回的异步任务的过期了，需要立即执行，而不是将js线程yield给(让给)浏览器renderer。
 function shouldYieldToRenderer() {
   if (didYield) {
     return true;
@@ -2270,15 +2272,19 @@ function shouldYieldToRenderer() {
 function performAsyncWork() {
   try {
     if (!shouldYieldToRenderer()) {
+      // 过期的任务需要立即执行
       // The callback timed out. That means at least one update has expired.
       // Iterate through the root schedule. If they contain expired work, set
       // the next render expiration time to the current time. This has the effect
       // of flushing all expired work in a single batch, instead of flushing each
       // level one at a time.
       if (firstScheduledRoot !== null) {
+        // 计算出当前调度的异步任务的时间，这个时间保存在currentRendererTime变量中，表示现在执行该函数到最初执行该js模块的时长
         recomputeCurrentRendererTime();
         let root: FiberRoot = firstScheduledRoot;
         do {
+          // 判断root双向链表中每个root的更新任务是否到期，如果到期，则将当前时间设置为root的nextExpirationTimeToWorkOn
+          // 该时间决定哪些节点的更新要在当前周期中被执行
           didExpireAtExpirationTime(root, currentRendererTime);
           // The root schedule is circular, so this is never null.
           root = (root.nextScheduledRoot: any);
@@ -2307,11 +2313,15 @@ function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
     // 获取调度队列中最高优先级的root节点，同时从双向循环调度队列中删除没有任务需要执行的节点。
   findHighestPriorityRoot();
 
-  //isYieldy为true表示异步performWork
+  //isYieldy为true表示异步的performwork，可以被中断
+  // 循环执行root链表中优先级最高的root的更新任务，直到所有的具有更新任务root的最高优先级任务没有过期或者时间片没有空余时间
+  // 执行某个root更新任务的函数为performWorkOnRoot
   if (isYieldy) {
+    // 重新计算当前渲染的时间，保存在currentRendererTime中，然后将currentRendererTime赋值给currentSchedulerTime
     recomputeCurrentRendererTime();
     currentSchedulerTime = currentRendererTime;
 
+    // 开发环境下，跳过
     if (enableUserTimingAPI) {
       const didExpire = nextFlushedExpirationTime > currentRendererTime;
       const timeout = expirationTimeToMs(nextFlushedExpirationTime);
@@ -2320,9 +2330,12 @@ function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
 
     //循环停止的条件是：所有root都perform完成，或者没有空闲时间并且下一个任务没有过期。
     while (
+      // 有需要更新任务的root
       nextFlushedRoot !== null &&
       nextFlushedExpirationTime !== NoWork &&
+      // 可以被中断的异步更新任务在这里处理，因为传入的minExpirationTime为NoWork，为0
       minExpirationTime <= nextFlushedExpirationTime &&
+      // 当前的时间片有空闲时间即didYield为false，或者该root已经过期了，即nextFlushedExpirationTime大于等于currentRendererTime
       !(didYield && currentRendererTime > nextFlushedExpirationTime)
     ) {
       //  下一个需要执行任务的root存在，并且其过期时间不是NoWork（说明当前节点有任务需要执行）
@@ -2336,19 +2349,25 @@ function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
         nextFlushedExpirationTime,
         currentRendererTime > nextFlushedExpirationTime,//为true表示还没有过期，说明是异步的。即performWorkOnRoot(root,expirationTime,isYieldy)中isYieldy为true
       );
-        //在一个页面调用多次ReactDOM.render的时候会存在多个root，这些root会被编成一个双向循环队列
-        //获取调度队列中最高优先级的root节点，同时从双向循环调度队列中删除没有任务需要执行的节点。
-      //  利用优先级最高节点的到期时间设置nextFlushedExpirationTime
+      // 由于通过performWorkOnRoot的调度之后会执行一些生命周期函数，导致root上的更新任务由变化，即最高的优先级会变化
+      // 因此需要调用findHighestPriorityRoot来更新nextFlushedExpirationTime
+      // 在root存在新的更新任务之后，自然就需要重新获取当前渲染时间，在while中通过比较优先级最高的到期时间与当前时间来判断是否过期，也就是是否需要再次调用performWorkOnRoot来执行更新任务
       findHighestPriorityRoot();
       recomputeCurrentRendererTime();
       currentSchedulerTime = currentRendererTime;
     }
   } else {
+    // isYieldy为false表示是同步的，不可以被中断
+    // 这里不需要判断任务过期，因为是一个同步的任务，无法被打断，在同步更新任务执行完的过程中，有可能会产生异步的更新，因此后续会将异步的更新推入调度器中
     while (
+      // 有需要更新任务的root，不需要判断任务是否过期
       nextFlushedRoot !== null &&
       nextFlushedExpirationTime !== NoWork &&
+      // 不可被中断的同步调度任务，因为传入的minExpirationTime为Sync，为最大number值。
+      // 下面的判断在同步的情况下会成立的原因是，对于最高优先级的同步任务的过期时间会是Sync，因此下面判断成立只能是相等
       minExpirationTime <= nextFlushedExpirationTime
     ) {
+      // 开始调度渲染，并且标记了这个root上的任务不可以被中断
       performWorkOnRoot(nextFlushedRoot, nextFlushedExpirationTime, false);
       findHighestPriorityRoot();
     }
@@ -2356,15 +2375,16 @@ function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
 
   // We're done flushing work. Either we ran out of time in this callback,
   // or there's no more work left with sufficient priority.
+  // 执行完更新任务之后，有可能时间片没有空闲或者没有足够优先级的任务需要处理了。
 
   // If we're inside a callback, set this to false since we just completed it.
-  //  如果在一个回调中，则将刚才完成的设置为false
+  //  如果是异步的，则将异步任务调度的callbackID设置为null
   if (isYieldy) {
     callbackExpirationTime = NoWork;
     callbackID = null;
   }
   // If there's work left over, schedule a new callback.
-  //  对于没有空闲时间并且下一个任务没有过期的情况，需要重新进行一次异步调度，在下一次animation frame中执行节点的任务。
+  // 通过上述的while循环执行完同步的更新任务以及过期的异步更新任务之后，可能还会存在一些没有过期的异步任务，因此需要将这些任务存到新的一轮调度中。
   if (nextFlushedExpirationTime !== NoWork) {
     //scheduleCallbackWithExpirationTime为scheduler中的unstable-scheduleCallback
     scheduleCallbackWithExpirationTime(
