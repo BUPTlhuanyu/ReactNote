@@ -99,7 +99,7 @@ PS： 真心给react粉丝们一个非常好的订阅号，react status，这个
 - [2-2、react源码浅析(六)：创建root下的fiber树并开始初始调度](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/2-2%e3%80%81%e5%88%9b%e5%bb%baroot%e4%b8%8b%e7%9a%84fiber%e6%a0%91%e5%b9%b6%e5%bc%80%e5%a7%8b%e5%88%9d%e5%a7%8b%e8%b0%83%e5%ba%a6.md)
 - [3-1、react源码浅析(六)：调度入口函数scheduleWork](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/3-1%e3%80%81%e8%b0%83%e5%ba%a6%e5%85%a5%e5%8f%a3%e5%87%bd%e6%95%b0scheduleWork.md)
 - [3-2、react源码浅析(六)：performAsyncWork与performSyncWork](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/3-2%e3%80%81performAsyncWork%e4%b8%8eperformSyncWork.md)
-- [3-3、react源码浅析(六)：performWork调度root双向循环链表](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/performWork%e8%b0%83%e5%ba%a6root%e5%8f%8c%e5%90%91%e5%be%aa%e7%8e%af%e9%93%be%e8%a1%a8)
+- [3-3、react源码浅析(六)：performWork调度root双向循环链表](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D6/performWork%e8%b0%83%e5%ba%a6root%e5%8f%8c%e5%90%91%e5%be%aa%e7%8e%af%e9%93%be%e8%a1%a8.md)
 - [3-5、react源码浅析(六)：performWorkOnRoot调度某个root的fiber树](http://note.youdao.com/noteshare?id=82c1def09e9ab49dc1f7ab12670c077d&sub=461FD4B88C714C4F86F8503DE9236B23)
 - [3-6-0、react源码浅析(六)：root渲染阶段renderRoot](http://note.youdao.com/noteshare?id=478f1a3b421050d8f1b72e3b221cca59&sub=169BA6CA7850481BBA68BC53379E26D1)
 - [3-6-1、react源码浅析(六)：对root执行updateHostRoot](http://note.youdao.com/noteshare?id=84df98e9c1e5cb9d1a66864b34268a7f&sub=1E16F316E66348EB945206AE4746119A)
