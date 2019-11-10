@@ -1210,7 +1210,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
       'by a bug in React. Please file an issue.',
   );
 
-  //处理副作用???
+  // ❓❓❓处理副作用，与commitRoot有关
   flushPassiveEffects();
 
   isWorking = true;
@@ -1222,12 +1222,14 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
     ReactCurrentOwner.currentDispatcher = DispatcherWithoutHooks;
   }
 
+  // 获取root上的nextExpirationTimeToWorkOn，这个到期时间初始设置是在调用performAsyncWork的时候，
+  // 回顾一下： 调用performAsyncWork的当前时间会被保存在currentRendererTime，然后利用这个时间root.expirationTime比较判断root的更新任务是否到期了，如果到期了，那么将currentRendererTime设置到root.nextExpirationTimeToWorkOn
   const expirationTime = root.nextExpirationTimeToWorkOn;
 
   // Check if we're starting from a fresh stack, or if we're resuming from
   // previously yielded work.
   //  判断是否是开始新的一次渲染阶段，还是返回到之前被中断的工作中。任意一个条件成立表示开始新的一次渲染阶段。
-  //  nextRenderExpirationTime : 下一个渲染阶段到期时间
+  //  nextRenderExpirationTime : 调用performAsyncWork的当前时间，将performWork推入调度器
   //  root !== nextRoot ：在只有一个root情况下fiber树有更新，nextRoot会在发生致命错误或者渲染阶段结束的时候将其设置为null。所以只要有更新都会进入到if中
   //  expirationTime !== nextRenderExpirationTime ：初次执行reactDOM.render的时候成立，大部分都是不成立的，其他情况未知。
   //  nextUnitOfWork === null ： 表示之前空闲时间将所有的任务够执行完了，因此nextUnitOfWork === null。如果不为null，表明之前还有没有完成的任务。
@@ -1245,6 +1247,10 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
       null,
       nextRenderExpirationTime,
     );
+    // 在renderRoot结束的时候会调用onFatal, onComplete, onSuspend, onYield这四个函数中的一个
+    // 其中onFatal(发生错误了)与onYield(被中断了)不会改变pendingCommitExpirationTime，而是将finishedWork设置为null，后续会进入第二阶段(提交阶段)
+    // 其中onComplete会将一个时间设置到pendingCommitExpirationTime，在返回performWork并进入第二阶段的时候，会根据这个时间来决定是否提交
+    // ❓❓❓：其中onSuspend会根据msUntilTimeout是否不为0以及是否有空闲时间来将pendingCommitExpirationTime设置为一个时间，并且会在第二阶段立即提交。否则不会设置pendingCommitExpirationTime
     root.pendingCommitExpirationTime = NoWork;
 
     if (enableSchedulerTracing) {
@@ -1292,6 +1298,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
   }
 
   let prevInteractions: Set<Interaction> = (null: any);
+  // debug部分跳过
   if (enableSchedulerTracing) {
     // We're about to start new traced work.
     // Restore pending interactions so cascading work triggered during the render phase will be accounted for.
@@ -1300,7 +1307,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
   }
 
   let didFatal = false;
-
+  // debug部分跳过 
   startWorkLoopTimer(nextUnitOfWork);
 
   do {
@@ -1378,7 +1385,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
     }
     break;
   } while (true);
-
+  // debug部分跳过 
   if (enableSchedulerTracing) {
     // Traced work is done for now; restore the previous interactions.
     __interactionsRef.current = prevInteractions;
@@ -2473,6 +2480,7 @@ function performWorkOnRoot(
       // If this root previously suspended, clear its existing timeout, since
       // we're about to try rendering again.
       //  如果这个root之前被挂起了，清除现有的timout标记，因为将会再次尝试渲染。
+      // ❓❓❓
       const timeoutHandle = root.timeoutHandle;
       if (timeoutHandle !== noTimeout) {
         root.timeoutHandle = noTimeout;
