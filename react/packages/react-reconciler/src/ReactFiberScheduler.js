@@ -1133,6 +1133,7 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
   const current = workInProgress.alternate;
 
   // See if beginning this work spawns more work.
+  // 该函数跳过
   startWorkTimer(workInProgress);
   if (__DEV__) {
     ReactCurrentFiber.setCurrentFiber(workInProgress);
@@ -1147,6 +1148,7 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
 
   let next;
   if (enableProfilerTimer) {
+    // 此处跳过
     if (workInProgress.mode & ProfileMode) {
       startProfilerTimer(workInProgress);
     }
@@ -1203,6 +1205,13 @@ function workLoop(isYieldy) {
   }
 }
 
+/**
+ * 1. 处理副作用(❓❓❓)
+ * 2. 获取节点上记录的上次执行performAsyncWork的时间
+ * 3. 
+ * @param {*} root 子树具有更新任务的root
+ * @param {*} isYieldy 同步或者异步，异步可被打断
+ */
 function renderRoot(root: FiberRoot, isYieldy: boolean): void {
   invariant(
     !isWorking,
@@ -1211,6 +1220,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
   );
 
   // ❓❓❓处理副作用，与commitRoot有关
+  // 1
   flushPassiveEffects();
 
   isWorking = true;
@@ -1222,19 +1232,21 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
     ReactCurrentOwner.currentDispatcher = DispatcherWithoutHooks;
   }
 
+  // 2
   // 获取root上的nextExpirationTimeToWorkOn，这个到期时间初始设置是在调用performAsyncWork的时候，
   // 回顾一下： 调用performAsyncWork的当前时间会被保存在currentRendererTime，然后利用这个时间root.expirationTime比较判断root的更新任务是否到期了，如果到期了，那么将currentRendererTime设置到root.nextExpirationTimeToWorkOn
   const expirationTime = root.nextExpirationTimeToWorkOn;
 
+  // 3
   // Check if we're starting from a fresh stack, or if we're resuming from
   // previously yielded work.
   //  判断是否是开始新的一次渲染阶段，还是返回到之前被中断的工作中。任意一个条件成立表示开始新的一次渲染阶段。
-  //  nextRenderExpirationTime : 调用performAsyncWork的当前时间，将performWork推入调度器
+  //  nextRenderExpirationTime : 上次调用performAsyncWork的时间，该函数会将performWork推入调度器
   //  root !== nextRoot ：在只有一个root情况下fiber树有更新，nextRoot会在发生致命错误或者渲染阶段结束的时候将其设置为null。所以只要有更新都会进入到if中
-  //  expirationTime !== nextRenderExpirationTime ：初次执行reactDOM.render的时候成立，大部分都是不成立的，其他情况未知。
+  //  expirationTime !== nextRenderExpirationTime ：初次执行reactDOM.render的时候成立，当本次renderRoot的过程中产生更新，那么这里不会成立。
   //  nextUnitOfWork === null ： 表示之前空闲时间将所有的任务够执行完了，因此nextUnitOfWork === null。如果不为null，表明之前还有没有完成的任务。
   if (
-    expirationTime !== nextRenderExpirationTime ||
+    expirationTime !== nextRenderExpirationTime || //这个条件成立的情况： 见computeExpirationForFiber
     root !== nextRoot ||
     nextUnitOfWork === null
   ) {
@@ -1253,6 +1265,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
     // ❓❓❓：其中onSuspend会根据msUntilTimeout是否不为0以及是否有空闲时间来将pendingCommitExpirationTime设置为一个时间，并且会在第二阶段立即提交。否则不会设置pendingCommitExpirationTime
     root.pendingCommitExpirationTime = NoWork;
 
+    // 跳过
     if (enableSchedulerTracing) {
       // Determine which interactions this batch of work currently includes,
       // So that we can accurately attribute time spent working on it,
@@ -1330,18 +1343,19 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
         didFatal = true;
         onUncaughtError(thrownValue);
       } else {
+        // 跳过
         if (enableProfilerTimer && nextUnitOfWork.mode & ProfileMode) {
           // Record the time spent rendering before an error was thrown.
           // This avoids inaccurate Profiler durations in the case of a suspended render.
           stopProfilerTimerIfRunningAndRecordDelta(nextUnitOfWork, true);
         }
-
+        // 跳过
         if (__DEV__) {
           // Reset global debug state
           // We assume this is defined in DEV
           (resetCurrentlyProcessingQueue: any)();
         }
-
+        // 跳过
         if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
           if (mayReplay) {
             const failedUnitOfWork: Fiber = nextUnitOfWork;
