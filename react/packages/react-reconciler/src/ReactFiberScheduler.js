@@ -1139,6 +1139,7 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
     ReactCurrentFiber.setCurrentFiber(workInProgress);
   }
 
+  // 跳过
   if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
     stashedWorkInProgressProperties = assignFiberPropertiesInDEV(
       stashedWorkInProgressProperties,
@@ -1165,6 +1166,7 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
     workInProgress.memoizedProps = workInProgress.pendingProps;
   }
 
+  // 跳过
   if (__DEV__) {
     ReactCurrentFiber.resetCurrentFiber();
     if (isReplayingFailedUnitOfWork) {
@@ -1175,6 +1177,7 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
       rethrowOriginalError();
     }
   }
+  // 跳过
   if (__DEV__ && ReactFiberInstrumentation.debugTool) {
     ReactFiberInstrumentation.debugTool.onBeginWork(workInProgress);
   }
@@ -1208,7 +1211,11 @@ function workLoop(isYieldy) {
 /**
  * 1. 处理副作用(❓❓❓)
  * 2. 获取节点上记录的上次执行performAsyncWork的时间
- * 3. 
+ * 3. 判断是开始新的renderroot还是恢复到之前被打断的任务中：
+ *    调度开始的过期时间与上次调度开始的到期时间不等则开始新的renderroot，如果在某次renderroot的过程中产生了更新并且被打断，则这个两个到期时间是一样的，因此恢复到之前被打断的任务中
+ *    本次调度的root与上一次的root不一样，那么将调度相关的栈清空，开始新的renderRoot
+ *    上次调度由于打断或者空余时间不足，导致还有任务没有执行则恢复到被打断的任务中，否则开始新的renderRoot
+ * 4. 
  * @param {*} root 子树具有更新任务的root
  * @param {*} isYieldy 同步或者异步，异步可被打断
  */

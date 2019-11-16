@@ -1342,6 +1342,9 @@ function ChildReconciler(shouldTrackSideEffects) {
 export const reconcileChildFibers = ChildReconciler(true);
 export const mountChildFibers = ChildReconciler(false);
 
+// fiber树节点的数据结构：fiber节点的return属性指向父节点fiber，sibling指向第一个兄弟节点，child指向第一个子节点
+// 一个fiber节点的兄弟节点的return属性都指向同一个父节点
+// cloneChildFibers的作用：利用createWorkInProgress将workInProgress的下面一层的所有fiber（即直接子节点）生成一个新的workInProgressfiber
 export function cloneChildFibers(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -1364,6 +1367,7 @@ export function cloneChildFibers(
   workInProgress.child = newChild;
 
   newChild.return = workInProgress;
+  // currentChild与newChild相当与两个指针，在两个子树的同一层节点之间同时向相邻的节点移动，相当于广度优先遍历。
   while (currentChild.sibling !== null) {
     currentChild = currentChild.sibling;
     newChild = newChild.sibling = createWorkInProgress(

@@ -1482,6 +1482,7 @@ function bailoutOnAlreadyFinishedWork(
   workInProgress: Fiber,
   renderExpirationTime: ExpirationTime,
 ): Fiber | null {
+  // debug跳过
   cancelWorkTimer(workInProgress);
 
   if (current !== null) {
@@ -1489,19 +1490,24 @@ function bailoutOnAlreadyFinishedWork(
     workInProgress.firstContextDependency = current.firstContextDependency;
   }
 
+  // 跳过
   if (enableProfilerTimer) {
     // Don't update "base" render times for bailouts.
     stopProfilerTimerIfRunning(workInProgress);
   }
 
   // Check if the children have any pending work.
+  // workInProgressfiber子树上的最高优先级到期时间与本次调度的开始时间比较来判断子树上的最高优先级任务到期了
   const childExpirationTime = workInProgress.childExpirationTime;
   if (childExpirationTime < renderExpirationTime) {
+    // 本次调度的时间如果更大，说明子树上没有更新任务到期，因此返回null，也就是直接跳过传入fiber子树上所有的子节点
     // The children don't have any work either. We can skip them.
     // TODO: Once we add back resuming, we should check if the children are
     // a work-in-progress set. If so, we need to transfer their effects.
     return null;
   } else {
+    // 子树上有更新任务到期了，因此调用cloneChildFibers将workInProgress下的第一层节点创建对应的workInProgressfiber
+    // 最后返回这个workInProgress的第一个子节点
     // This fiber doesn't have work, but its subtree does. Clone the child
     // fibers and continue.
     cloneChildFibers(current, workInProgress);
