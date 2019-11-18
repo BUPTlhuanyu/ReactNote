@@ -1522,11 +1522,14 @@ function beginWork(
 ): Fiber | null {
   const updateExpirationTime = workInProgress.expirationTime;
 
+  // 在reactDOM.render的时候，传入的current为rootFiber不为null
+  // 在其他节点初次渲染的时候，即挂载的时候current为null。
   if (current !== null) {
     //上一次渲染完成之后的props
     const oldProps = current.memoizedProps;
     //新的变动带来的新的props
     const newProps = workInProgress.pendingProps;
+    // 一下逻辑是当前fiber节点没有过期的更新任务
     if (
       oldProps === newProps &&
       !hasLegacyContextChanged() &&
@@ -1535,6 +1538,7 @@ function beginWork(
       // This fiber does not have any pending work. Bailout without entering
       // the begin phase. There's still some bookkeeping we that needs to be done
       // in this optimized path, mostly pushing stuff onto the stack.
+      // 处理context
       switch (workInProgress.tag) {
         case HostRoot:
           pushHostRootContext(workInProgress);
@@ -1618,7 +1622,7 @@ function beginWork(
 
   // Before entering the begin phase, clear the expiration time.
   workInProgress.expirationTime = NoWork;
-
+  // 当前fiber节点有更新任务：开始处理更新任务，对于不用类型的组件，有不同的处理方法 
   switch (workInProgress.tag) {
     case IndeterminateComponent: {
       const elementType = workInProgress.elementType;

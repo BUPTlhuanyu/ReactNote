@@ -354,6 +354,7 @@ export function createWorkInProgress(
     workInProgress.type = current.type;
     workInProgress.stateNode = current.stateNode;
 
+    // 跳过
     if (__DEV__) {
       // DEV-only fields
       workInProgress._debugID = current._debugID;
@@ -375,6 +376,7 @@ export function createWorkInProgress(
     workInProgress.firstEffect = null;
     workInProgress.lastEffect = null;
 
+    // 跳过
     if (enableProfilerTimer) {
       // We intentionally reset, rather than copy, actualDuration & actualStartTime.
       // This prevents time from endlessly accumulating in new commits.
@@ -399,6 +401,7 @@ export function createWorkInProgress(
   workInProgress.index = current.index;
   workInProgress.ref = current.ref;
 
+  // 跳过
   if (enableProfilerTimer) {
     workInProgress.selfBaseDuration = current.selfBaseDuration;
     workInProgress.treeBaseDuration = current.treeBaseDuration;

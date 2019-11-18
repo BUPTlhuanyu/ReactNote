@@ -15124,7 +15124,12 @@
     function beginWork(current$$1, workInProgress, renderExpirationTime) {
         var updateExpirationTime = workInProgress.expirationTime;
 
+        if(current$$1 === null){
+            console.log('current$$1========================================================================>', workInProgress);
+        }
+
         if (current$$1 !== null) {
+            console.log('beginWork=========>', current$$1)
             var oldProps = current$$1.memoizedProps;
             var newProps = workInProgress.pendingProps;
             if (oldProps === newProps && !hasContextChanged() && updateExpirationTime < renderExpirationTime) {
@@ -17986,16 +17991,18 @@
         }
 
         if (next === null) {
+            console.log('next null null-------------------------------->', workInProgress)
             // If this doesn't spawn new work, complete the current work.
             next = completeUnitOfWork(workInProgress);
         }
 
         ReactCurrentOwner$2.current = null;
-
+        console.log('next-------------------------------->', next)
         return next;
     }
 
     function workLoop(isYieldy) {
+        console.log('workLoop====================>', nextUnitOfWork)
         if (!isYieldy) {
             // Flush work without yielding
             while (nextUnitOfWork !== null) {
