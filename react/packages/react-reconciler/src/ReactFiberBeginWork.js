@@ -612,17 +612,23 @@ function pushHostRootContext(workInProgress) {
 }
 
 function updateHostRoot(current, workInProgress, renderExpirationTime) {
+  // 1 context的操作，
   pushHostRootContext(workInProgress);
+  // 2 获取当前rootFiber的workInProgress的更新队列
   const updateQueue = workInProgress.updateQueue;
+  // 3 更新队列如果为null，则报错
   invariant(
     updateQueue !== null,
     'If the root does not have an updateQueue, we should have already ' +
       'bailed out. This error is likely caused by a bug in React. Please ' +
       'file an issue.',
   );
+  // 4 获取props
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
+  // 5 通过prevState获取prevChildren
   const prevChildren = prevState !== null ? prevState.element : null;
+  // 6 处理更新队列
   processUpdateQueue(
     workInProgress,
     updateQueue,
@@ -630,6 +636,7 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
     null,
     renderExpirationTime,
   );
+  // 7 处理更新队列的过程中会将变化后的state存到workInProgress.memoizedState，并作为nextState
   const nextState = workInProgress.memoizedState;
   // Caution: React DevTools currently depends on this property
   // being called "element".
@@ -650,6 +657,7 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
     root.hydrate &&
     enterHydrationState(workInProgress)
   ) {
+    // 服务端渲染相关，暂时跳过
     // If we don't have any current children this might be the first pass.
     // We always try to hydrate. If this isn't a hydration pass there won't
     // be any children to hydrate which is effectively the same thing as
@@ -671,6 +679,7 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
       renderExpirationTime,
     );
   } else {
+    // 开始调度Children
     // Otherwise reset hydration state in case we aborted and resumed another
     // root.
     reconcileChildren(
@@ -681,6 +690,7 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
     );
     resetHydrationState();
   }
+  // 返回workInProgress.child
   return workInProgress.child;
 }
 
@@ -1531,9 +1541,9 @@ function beginWork(
     const newProps = workInProgress.pendingProps;
     // 一下逻辑是当前fiber节点没有过期的更新任务
     if (
-      oldProps === newProps &&
-      !hasLegacyContextChanged() &&
-      updateExpirationTime < renderExpirationTime
+      oldProps === newProps && // props没有变化
+      !hasLegacyContextChanged() && // 判断了是否有老版本context使用并且context发生变化
+      updateExpirationTime < renderExpirationTime //当前workInProgress上的更新任务没有过期
     ) {
       // This fiber does not have any pending work. Bailout without entering
       // the begin phase. There's still some bookkeeping we that needs to be done
