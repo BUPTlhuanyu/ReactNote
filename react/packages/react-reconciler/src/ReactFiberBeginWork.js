@@ -612,7 +612,7 @@ function pushHostRootContext(workInProgress) {
 }
 
 function updateHostRoot(current, workInProgress, renderExpirationTime) {
-  // 1 context的操作，
+  // 1 context的操作，暂时跳过
   pushHostRootContext(workInProgress);
   // 2 获取当前rootFiber的workInProgress的更新队列
   const updateQueue = workInProgress.updateQueue;

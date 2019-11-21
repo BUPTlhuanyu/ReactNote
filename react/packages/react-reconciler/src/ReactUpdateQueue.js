@@ -164,14 +164,20 @@ export function createUpdateQueue<State>(baseState: State): UpdateQueue<State> {
   return queue;
 }
 
+/**
+ * 将更新队列的effect清除
+ * @param {*} currentQueue 
+ */
 function cloneUpdateQueue<State>(
   currentQueue: UpdateQueue<State>,
 ): UpdateQueue<State> {
   const queue: UpdateQueue<State> = {
-    baseState: currentQueue.baseState,
-    firstUpdate: currentQueue.firstUpdate,
-    lastUpdate: currentQueue.lastUpdate,
+    baseState: currentQueue.baseState, // 当前的state
+    firstUpdate: currentQueue.firstUpdate, //第一个更新任务对象
+    lastUpdate: currentQueue.lastUpdate, //最后一个更新任务对象
 
+    // TODO：重用或者跳过子组件树，则需要保持这些effects
+    // 目前：设置为null
     // TODO: With resuming, if we bail out and resuse the child tree, we should
     // keep these effects.
     firstCapturedUpdate: null,
@@ -338,18 +344,26 @@ export function enqueueCapturedUpdate<State>(
   }
 }
 
+/**
+ * 确保workInProgress.updateQueue与current.updateQueue是同一个对象，并且这个对象的effect相关的属性被重置为null
+ * @param {*} workInProgress 
+ * @param {*} queue 
+ */
 function ensureWorkInProgressQueueIsAClone<State>(
   workInProgress: Fiber,
   queue: UpdateQueue<State>,
 ): UpdateQueue<State> {
+  // current在updatHost的时候不为null
   const current = workInProgress.alternate;
   if (current !== null) {
     // If the work-in-progress queue is equal to the current queue,
     // we need to clone it first.
+    // 如果workInProgress.updateQueue更新队列与current.updateQueue更新队列是同一个，则将workInProgress.updateQueue克隆，并分别设置到workInProgress与current上，保证这两者指向同一个
     if (queue === current.updateQueue) {
       queue = workInProgress.updateQueue = cloneUpdateQueue(queue);
     }
   }
+  // 不操作，直接返回传入的更新队列
   return queue;
 }
 
@@ -422,6 +436,14 @@ function getStateFromUpdate<State>(
   return prevState;
 }
 
+/**
+ * 处理传入fiber的更新队列
+ * @param {*} workInProgress 
+ * @param {*} queue  workInProgress.updateQueue
+ * @param {*} props 
+ * @param {*} instance 
+ * @param {*} renderExpirationTime 
+ */
 export function processUpdateQueue<State>(
   workInProgress: Fiber,
   queue: UpdateQueue<State>,
@@ -429,8 +451,10 @@ export function processUpdateQueue<State>(
   instance: any,
   renderExpirationTime: ExpirationTime,
 ): void {
+  // 1 强制更新的标志
   hasForceUpdate = false;
 
+  // 2 确保workInProgress.updateQueue与current.updateQueue是同一个对象，并且这个对象的effect相关的属性被重置为null
   queue = ensureWorkInProgressQueueIsAClone(workInProgress, queue);
 
   if (__DEV__) {
@@ -438,18 +462,21 @@ export function processUpdateQueue<State>(
   }
 
   // These values may change as we process the queue.
-  let newBaseState = queue.baseState;
-  let newFirstUpdate = null;
-  let newExpirationTime = NoWork;
+  let newBaseState = queue.baseState; // 执行更新队列中的更新任务之前的state
+  let newFirstUpdate = null; // 用于暂存当前的更新任务
+  let newExpirationTime = NoWork; // 保存一个被跳过的更新任务中优先级最高任务的到期时间，这个到期时间也是被跳过的任务中最大的。
 
   // Iterate through the list of updates to compute the result.
-  let update = queue.firstUpdate;
-  let resultState = newBaseState;
+  // 3 循环遍历更新队列，然后计算出这些更新的结果
+  let update = queue.firstUpdate; // 第一个更新任务
+  let resultState = newBaseState; // 执行完更新队列中的更新任务之后的state
   while (update !== null) {
-    const updateExpirationTime = update.expirationTime;
-    if (updateExpirationTime < renderExpirationTime) {
+    const updateExpirationTime = update.expirationTime; // 遍历到当前的更新任务的到期时间
+    if (updateExpirationTime < renderExpirationTime) { 
+      // 如果当前更新任务没有过期，则跳过这个循环，但是需要将这个被跳过的更新处置妥当
       // This update does not have sufficient priority. Skip it.
       if (newFirstUpdate === null) {
+        // 如果这是第一个被跳过的更新任务，则将其存储在❗newFirstUpdate，将resultState存储在❗newBaseState
         // This is the first skipped update. It will be the first update in
         // the new list.
         newFirstUpdate = update;
@@ -459,10 +486,12 @@ export function processUpdateQueue<State>(
       }
       // Since this update will remain in the list, update the remaining
       // expiration time.
+      // 如果之前所有的被跳过的更新任务的最高优先级低于当前被跳过的更新任务的优先级，则将这个优先级对应的到期时间保存在newExpirationTime中，当然这个到期时间也是他们中最大的
       if (newExpirationTime < updateExpirationTime) {
         newExpirationTime = updateExpirationTime;
       }
     } else {
+      // 开始根据这个任务计算state
       // This update does have sufficient priority. Process it and compute
       // a new result.
       resultState = getStateFromUpdate(
@@ -473,10 +502,17 @@ export function processUpdateQueue<State>(
         props,
         instance,
       );
+      // 获取当前更新任务的回调
       const callback = update.callback;
+      // ❗处理effect？？？
+      // 如果更新任务还要回调函数，则将这个更新任务设置到更新队列的effect队列上，queue.firstEffect指向第一个副作用，lastEffect指向最后一个副作用，lastEffect.nextEffect指向
+      // 如果更新队列的effect队列为空，则queue.firstEffect = queue.lastEffect = update;
+      // 如果不为空，则添加到队列末尾，先将queue.lastEffect指向的对象的nextEffect指向当前的这个更新任务，然后将queue.lastEffect指向当前的这个更新任务
       if (callback !== null) {
+        // effectTag的作用？
         workInProgress.effectTag |= Callback;
         // Set this to null, in case it was mutated during an aborted render.
+        // 清除effect
         update.nextEffect = null;
         if (queue.lastEffect === null) {
           queue.firstEffect = queue.lastEffect = update;
@@ -486,11 +522,13 @@ export function processUpdateQueue<State>(
         }
       }
     }
+    // 获取下一个更新任务
     // Continue to the next update.
     update = update.next;
   }
 
   // Separately, iterate though the list of captured updates.
+  // ❗什么是捕获类型的更新任务？？？
   let newFirstCapturedUpdate = null;
   update = queue.firstCapturedUpdate;
   while (update !== null) {
