@@ -386,8 +386,11 @@ function getStateFromUpdate<State>(
 ): any {
   switch (update.tag) {
     case ReplaceState: {
-      const payload = update.payload;
+      // deprecatedAPIs 已经被弃用了，但effecthook中返回的state是直接替换掉现有的，内部可能维护了replacestate
+      const payload = update.payload; //更新内容，比如`setState`接收的第一个参数
       if (typeof payload === 'function') {
+        // 如果ReplaceState的第一个参数是一个函数，则将prevState与nextProps作为该函数的参数，并执行
+        // 同时这个函数中的this指向该组件的实例对象，因此可以引用这个组件的实例方法
         // Updater function
         if (__DEV__) {
           if (
@@ -401,9 +404,11 @@ function getStateFromUpdate<State>(
         return payload.call(instance, prevState, nextProps);
       }
       // State object
+      // 如果setState的第一个参数是一个对象，则直接返回，而不会调用assign与之前的state进行浅合并
       return payload;
     }
     case CaptureUpdate: {
+      // ❗❗️副作用相关，一般我们知道的是比如获取数据/操作DOM等算副作用，那么react的源码是如何区分副作用的呢
       workInProgress.effectTag =
         (workInProgress.effectTag & ~ShouldCapture) | DidCapture;
     }
@@ -423,14 +428,16 @@ function getStateFromUpdate<State>(
             payload.call(instance, prevState, nextProps);
           }
         }
+        // 是函数，则直接传入参数prevState, nextProps，将返回的state保存到partialState，后续与之前的state浅合并
         partialState = payload.call(instance, prevState, nextProps);
       } else {
         // Partial state object
+        // 如果setState不是个函数，则update.payload直接赋值给partialState
         partialState = payload;
       }
       if (partialState === null || partialState === undefined) {
         // Null and undefined are treated as no-ops.
-        // 如果合并后的state为null或者undefined则返回之前的state
+        // 如果执行完setState的第一个参数之后得到的需要被合并的partialState为null或者undefined则返回之前的state，因为没哟必要assign了
         return prevState;
       }
       // Merge the partial state and the previous state.
@@ -438,6 +445,8 @@ function getStateFromUpdate<State>(
       return Object.assign({}, prevState, partialState);
     }
     case ForceUpdate: {
+      // 强制更新，返回之前的state
+      // 为什么是返回之前的state，而不是update.payload？
       hasForceUpdate = true;
       return prevState;
     }
