@@ -367,6 +367,15 @@ function ensureWorkInProgressQueueIsAClone<State>(
   return queue;
 }
 
+/**
+ * 根据更新任务的不同以不同的方式计算state
+ * @param {*} workInProgress 
+ * @param {*} queue 
+ * @param {*} update 
+ * @param {*} prevState 
+ * @param {*} nextProps 
+ * @param {*} instance 
+ */
 function getStateFromUpdate<State>(
   workInProgress: Fiber,
   queue: UpdateQueue<State>,
