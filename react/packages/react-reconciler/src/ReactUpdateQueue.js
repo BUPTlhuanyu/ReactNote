@@ -455,7 +455,20 @@ function getStateFromUpdate<State>(
 }
 
 /**
+ * 注意： update与CapturedUpdate的区别
  * 处理传入fiber的更新队列
+ * 第一个循环：遍历fiber的更新队列queue上的更新任务update，根据update上的payload与prevState计算出一个新的state作为resultState
+ * 注意： 
+ *        🍀计算当前更新任务的state的时候，prevState是上一个更新任务计算得到的state
+ *        🍀可以看到这种state对象的直接赋值给fiber上的属性的方式，导致了不能直接修改state
+ * 第二个循环：遍历CapturedUpdate队列，循环的开始prevState是第一个循环最终的resultState
+ * 
+ * 最终：
+ *  queue.baseState = newBaseState; //指向resultState，因为resultState一直在变化，与resultState指向同一个对象
+    queue.firstUpdate = newFirstUpdate; // 第一个未到期的update更新任务
+    queue.firstCapturedUpdate = newFirstCapturedUpdate; //第一个未到期的CapturedUpdate更新任务
+    workInProgress.expirationTime = newExpirationTime; // 所有未到期的update与CapturedUpdate中优先级最高的一个任务的到期时间
+    workInProgress.memoizedState = resultState; // 执行完update队列过期的更新任务之后再执行CapturedUpdate队列过期的更新任务之后得到的最终state结果，与newBaseState指向同一个对象
  * @param {*} workInProgress 
  * @param {*} queue  workInProgress.updateQueue
  * @param {*} props 
@@ -481,8 +494,8 @@ export function processUpdateQueue<State>(
 
   // These values may change as we process the queue.
   let newBaseState = queue.baseState; // 执行更新队列中的更新任务之前的state
-  let newFirstUpdate = null; // 用于暂存当前的更新任务
-  let newExpirationTime = NoWork; // 保存一个被跳过的更新任务中优先级最高任务的到期时间，这个到期时间也是被跳过的任务中最大的。
+  let newFirstUpdate = null; // 用于暂存update队列中第一个为过期的更新任务
+  let newExpirationTime = NoWork; // 保存一个被跳过的更新任务（update以及CapturedUpdate）中优先级最高任务的到期时间，这个到期时间也是被跳过的任务中最大的。
 
   // Iterate through the list of updates to compute the result.
   // 3 循环遍历更新队列，然后计算出这些更新的结果
@@ -509,7 +522,8 @@ export function processUpdateQueue<State>(
         newExpirationTime = updateExpirationTime;
       }
     } else {
-      // 开始根据这个任务计算state
+      // 开始根据这个任务计算state，根据update.tag的类型，由replaceState或者setState或者forceupdate第一个参数计算出一个state，然后直接返回或者与prevState合并成最新的state
+      // 这里的prevState是上一个update计算得到的state
       // This update does have sufficient priority. Process it and compute
       // a new result.
       resultState = getStateFromUpdate(
@@ -520,14 +534,15 @@ export function processUpdateQueue<State>(
         props,
         instance,
       );
-      // 获取当前更新任务的回调
+      // 获取当前更新任务的回调，也就是更新任务的第二个参数
       const callback = update.callback;
       // ❗处理effect？？？
       // 如果更新任务还要回调函数，则将这个更新任务设置到更新队列的effect队列上，queue.firstEffect指向第一个副作用，lastEffect指向最后一个副作用，lastEffect.nextEffect指向
       // 如果更新队列的effect队列为空，则queue.firstEffect = queue.lastEffect = update;
       // 如果不为空，则添加到队列末尾，先将queue.lastEffect指向的对象的nextEffect指向当前的这个更新任务，然后将queue.lastEffect指向当前的这个更新任务
       if (callback !== null) {
-        // effectTag的作用？
+        // Callback = 0b000000100000
+        // effectTag的作用，将workInProgress.effectTag与Callback或运算，相当于给这workInProgress.effectTag添加了Callback的标记
         workInProgress.effectTag |= Callback;
         // Set this to null, in case it was mutated during an aborted render.
         // 清除effect
@@ -547,6 +562,10 @@ export function processUpdateQueue<State>(
 
   // Separately, iterate though the list of captured updates.
   // ❗什么是捕获类型的更新任务？？？
+  // 与上面while处理update更新队列逻辑一致，但是这里有两点需要注意
+  // 1 处理的是CapturedUpdate队列
+  // 2 当前的CapturedUpdate没有过期，并且上面所有Update也没有过期(即newFirstUpdate === null)，那么需要将上面while产生resultState赋值给newBaseState
+  // 3 上述update队列计算得到的resultState会作为CapturedUpdate队列的第一个过期的更新任务的prevState
   let newFirstCapturedUpdate = null;
   update = queue.firstCapturedUpdate;
   while (update !== null) {
@@ -595,20 +614,25 @@ export function processUpdateQueue<State>(
     update = update.next;
   }
 
+  // update队列都过期了，那么queue.lastUpdate= null，说明更新队列的为空，没有更新任务执行
   if (newFirstUpdate === null) {
     queue.lastUpdate = null;
   }
   if (newFirstCapturedUpdate === null) {
+    // CapturedUpdate队列都过期了，则清空CapturedUpdate队列
     queue.lastCapturedUpdate = null;
   } else {
+    // 如果有CapturedUpdate任务没有过期，则为workInProgress.effectTag添加Callback标记
     workInProgress.effectTag |= Callback;
   }
+  // 如果update队列与CapturedUpdate队列都过期了，那么将newBaseState = resultState，其中resultState为遍历CapturedUpdate队列的结果
   if (newFirstUpdate === null && newFirstCapturedUpdate === null) {
     // We processed every update, without skipping. That means the new base
     // state is the same as the result state.
     newBaseState = resultState;
   }
 
+  // 设置queue相关属性
   queue.baseState = newBaseState;
   queue.firstUpdate = newFirstUpdate;
   queue.firstCapturedUpdate = newFirstCapturedUpdate;
@@ -620,6 +644,8 @@ export function processUpdateQueue<State>(
   // dealt with the props. Context in components that specify
   // shouldComponentUpdate is tricky; but we'll have to account for
   // that regardless.
+  // 更新这个workInProgressfiber上更新任务的最高优先级任务的到期时间，这个到期时间是上述没有到期的任务中的最高优先级任务的到期时间，也是Update队列中所有未到期任务中的最大的到期时间
+  // 将计算出来的state存储在memoizedState
   workInProgress.expirationTime = newExpirationTime;
   workInProgress.memoizedState = resultState;
 
