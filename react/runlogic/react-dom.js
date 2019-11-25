@@ -14211,6 +14211,8 @@
 
     function reconcileChildren(current$$1, workInProgress, nextChildren, renderExpirationTime) {
         if (current$$1 === null) {
+            console.log('🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗');
+
             // If this is a fresh new component that hasn't been rendered yet, we
             // won't update its child set by applying minimal side-effects. Instead,
             // we will add them all to the child before it gets rendered. That means
@@ -14494,13 +14496,17 @@
         // Caution: React DevTools currently depends on this property
         // being called "element".
         var nextChildren = nextState.element;
+        
+        
         if (nextChildren === prevChildren) {
+            console.log('nextChildren🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀', nextState, nextChildren);
             // If the state is the same as before, that's a bailout because we had
             // no work that expires at this time.
             resetHydrationState();
             return bailoutOnAlreadyFinishedWork(current$$1, workInProgress, renderExpirationTime);
         }
         var root = workInProgress.stateNode;
+        console.log('root🥗🥗🥗🥗🥗🥗🥗', workInProgress);
         if ((current$$1 === null || current$$1.child === null) && root.hydrate && enterHydrationState(workInProgress)) {
             // If we don't have any current children this might be the first pass.
             // We always try to hydrate. If this isn't a hydration pass there won't

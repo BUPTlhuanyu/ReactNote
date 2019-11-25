@@ -134,6 +134,16 @@ if (__DEV__) {
   didWarnAboutFunctionRefs = {};
 }
 
+/**
+ * 调度子节点
+ * 见ReactChildFiber.js：
+ * export const reconcileChildFibers = ChildReconciler(true);
+ * export const mountChildFibers = ChildReconciler(false);
+ * @param {*} current 
+ * @param {*} workInProgress 
+ * @param {*} nextChildren 
+ * @param {*} renderExpirationTime 
+ */
 export function reconcileChildren(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -141,6 +151,7 @@ export function reconcileChildren(
   renderExpirationTime: ExpirationTime,
 ) {
   if (current === null) {
+    // 第一次调用updateHOst的时候current !== null
     // If this is a fresh new component that hasn't been rendered yet, we
     // won't update its child set by applying minimal side-effects. Instead,
     // we will add them all to the child before it gets rendered. That means
@@ -626,9 +637,12 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
   // 4 获取props
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
-  // 5 通过prevState获取prevChildren
+  // 5 通过prevState获取prevChildren，这里prevState为null因此prevChildren也是null
+  // 在第二次执行updateHost的时候（一般是不会第二次执行的），这里的prevState.element是ReactDOM.render传入的第一个参数，原因见shcduleRootUpdate中的update.paload = {element}
   const prevChildren = prevState !== null ? prevState.element : null;
-  // 6 处理更新队列
+  // 6 处理更新队列,依次遍历update以及captureupdate队列，前一个过期的更新任务计算出的state会作为下一个过期的更新任务的prevState，最终将这个结果保存在workInProgress.memoizedState以及queue.baseState
+  //    将未过期的第一个update保存在queue.firstUpdate，未过期的第一个CapturedUpdate作为queue.firstCapturedUpdate
+  //    将未过期的所有update与captureupdate中优先级最高的那个更新任务的到期时间保存在workInProgress.expirationTime
   processUpdateQueue(
     workInProgress,
     updateQueue,
@@ -642,15 +656,19 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
   // being called "element".
   const nextChildren = nextState.element;
   if (nextChildren === prevChildren) {
+    // 如果nextChildren与prevChildren指向同一个react对象那么就相等
     // If the state is the same as before, that's a bailout because we had
     // no work that expires at this time.
+    // 服务端渲染相关
     resetHydrationState();
+    // 跳过此次渲染，调用bailoutOnAlreadyFinishedWork，如果子节点有更新则返回workInProgress.child，否则返回null
     return bailoutOnAlreadyFinishedWork(
       current,
       workInProgress,
       renderExpirationTime,
     );
   }
+  // 获取fiberroot节点
   const root: FiberRoot = workInProgress.stateNode;
   if (
     (current === null || current.child === null) &&
@@ -688,6 +706,7 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
       nextChildren,
       renderExpirationTime,
     );
+    // 跳过，服务端渲染
     resetHydrationState();
   }
   // 返回workInProgress.child
@@ -1487,6 +1506,12 @@ function updateContextConsumer(
   return workInProgress.child;
 }
 
+/**
+ * 
+ * @param {*} current 
+ * @param {*} workInProgress 
+ * @param {*} renderExpirationTime 
+ */
 function bailoutOnAlreadyFinishedWork(
   current: Fiber | null,
   workInProgress: Fiber,
