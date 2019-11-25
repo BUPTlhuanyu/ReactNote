@@ -149,7 +149,7 @@ function scheduleRootUpdate(
     );
     update.callback = callback;
   }
-
+  // 刷新副作用 
   flushPassiveEffects();
   enqueueUpdate(current, update);
   scheduleWork(current, expirationTime);
@@ -188,7 +188,7 @@ export function updateContainerAtExpirationTime(
     container.pendingContext = context;
   }
   //开始调度root的更新
-  return scheduleRootUpdate(current, element, expirationTime, callback);
+  return scheduleRootUpdate(current/* rootFiber */, element /* 第一个react组件app */, expirationTime /* rootFiber的到期事件 */, callback /* 第三个参数回调函数的执行器 */);
 }
 
 function findHostInstance(component: Object): PublicInstance | null {

@@ -351,6 +351,7 @@ ReactRoot.prototype.render = function(
   children: ReactNodeList,
   callback: ?() => mixed,
 ): Work {
+  // 创建ReactWork对象实例，将第三个参数传入这个实例的_callbacks属性上，在container更新提交阶段完成之后依此执行回调
   const root = this._internalRoot;
   const work = new ReactWork();
   callback = callback === undefined ? null : callback;
@@ -360,7 +361,7 @@ ReactRoot.prototype.render = function(
   if (callback !== null) {
     work.then(callback);
   }
-  //开始构建fiber树
+  //开始构建fiber树，children是ReactDOM.render的第一个参数，root是第二个参数对应的FiberRoot，work._onCommit是第三个参数回调函数的执行器
   DOMRenderer.updateContainer(children, root, null, work._onCommit);
   //最终返回实例work
   return work;
