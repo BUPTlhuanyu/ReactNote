@@ -1759,6 +1759,7 @@ function retrySuspendedRoot(
  * @param {*} expirationTime 发生更新的到期时间
  */
 function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
+  // 跳过，与debug相关
   recordScheduleUpdate();
 
   if (__DEV__) {
