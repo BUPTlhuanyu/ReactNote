@@ -151,7 +151,7 @@ function scheduleRootUpdate(
   }
   // 刷新副作用 
   flushPassiveEffects();
-  enqueueUpdate(current, update);
+  enqueueUpdate(current, update); // current是container的rootFiber
   scheduleWork(current, expirationTime);
 
   return expirationTime;

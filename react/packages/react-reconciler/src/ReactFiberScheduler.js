@@ -1762,6 +1762,7 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
   // 跳过，与debug相关
   recordScheduleUpdate();
 
+  // 跳过
   if (__DEV__) {
     if (fiber.tag === ClassComponent) {
       const instance = fiber.stateNode;
@@ -1821,7 +1822,7 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
     }
   }
 
-  //如果允许跟踪，则执行
+  // 跳过，如果允许跟踪，则执行
   if (enableSchedulerTracing) {
     if (root !== null) {
       const interactions = __interactionsRef.current;

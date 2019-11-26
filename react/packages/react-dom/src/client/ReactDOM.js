@@ -561,6 +561,7 @@ function legacyRenderSubtreeIntoContainer(
   let root: Root = (container._reactRootContainer: any);
   if (!root) {
     // Initial mount
+    // 构建root并保存在container._reactRootContainer，这会导致下一次调用ReactDOM.render的时候，会进入else部分。
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
       forceHydrate,
