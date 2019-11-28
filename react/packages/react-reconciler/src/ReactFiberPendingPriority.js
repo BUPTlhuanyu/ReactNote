@@ -274,7 +274,7 @@ function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
 
   // If there is no pending or pinged work, check if there's suspended work
   // that's lower priority than what we just completed.
-  //  如果最先过期的到期时间为0说明当前fiber树没有任务需要执行，
+  //  经过上面的代码分析，只有earliestPendingTime不为0的时候nextExpirationTimeToWorkOn才有机会为0，从而等价于latestPingedTime为0，对应的也就是最后过期的到期时间为0说明当前fiber树没有任务需要执行，
     // 并且如果存在被挂起的任务中最低优先级小于刚完成任务的优先级，说明所有挂起任务还不需要执行，
     // 因此将这个最低优先级任务到期时间赋值给nextExpirationTimeToWorkOn，也就是下一次渲染用到的到期时间
   if (
@@ -289,12 +289,21 @@ function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
   }
 
   //下一次渲染存在任务并且优先级小于挂起的任务的最高优先级，则将当前渲染的到期时间设置为该优先级。
+  // 在earliestPendingTime不为0的情况下，
+  //    如果expirationTime=nextExpirationTimeToWorkOn===earliestPendingTime优先级小于earliestSuspendedTime，那么expirationTime= earliestSuspendedTime
+  //    否则expirationTime=nextExpirationTimeToWorkOn===earliestPendingTime
+  // 在earliestPendingTime为0的情况下，latestPingedTime必然为0
+  //    但是传入的completedExpirationTime是否一定在这两者之间是不确定的，但是能确定的是
+  //    ❗️❗️如果从scheduleWork进来，那么completedExpirationTime也必定为0(但是这样似乎就很不合理了，有待后续的思考)。在这种情况下，上面的if和下面的if都会成立，这样使得nextExpirationTimeToWorkOn = latestSuspendedTime;以及expirationTime = earliestSuspendedTime
+  //    如果从其他地方进来，completedExpirationTime可能不等于0，并且也不会在earliestPendingTime与latestPingedTime的区间内，因此
+  //        如果completedExpirationTime大于latestSuspendedTime，那么nextExpirationTimeToWorkOn = latestSuspendedTime;以及expirationTime = earliestSuspendedTime
+  //        如果completedExpirationTime小于latestSuspendedTime，那么nextExpirationTimeToWorkOn = 0;以及expirationTime = earliestSuspendedTime
   let expirationTime = nextExpirationTimeToWorkOn;
   if (expirationTime !== NoWork && earliestSuspendedTime > expirationTime) {
     // Expire using the earliest known expiration time.
     expirationTime = earliestSuspendedTime;
   }
-
+  // 如果没有 Suspended，那么root.nextExpirationTimeToWorkOn与root.expirationTime都是earliestPendingTime
   root.nextExpirationTimeToWorkOn = nextExpirationTimeToWorkOn;
   root.expirationTime = expirationTime;
 }
