@@ -10834,7 +10834,12 @@
         var latestSuspendedTime = root.latestSuspendedTime;
         var earliestPendingTime = root.earliestPendingTime;
         var latestPingedTime = root.latestPingedTime;
-
+        console.log('earliestSuspendedTime🍏🍏🍏', earliestSuspendedTime, 
+                    'latestSuspendedTime🍏🍏🍏', latestSuspendedTime, 
+                    'earliestPendingTime🍏🍏🍏', earliestPendingTime, 
+                    'latestPingedTime🍏🍏🍏', latestPingedTime,
+                    'completedExpirationTime🍏🍏🍏', completedExpirationTime);
+        
         // Work on the earliest pending time. Failing that, work on the latest
         // pinged time.
         var nextExpirationTimeToWorkOn = earliestPendingTime !== NoWork ? earliestPendingTime : latestPingedTime;

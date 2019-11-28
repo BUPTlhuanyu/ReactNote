@@ -257,7 +257,7 @@ export function didExpireAtExpirationTime(
 // 决定哪些更新要在当前周期中被执行
 // 通过跟每个节点的expirationTime比较决定该节点是否可以直接bailout（跳过）
 function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
-  const earliestSuspendedTime = root.earliestSuspendedTime;
+  const earliestSuspendedTime = root.earliestSuspendedTime; // 优先级最大的被挂起的更新任务的到期时间，suepend组件在目标组件获取成功之后需要进行展示，这个展示就是一个更新任务，因此拥有到期时间
   const latestSuspendedTime = root.latestSuspendedTime;
   const earliestPendingTime = root.earliestPendingTime;
   const latestPingedTime = root.latestPingedTime;
@@ -268,7 +268,7 @@ function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
   //  区间为[latestPendingTime，earliestPendingTime]，latestPendingTime值小于等于earliestPendingTime，
     // 因此earliestPendingTime会先于latestPendingTime过期，原因是react的时间是从1073741823开始随着时间的推移而减少的
     // 下面对nextExpirationTimeToWorkOn赋值的逻辑是：如果earliestPendingTime不等于0则返回earliestPendingTime，否则返回latestPingedTime
-    // 将nextExpirationTimeToWorkOn设置为当前root对应fiber树中更新任务的最先过期的到期时间
+    // 将nextExpirationTimeToWorkOn设置为当前root对应fiber树中更新任务的最先过期的到期时间,也就是优先级最大的到期时间
     let nextExpirationTimeToWorkOn =
     earliestPendingTime !== NoWork ? earliestPendingTime : latestPingedTime;
 

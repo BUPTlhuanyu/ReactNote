@@ -2020,11 +2020,11 @@ function scheduleCallbackWithExpirationTime(
     startRequestCallbackTimer();
   }
 
-  callbackExpirationTime = expirationTime;
-  const currentMs = now() - originalStartTimeMs;
-  const expirationTimeMs = expirationTimeToMs(expirationTime);
-  const timeout = expirationTimeMs - currentMs;
-  callbackID = scheduleDeferredCallback(performAsyncWork, {timeout});
+  callbackExpirationTime = expirationTime;// 记录本次异步调度的最高优先级的到期时间
+  const currentMs = now() - originalStartTimeMs;// 计算从react应用启动到现在的绝对间隔时间
+  const expirationTimeMs = expirationTimeToMs(expirationTime); // 将本次异步调度的最高优先级的到期时间换算成ms单位
+  const timeout = expirationTimeMs - currentMs; // 计算出还剩余多少ms，本次异步调度中的更新队列中最高优先级任务就会过期，scheduler会根据这个时间来判断本次异步调度函数的是否过期
+  callbackID = scheduleDeferredCallback(performAsyncWork, {timeout}); // 将本次异步调度函数以及对应的到期时间传递给scheduler，并获得一个callbackID，用于在有高优先级任务打断本次调度的时候从scheduler中删除这个调度函数
 }
 
 // For every call to renderRoot, one of onFatal, onComplete, onSuspend, and
@@ -2172,6 +2172,13 @@ function requestWork(root: FiberRoot, expirationTime: ExpirationTime) {
   }
 }
 
+/**
+ * 将传入的到期时间设置到root.expirationTime上，然后将root添加到双向循环链表上。
+ * 所有经过调度的root会被组织成双向循环链表，firstScheduledRoot与lastScheduledRoot分别指向第一个和最后一个root，
+ * root.nextScheduledRoot指向下一个被调度过的root，lastScheduledRoot指向的root的nextScheduledRoot指向链表的第一个root
+ * @param {*} root 
+ * @param {*} expirationTime 
+ */
 function addRootToSchedule(root: FiberRoot, expirationTime: ExpirationTime) {
   // Add the root to the schedule.
   // Check if this root is already part of the schedule.
@@ -2296,9 +2303,6 @@ function shouldYieldToRenderer() {
 }
 
 // performAsyncWork 异步方式
-// 异步情况给performWork设置的minExpirationTime是NoWork，并且会判断dl.didTimeout，
-// 这个值是指任务的expirationTime是否已经超时，
-// 如果超时了，则直接设置newExpirationTimeToWorkOn为当前时间，表示这个任务直接执行就行了，不需要判断是否超过了帧时间
 function performAsyncWork() {
   try {
     if (!shouldYieldToRenderer()) {
@@ -2321,6 +2325,7 @@ function performAsyncWork() {
         } while (root !== firstScheduledRoot);
       }
     }
+    // 无论什么情况都会执行performWork
     performWork(NoWork, true);
   } finally {
     didYield = false;
