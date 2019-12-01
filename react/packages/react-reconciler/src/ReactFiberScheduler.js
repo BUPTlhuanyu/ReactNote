@@ -2420,6 +2420,7 @@ function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
   }
   // If there's work left over, schedule a new callback.
   // 通过上述的while循环执行完同步的更新任务以及过期的异步更新任务之后，可能还会存在一些没有过期的异步任务，因此需要将这些任务存到新的一轮调度中。
+  // nextFlushedExpirationTime会在requestWork以及findHighestPriorityRoot以及flushRoot的时候会被赋值
   if (nextFlushedExpirationTime !== NoWork) {
     //scheduleCallbackWithExpirationTime为scheduler中的unstable-scheduleCallback
     scheduleCallbackWithExpirationTime(
