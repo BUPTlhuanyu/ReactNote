@@ -14531,6 +14531,7 @@
         } else {
             // Otherwise reset hydration state in case we aborted and resumed another
             // root.
+            console.log('reconcileChildren🍀🍀🍀🍀🍀🍀🥗🥗🥗🥗🥗🥗🥗', current$$1, workInProgress, nextChildren, renderExpirationTime);
             reconcileChildren(current$$1, workInProgress, nextChildren, renderExpirationTime);
             resetHydrationState();
         }
