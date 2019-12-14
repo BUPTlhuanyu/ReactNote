@@ -236,6 +236,9 @@ function warnOnFunctionType() {
 // to be able to optimize each path individually by branching early. This needs
 // a compiler or we can do it manually. Helpers that don't need this branching
 // live outside of this function.
+/**
+ * shouldTrackSideEffects
+ */
 function ChildReconciler(shouldTrackSideEffects) {
   function deleteChild(returnFiber: Fiber, childToDelete: Fiber): void {
     if (!shouldTrackSideEffects) {
@@ -339,6 +342,10 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
   }
 
+  /**
+   * 判断是否是第一次渲染，如果是的话给effectTag标记为Placement，表示后面需要挂载
+   * @param {*} newFiber 需要调度的孩子节点
+   */
   function placeSingleChild(newFiber: Fiber): Fiber {
     // This is simpler for the single child case. We only need to do a
     // placement for inserting new children.
@@ -1105,6 +1112,13 @@ function ChildReconciler(shouldTrackSideEffects) {
     return created;
   }
 
+  /**
+   * 
+   * @param {*} returnFiber 
+   * @param {*} currentFirstChild 
+   * @param {*} element 
+   * @param {*} expirationTime 
+   */
   function reconcileSingleElement(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -1215,6 +1229,13 @@ function ChildReconciler(shouldTrackSideEffects) {
   // This API will tag the children with the side-effect of the reconciliation
     // itself. They will be added to the side-effect list as we pass through the
     // children and the parent.
+  /**
+   * 
+   * @param {*} returnFiber 传入的父节点
+   * @param {*} currentFirstChild 父节点下旧的第一个子节点
+   * @param {*} newChild 执行完workinprogressfiber上的更新任务之后，得到节点上新的children 
+   * @param {*} expirationTime 执行渲染任务的时间对于的到期时间
+   */
   function reconcileChildFibers(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -1229,6 +1250,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     // Handle top level unkeyed fragments as if they were arrays.
     // This leads to an ambiguity between <>{[...]}</> and <>...</>.
     // We treat the ambiguous cases above the same.
+    // 1. 根据新的子节点是否是一个fragment节点，React.Fragment或者<></>,如果是则将新的子节点的子节点存储到newChild变量上，然后继续下面的调和
     const isUnkeyedTopLevelFragment =
       typeof newChild === 'object' &&
       newChild !== null &&
@@ -1239,10 +1261,13 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
 
     // Handle object types
+    // 2. 判断newChild是否是一个对象
     const isObject = typeof newChild === 'object' && newChild !== null;
 
+    // 3. 如果是一个对象，那么判断新子节点是一个react element还是react portal，然后根据对于的类型调用相应的方法
     if (isObject) {
       switch (newChild.$$typeof) {
+        // 是react element对象
         case REACT_ELEMENT_TYPE:
           return placeSingleChild(
             reconcileSingleElement(
@@ -1252,6 +1277,7 @@ function ChildReconciler(shouldTrackSideEffects) {
               expirationTime,
             ),
           );
+        // 是react portal type对象
         case REACT_PORTAL_TYPE:
           return placeSingleChild(
             reconcileSinglePortal(
@@ -1264,6 +1290,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
 
+    // 4. 如果新子节点是字符串或者数字，那么调用相应的方法处理
     if (typeof newChild === 'string' || typeof newChild === 'number') {
       return placeSingleChild(
         reconcileSingleTextNode(
@@ -1275,6 +1302,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       );
     }
 
+    // 5.如果新的子节点是一个数组，那么调用相应的方法来调和数组节点
     if (isArray(newChild)) {
       return reconcileChildrenArray(
         returnFiber,
@@ -1284,6 +1312,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       );
     }
 
+    // 6.如果新的子节点具有遍历器接口，那么调用相应的方法来调和
     if (getIteratorFn(newChild)) {
       return reconcileChildrenIterator(
         returnFiber,
@@ -1293,19 +1322,24 @@ function ChildReconciler(shouldTrackSideEffects) {
       );
     }
 
+    // 7.如果是一个对象，但是不是3，5，6的情况，则报错。
     if (isObject) {
       throwOnInvalidObjectType(returnFiber, newChild);
     }
 
+    // 跳过
     if (__DEV__) {
       if (typeof newChild === 'function') {
         warnOnFunctionType();
       }
     }
+
+    // 8. 如果传入的newChild不是fragment，并且newChild不是上面的所有类型而是undefined
     if (typeof newChild === 'undefined' && !isUnkeyedTopLevelFragment) {
       // If the new child is undefined, and the return fiber is a composite
       // component, throw an error. If Fiber return types are disabled,
       // we already threw above.
+      // 判断当前正在更新的节点（新子节点的父节点）的类型，如果是类组件，空操作。如果是函数组件，则报错，说明函数组件返回null或者没有return语句
       switch (returnFiber.tag) {
         case ClassComponent: {
           if (__DEV__) {
@@ -1332,6 +1366,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
 
+    // 9. 如果传入的newChild是fragment，并且fragement中的children不是上面的234567所有类型，则当作新的子节点为空，那么需要调用deleteRemainingChildren将父节点中原来的子节点都删除
     // Remaining cases are all treated as empty.
     return deleteRemainingChildren(returnFiber, currentFirstChild);
   }
