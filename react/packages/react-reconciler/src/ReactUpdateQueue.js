@@ -410,6 +410,7 @@ function getStateFromUpdate<State>(
     case CaptureUpdate: {
       // ❗❗️副作用相关，一般我们知道的是比如获取数据/操作DOM等算副作用，那么react的源码是如何区分副作用的呢
       workInProgress.effectTag =
+      // 去除ShouldCapture状态，添加DidCapture状态
         (workInProgress.effectTag & ~ShouldCapture) | DidCapture;
     }
     // Intentional fallthrough
@@ -494,7 +495,7 @@ export function processUpdateQueue<State>(
 
   // These values may change as we process the queue.
   let newBaseState = queue.baseState; // 执行更新队列中的更新任务之前的state
-  let newFirstUpdate = null; // 用于暂存update队列中第一个为过期的更新任务
+  let newFirstUpdate = null; // 用于暂存update队列中第一个未过期的更新任务
   let newExpirationTime = NoWork; // 保存一个被跳过的更新任务（update以及CapturedUpdate）中优先级最高任务的到期时间，这个到期时间也是被跳过的任务中最大的。
 
   // Iterate through the list of updates to compute the result.

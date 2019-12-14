@@ -873,6 +873,9 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
   }
 }
 
+/**
+ * 设置workInProgress的childExpirationTime。遍历workInProgress下的第一层所有子节点，选出所有子节点以及子树中优先级最高的更新任务的到期时间作为workInProgress的childExpirationTime
+ */
 function resetChildExpirationTime(
   workInProgress: Fiber,
   renderTime: ExpirationTime,
@@ -886,6 +889,7 @@ function resetChildExpirationTime(
   let newChildExpirationTime = NoWork;
 
   // Bubble up the earliest expiration time.
+  // 跳过
   if (enableProfilerTimer && workInProgress.mode & ProfileMode) {
     // We're in profiling mode.
     // Let's use this same traversal to update the render durations.
@@ -949,6 +953,7 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
     // means that we don't need an additional field on the work in
     // progress.
     const current = workInProgress.alternate;
+    // 跳过
     if (__DEV__) {
       ReactCurrentFiber.setCurrentFiber(workInProgress);
     }
@@ -957,6 +962,7 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
     const siblingFiber = workInProgress.sibling;
 
     if ((workInProgress.effectTag & Incomplete) === NoEffect) {
+      // 跳过
       if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
         // Don't replay if it fails during completion phase.
         mayReplayFailedUnitOfWork = false;
@@ -965,6 +971,7 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
       // Remember we're completing this unit so we can find a boundary if it fails.
       nextUnitOfWork = workInProgress;
       if (enableProfilerTimer) {
+        // debug跳过
         if (workInProgress.mode & ProfileMode) {
           startProfilerTimer(workInProgress);
         }
@@ -984,12 +991,15 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
           nextRenderExpirationTime,
         );
       }
+      // 跳过
       if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
         // We're out of completion phase so replaying is fine now.
         mayReplayFailedUnitOfWork = true;
       }
+      // 跳过
       stopWorkTimer(workInProgress);
       resetChildExpirationTime(workInProgress, nextRenderExpirationTime);
+      // 跳过
       if (__DEV__) {
         ReactCurrentFiber.resetCurrentFiber();
       }
@@ -1036,6 +1046,7 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
         }
       }
 
+      // 跳过
       if (__DEV__ && ReactFiberInstrumentation.debugTool) {
         ReactFiberInstrumentation.debugTool.onCompleteWork(workInProgress);
       }
@@ -1052,6 +1063,7 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
         return null;
       }
     } else {
+      // 跳过
       if (enableProfilerTimer && workInProgress.mode & ProfileMode) {
         // Record the render duration for the fiber that errored.
         stopProfilerTimerIfRunningAndRecordDelta(workInProgress, false);
@@ -1078,12 +1090,15 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
         stopWorkTimer(workInProgress);
       }
 
+      // 跳过
       if (__DEV__) {
         ReactCurrentFiber.resetCurrentFiber();
       }
 
       if (next !== null) {
+        // 跳过
         stopWorkTimer(workInProgress);
+        // 跳过
         if (__DEV__ && ReactFiberInstrumentation.debugTool) {
           ReactFiberInstrumentation.debugTool.onCompleteWork(workInProgress);
         }
@@ -1101,7 +1116,7 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
         returnFiber.firstEffect = returnFiber.lastEffect = null;
         returnFiber.effectTag |= Incomplete;
       }
-
+      // 跳过
       if (__DEV__ && ReactFiberInstrumentation.debugTool) {
         ReactFiberInstrumentation.debugTool.onCompleteWork(workInProgress);
       }
@@ -1253,6 +1268,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
   //  expirationTime !== nextRenderExpirationTime ：初次执行reactDOM.render的时候成立，当本次renderRoot的过程中产生更新，那么这里不会成立。
   //  nextUnitOfWork === null ： 表示之前空闲时间将所有的任务够执行完了，因此nextUnitOfWork === null。如果不为null，表明之前还有没有完成的任务。
   if (
+    // 在renderRoot的时候发生的更新任务的到期时间会与当前renderRoot的时候最高优先级任务到期时间保持一致
     expirationTime !== nextRenderExpirationTime || //这个条件成立的情况： 见computeExpirationForFiber
     root !== nextRoot ||
     nextUnitOfWork === null
@@ -2017,6 +2033,7 @@ function scheduleCallbackWithExpirationTime(
     }
     // The request callback timer is already running. Don't start a new one.
   } else {
+    // 跳过，debug相关
     startRequestCallbackTimer();
   }
 
