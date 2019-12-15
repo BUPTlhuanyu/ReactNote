@@ -13206,6 +13206,8 @@
         }
 
         function placeSingleChild(newFiber) {
+            console.log('调用placeSingleChild🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀', newFiber);
+
             // This is simpler for the single child case. We only need to do a
             // placement for inserting new children.
             if (shouldTrackSideEffects && newFiber.alternate === null) {
@@ -14216,7 +14218,7 @@
 
     function reconcileChildren(current$$1, workInProgress, nextChildren, renderExpirationTime) {
         if (current$$1 === null) {
-            console.log('🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗');
+            console.log('reconcileChildren🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗');
 
             // If this is a fresh new component that hasn't been rendered yet, we
             // won't update its child set by applying minimal side-effects. Instead,
@@ -14490,6 +14492,7 @@
     }
 
     function updateHostRoot(current$$1, workInProgress, renderExpirationTime) {
+        console.log('调用updateHostRoot🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀', current$$1);
         pushHostRootContext(workInProgress);
         var updateQueue = workInProgress.updateQueue;
         !(updateQueue !== null) ? invariant(false, 'If the root does not have an updateQueue, we should have already bailed out. This error is likely caused by a bug in React. Please file an issue.') : void 0;
@@ -14527,6 +14530,7 @@
             // Ensure that children mount into this root without tracking
             // side-effects. This ensures that we don't store Placement effects on
             // nodes that will be hydrated.
+            console.log('调用mountChildFibers🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀🍀', current);
             workInProgress.child = mountChildFibers(workInProgress, null, nextChildren, renderExpirationTime);
         } else {
             // Otherwise reset hydration state in case we aborted and resumed another

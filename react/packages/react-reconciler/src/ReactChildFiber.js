@@ -266,6 +266,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     currentFirstChild: Fiber | null,
   ): null {
     if (!shouldTrackSideEffects) {
+      // 由于第一次渲染，因此没有旧的子节点，因此不需要删除旧的子节点
       // Noop.
       return null;
     }
@@ -349,6 +350,8 @@ function ChildReconciler(shouldTrackSideEffects) {
   function placeSingleChild(newFiber: Fiber): Fiber {
     // This is simpler for the single child case. We only need to do a
     // placement for inserting new children.
+    // 第一次渲染的时候会调用createFiber创建fiber对象，alternate属性为null，
+    // 在更新过程中，会创建当前fiber对应的workinprogress对象，其alternate属性就是当前的fiber，当前的fiber的alternate属性就是刚刚创建的workinprogress对象
     if (shouldTrackSideEffects && newFiber.alternate === null) {
       newFiber.effectTag = Placement;
     }
@@ -1334,7 +1337,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
 
-    // 8. 如果传入的newChild不是fragment，并且newChild不是上面的所有类型而是undefined
+    // 8. 如果传入的newChild不是fragment，并且newChild不是上面的所有类型而是undefined，也就是没有传入child
     if (typeof newChild === 'undefined' && !isUnkeyedTopLevelFragment) {
       // If the new child is undefined, and the return fiber is a composite
       // component, throw an error. If Fiber return types are disabled,
