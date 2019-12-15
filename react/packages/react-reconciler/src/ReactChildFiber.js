@@ -250,14 +250,19 @@ function ChildReconciler(shouldTrackSideEffects) {
     // deletions, so we can just append the deletion to the list. The remaining
     // effects aren't added until the complete phase. Once we implement
     // resuming, this may not be true.
+    // 获取父节点的最后一个副作用
     const last = returnFiber.lastEffect;
+    // 如果父节点上副作用链表不为空，也就是最后一个副作用存在，则将需要删除的子节点添加到副作用链表的最后，然后将父节点中指向最后一个副作用的指针lastEffect指向要删除的子节点，也就是指向副作用链表的最后一个节点
     if (last !== null) {
       last.nextEffect = childToDelete;
       returnFiber.lastEffect = childToDelete;
     } else {
+      // 如果父节点副作用链表为空，则将需要被删除的节点添加到链表上，父节点的firstEffect与lastEffect都指向该需要被删除的节点
       returnFiber.firstEffect = returnFiber.lastEffect = childToDelete;
     }
+    // 将需要被删除的节点上原来存在的指向下一个副作用的指针清空
     childToDelete.nextEffect = null;
+    // 将需要被删除的节点的effectTag标记为Deletion，在提交阶段需要，表示这个节点需要被删除
     childToDelete.effectTag = Deletion;
   }
 
