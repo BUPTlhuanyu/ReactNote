@@ -1133,18 +1133,27 @@ function ChildReconciler(shouldTrackSideEffects) {
     element: ReactElement,
     expirationTime: ExpirationTime,
   ): Fiber {
+    // 获取新的子节点的key
     const key = element.key;
+    // 将老的第一个子节点保存在变量child上
     let child = currentFirstChild;
+    // 
     while (child !== null) {
       // TODO: If key === null and child.key === null, then this only applies to
       // the first item in the list.
+      // 如果当前遍历到的老的子节点的key与新的子节点的key相等，那么重用老的子节点
       if (child.key === key) {
+        // 如果当前遍历到的老的子节点是fragment，判断新的子节点类型是否是REACT_FRAGMENT_TYPE，
+        // 如果当前遍历到的老的子节点不是fragment，判断当前老的子节点的elementType是否等于新的子节点的type。
+        // type是createElement时传入的第一个参数，节点fiber.elementType与其ReactElement.type相等
         if (
           child.tag === Fragment
             ? element.type === REACT_FRAGMENT_TYPE
             : child.elementType === element.type
         ) {
+          // 删除其他老的子节点
           deleteRemainingChildren(returnFiber, child.sibling);
+          // 复用key相同，type也相同的节点
           const existing = useFiber(
             child,
             element.type === REACT_FRAGMENT_TYPE
@@ -1152,40 +1161,53 @@ function ChildReconciler(shouldTrackSideEffects) {
               : element.props,
             expirationTime,
           );
+          // 创建ref
           existing.ref = coerceRef(returnFiber, child, element);
+          // 设置父节点
           existing.return = returnFiber;
           if (__DEV__) {
             existing._debugSource = element._source;
             existing._debugOwner = element._owner;
           }
+          // 返回复用后的节点，结束reconcileSingleElement
           return existing;
         } else {
+          // 如果key相同但是类型不一样，那么说明老的节点还是无法复用，则删除所有老的子节点，跳出循环，开始创建新的fiber节点
           deleteRemainingChildren(returnFiber, child);
           break;
         }
       } else {
+        // 如果key不一样，直接删除当前老的子节点
         deleteChild(returnFiber, child);
       }
+      // 将child设置为下一个子节点，也就是当前子节点的兄弟节点
       child = child.sibling;
     }
-
+    // 如果新的子节点的type是REACT_FRAGMENT_TYPE
     if (element.type === REACT_FRAGMENT_TYPE) {
+      // 则创建Fragment类型的fiber
       const created = createFiberFromFragment(
         element.props.children,
         returnFiber.mode,
         expirationTime,
         element.key,
       );
+      // 给新创建的Fragment类型的fiber设置父节点
       created.return = returnFiber;
+      // 返回新创建的fiber，结束reconcileSingleElement
       return created;
     } else {
+      // 如果新的子节点的type不是REACT_FRAGMENT_TYPE，则创建普通类型的fiber
       const created = createFiberFromElement(
         element,
         returnFiber.mode,
         expirationTime,
       );
+      // 创建ref
       created.ref = coerceRef(returnFiber, currentFirstChild, element);
+      // 给新创建的fiber设置父节点
       created.return = returnFiber;
+      // 返回新创建的fiber，结束reconcileSingleElement
       return created;
     }
   }
