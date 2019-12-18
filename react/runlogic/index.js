@@ -195,55 +195,73 @@ function testCLassComponent(){
             }
         }
 
+        // clickHandler(){
+        //     for(let i=0;i<10000;i++){
+        //         (function(){})()
+        //     }
+        //     this.setState({
+        //         a : 2
+        //     })
+        //     for(let i=0;i<10000;i++){
+        //         (function(){})()
+        //     }
+        //     this.setState({
+        //         a : 3
+        //     })
+        //     for(let i=0;i<10000;i++){
+        //         (function(){})()
+        //     }
+        //     this.setState({
+        //         a : 4
+        //     })
+        //     for(let i=0;i<10000;i++){
+        //         (function(){})()
+        //     }
+        //     this.setState({
+        //         a : 5
+        //     })
+        // }
+
         clickHandler(){
-            for(let i=0;i<10000;i++){
-                (function(){})()
-            }
             this.setState({
-                a : 2
+                a: this.state.a + 1
             })
-            for(let i=0;i<10000;i++){
-                (function(){})()
-            }
             this.setState({
-                a : 3
+                a: this.state.a + 1
             })
-            for(let i=0;i<10000;i++){
-                (function(){})()
-            }
             this.setState({
-                a : 4
+                a: this.state.a + 1
             })
-            for(let i=0;i<10000;i++){
-                (function(){})()
-            }
             this.setState({
-                a : 5
+                a: this.state.a + 1
+            })
+            this.setState({
+                a: this.state.a + 1
             })
         }
 
         // clickHandler(){
-        //     for(let i=0;i<5000;i++){
-        //         (function(){})()
-        //     }
+        //     // for(let i=0;i<5000;i++){
+        //     //     (function(){})()
+        //     // }
         //     this.setState((prevState, nextProps) => {
         //         return {a:prevState.a + 1};
         //     })
-        //     for(let i=0;i<5000;i++){
-        //         (function(){})()
-        //     }
+        //     // for(let i=0;i<5000;i++){
+        //     //     (function(){})()
+        //     // }
         //     this.setState((prevState, nextProps) => {
         //         return {a:prevState.a + 1};
         //     })
-        //     for(let i=0;i<5000;i++){
-        //         (function(){})()
-        //     }
+        //     // for(let i=0;i<5000;i++){
+        //     //     (function(){})()
+        //     // }
         //     this.setState((prevState, nextProps) => {
         //         return {a:prevState.a + 1};
         //     })
-        //     for(let i=0;i<5000;i++){
-        //         (function(){})()
-        //     }
+        //     // for(let i=0;i<5000;i++){
+        //     //     (function(){})()
+        //     // }
         //     this.setState((prevState, nextProps) => {
         //         return {a:prevState.a + 1};
         //     })

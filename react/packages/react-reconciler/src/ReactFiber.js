@@ -547,6 +547,7 @@ export function createFiberFromElement(
   mode: TypeOfMode,
   expirationTime: ExpirationTime,
 ): Fiber {
+  // owner: ReactElement创建的时候所在组件
   let owner = null;
   if (__DEV__) {
     owner = element._owner;

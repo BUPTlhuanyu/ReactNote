@@ -326,22 +326,28 @@ function ChildReconciler(shouldTrackSideEffects) {
     newIndex: number,
   ): number {
     newFiber.index = newIndex;
+    // 首次渲染的时候,直接返回lastPlacedIndex
     if (!shouldTrackSideEffects) {
       // Noop.
       return lastPlacedIndex;
     }
+    // 如果不是首次渲染,获取新的子节点的workinprogress
     const current = newFiber.alternate;
+    // 如果current存在
     if (current !== null) {
       const oldIndex = current.index;
       if (oldIndex < lastPlacedIndex) {
+        // 如果老的节点位置小于新的节点位置,说明需要标记这个新的节点的effectTag为移动placement
         // This is a move.
         newFiber.effectTag = Placement;
         return lastPlacedIndex;
       } else {
+        // 否则不需要标记为移动
         // This item can stay in place.
         return oldIndex;
       }
     } else {
+      // 如果current不存在,那么
       // This is an insertion.
       newFiber.effectTag = Placement;
       return lastPlacedIndex;
@@ -532,6 +538,15 @@ function ChildReconciler(shouldTrackSideEffects) {
     return null;
   }
 
+  /**
+   * 新的子节点不是fiber而是通过createElement创建的，也就是react-babel的工作
+   * 根据新的子节点的类型做类似的处理：如果新老子节点的key不相同，直接返回null；如果相同，再判断类型是否相同，相同则复用老的子节点，不同创建新的节点。
+   * 最终返回新的子节点的fiber
+   * @param {*} returnFiber 
+   * @param {*} oldFiber 
+   * @param {*} newChild 
+   * @param {*} expirationTime 
+   */
   function updateSlot(
     returnFiber: Fiber,
     oldFiber: Fiber | null,
@@ -540,15 +555,19 @@ function ChildReconciler(shouldTrackSideEffects) {
   ): Fiber | null {
     // Update the fiber if the keys match, otherwise return null.
 
+    // 获取老节点的key
     const key = oldFiber !== null ? oldFiber.key : null;
 
+    // 如果新节点是字符串或者数字
     if (typeof newChild === 'string' || typeof newChild === 'number') {
       // Text nodes don't have keys. If the previous node is implicitly keyed
       // we can continue to replace it without aborting even if it is not a text
       // node.
+      // 如果存在key，则返回null
       if (key !== null) {
         return null;
       }
+      // 如果没有key，则调用updateTextNode创建对应的text类型的fiber
       return updateTextNode(
         returnFiber,
         oldFiber,
@@ -557,6 +576,21 @@ function ChildReconciler(shouldTrackSideEffects) {
       );
     }
 
+    // newChild是新的数组类型子节点中的一个子节点
+    // 如果新的子节点是一个对象：
+        // 新的字节但的newChild.$$typeof存在
+            // 如果$$typeof是REACT_ELEMENT_TYPE
+                // 如果新的子节点与老的字节点key相同：
+                    // 如果新的子节点是fragment，则返回调用updateFragment：如果老的子节点也是fragment类型，则复用老的子节点（复用是指复用fiber部分属性，不会创建fiber，虽然调用了createWorkInProgress）。否则创建fragment类型的fiber(会new FiberNode())
+                    // 如果新的子节点不是fragment，则返回调用updateElement：如果老的子节点与新的子节点的类型相同，则复用老的子节点。否则根据新的子节点的type创建对应类型的fiber
+                // 如果新的子节点与老的字节点key不相同：返回null
+            // 如果$$typeof是REACT_PORTAL_TYPE
+                // 如果新的子节点与老的字节点key相同：返回调用updatePortal：依据老的子节点的类型，复用老的子节点或者创建Portal类型的fiber
+                // 如果新的子节点与老的字节点key不相同：返回null
+        // 如果新的子节点是一个数组或者是具有遍历器接口的对象：
+            // 如果老的子节点存在key，返回null
+            // 如果老的子节点不存在key， 返回调用updateFragment
+        // 其余情况直接报错
     if (typeof newChild === 'object' && newChild !== null) {
       switch (newChild.$$typeof) {
         case REACT_ELEMENT_TYPE: {
@@ -616,7 +650,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         warnOnFunctionType();
       }
     }
-
+    // 不是数字，不是字符串，不是对象，返回null 
     return null;
   }
 
@@ -769,6 +803,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     // If you change this code, also update reconcileChildrenIterator() which
     // uses the same algorithm.
 
+    // 跳过
     if (__DEV__) {
       // First, validate keys.
       let knownKeys = null;
@@ -781,52 +816,71 @@ function ChildReconciler(shouldTrackSideEffects) {
     let resultingFirstChild: Fiber | null = null;
     let previousNewFiber: Fiber | null = null;
 
-    let oldFiber = currentFirstChild;
+    // 获取老的第一个子节点
+    let oldFiber = currentFirstChild; 
     let lastPlacedIndex = 0;
+    // 遍历新的children的时候，用于存储当前子节点的下标
     let newIdx = 0;
     let nextOldFiber = null;
+    // 遍历新老节点数组,找到第一个不能复用的老的节点则跳出循环
     for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
+      // 如果还没有遍历完newChildren并且还有老的子节点，则执行for循环的新一轮遍历
       if (oldFiber.index > newIdx) {
+        // ！如果老的子节点位置比当前新的子节点位置靠后，说明新的子节点往前移动了
         nextOldFiber = oldFiber;
         oldFiber = null;
       } else {
+        // 将老的子节点的兄弟节点赋值给变量nextOldFiber
         nextOldFiber = oldFiber.sibling;
       }
+      // 根据新的子节点的类型做类似的处理：如果新老子节点的key不相同，直接返回null；如果相同，再判断类型是否相同，相同则复用老的子节点，不同创建新的节点。
+      // 最终返回新的子节点的fiber
       const newFiber = updateSlot(
         returnFiber,
         oldFiber,
         newChildren[newIdx],
         expirationTime,
       );
+      // 如果newFiber === null，说明新的子节点类型不正确或者新老节点的key不相同
       if (newFiber === null) {
         // TODO: This breaks on empty slots like null children. That's
         // unfortunate because it triggers the slow path all the time. We need
         // a better way to communicate whether this was a miss or null,
         // boolean, undefined, etc.
         if (oldFiber === null) {
+          // 如果当前遍历到的老节点为null，重新设置oldFiber
           oldFiber = nextOldFiber;
         }
+        // 跳出循环
         break;
       }
+      // 如果是首次渲染，shouldTrackSideEffects为true
       if (shouldTrackSideEffects) {
         if (oldFiber && newFiber.alternate === null) {
           // We matched the slot, but we didn't reuse the existing fiber, so we
           // need to delete the existing child.
+          // newFiber如果复用了oldFiber，那么alternate是存在的，所以到这里表示newFiber没有复用oldFiber，需要从父节点上删除这个老节点
           deleteChild(returnFiber, oldFiber);
         }
       }
+      // 
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+
       if (previousNewFiber === null) {
         // TODO: Move out of the loop. This only happens for the first run.
+        // 第一次进入循环,将第一得到的新的子节点保存到resultingFirstChild
         resultingFirstChild = newFiber;
       } else {
         // TODO: Defer siblings if we're not at the right index for this slot.
         // I.e. if we had null values before, then we want to defer this
         // for each null value. However, we also don't want to call updateSlot
         // with the previous one.
+        // 将上一次循环得到的newFiber的兄弟节点设置为当前得到的新的子节点
         previousNewFiber.sibling = newFiber;
       }
+      // previousNewFiber指向当前新的子节点
       previousNewFiber = newFiber;
+      // 设置下一次循环需要处理的老节点为nextOldFiber
       oldFiber = nextOldFiber;
     }
 
