@@ -13494,6 +13494,7 @@
             var newIdx = 0;
             var nextOldFiber = null;
             for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
+                console.log('oldFiber🌈🌈🌈🌈🌈🌈🌈🌈🌈', oldFiber)
                 if (oldFiber.index > newIdx) {
                     nextOldFiber = oldFiber;
                     oldFiber = null;
@@ -14217,8 +14218,9 @@
     }
 
     function reconcileChildren(current$$1, workInProgress, nextChildren, renderExpirationTime) {
+        console.log('reconcileChildren🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗');
         if (current$$1 === null) {
-            console.log('reconcileChildren🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗');
+            console.log('mountChildFibers🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩',nextChildren);
 
             // If this is a fresh new component that hasn't been rendered yet, we
             // won't update its child set by applying minimal side-effects. Instead,
@@ -14226,6 +14228,7 @@
             // we can optimize this reconciliation pass by not tracking side-effects.
             workInProgress.child = mountChildFibers(workInProgress, null, nextChildren, renderExpirationTime);
         } else {
+            console.log('reconcileChildFibers🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩🎩',nextChildren);
             // If the current child is the same as the work in progress, it means that
             // we haven't yet started any work on these children. Therefore, we use
             // the clone algorithm to create a copy of all the current children.
@@ -14458,6 +14461,7 @@
 
         // React DevTools reads this flag.
         workInProgress.effectTag |= PerformedWork;
+        console.log('finishClassComponent🌱🌱🌱🌱🌱🌱🌱', current$$1);
         if (current$$1 !== null && didCaptureError) {
             // If we're recovering from an error, reconcile without reusing any of
             // the existing children. Conceptually, the normal children and the children
