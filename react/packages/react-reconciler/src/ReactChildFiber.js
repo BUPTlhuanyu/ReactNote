@@ -321,19 +321,20 @@ function ChildReconciler(shouldTrackSideEffects) {
   }
 
   function placeChild(
-    newFiber: Fiber,
-    lastPlacedIndex: number,
-    newIndex: number,
+    newFiber: Fiber, // 当前的新的子节点
+    lastPlacedIndex: number, // 上一次被标记为placement的下标
+    newIndex: number, //当前新的子节点的下标
   ): number {
+    // 将新的子节点的index设置为传入当前遍历对应的下标
     newFiber.index = newIndex;
-    // 首次渲染的时候,直接返回lastPlacedIndex
+    // 如果不是首次渲染,直接返回lastPlacedIndex
     if (!shouldTrackSideEffects) {
       // Noop.
       return lastPlacedIndex;
     }
-    // 如果不是首次渲染,获取新的子节点的workinprogress
+    // 如果是首次渲染,获取新的子节点的workinprogress
     const current = newFiber.alternate;
-    // 如果current存在
+    // 如果current存在，说明是复用的
     if (current !== null) {
       const oldIndex = current.index;
       if (oldIndex < lastPlacedIndex) {
@@ -347,7 +348,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         return oldIndex;
       }
     } else {
-      // 如果current不存在,那么
+      // 如果current不存在,那么标记新的子节点为Placement
       // This is an insertion.
       newFiber.effectTag = Placement;
       return lastPlacedIndex;
@@ -841,7 +842,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         newChildren[newIdx],
         expirationTime,
       );
-      // 如果newFiber === null，说明新的子节点类型不正确或者新老节点的key不相同
+      // 如果newFiber === null，说明新的子节点类型不正确或者新老节点的key不相同，则直接跳出循环。
       if (newFiber === null) {
         // TODO: This breaks on empty slots like null children. That's
         // unfortunate because it triggers the slow path all the time. We need
@@ -854,7 +855,8 @@ function ChildReconciler(shouldTrackSideEffects) {
         // 跳出循环
         break;
       }
-      // 如果是首次渲染，shouldTrackSideEffects为true
+      // 如果是首次渲染，shouldTrackSideEffects为true，
+      // 如果没有复用老节点，则将其删除
       if (shouldTrackSideEffects) {
         if (oldFiber && newFiber.alternate === null) {
           // We matched the slot, but we didn't reuse the existing fiber, so we
