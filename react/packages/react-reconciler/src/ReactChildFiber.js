@@ -859,7 +859,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         if (oldFiber && newFiber.alternate === null) {
           // We matched the slot, but we didn't reuse the existing fiber, so we
           // need to delete the existing child.
-          // newFiber如果复用了oldFiber，那么alternate是存在的，所以到这里表示newFiber没有复用oldFiber，需要从父节点上删除这个老节点
+          // newFiber如果复用了oldFiber，那么alternate是存在的，所以到这里表示newFiber没有复用oldFiber，需要从父节点上删除这个老节点，因此调用deleteChild将oldFiber的effecttag标记为删除
           deleteChild(returnFiber, oldFiber);
         }
       }
