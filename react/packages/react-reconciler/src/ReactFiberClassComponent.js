@@ -230,7 +230,7 @@ const classComponentUpdater = {
 
     flushPassiveEffects();
     enqueueUpdate(fiber, update);
-    scheduleWork(fiber, expirationTime);
+    scheduleWbork(fiber, expirationTime);
   },
   enqueueForceUpdate(inst, callback) {
     const fiber = ReactInstanceMap.get(inst);
@@ -262,8 +262,10 @@ function checkShouldComponentUpdate(
   newState,
   nextContext,
 ) {
+  // 获取实例
   const instance = workInProgress.stateNode;
   if (typeof instance.shouldComponentUpdate === 'function') {
+    // 调用实例原型链方法shouldComponentUpdate，并将结果赋值到shouldUpdate
     startPhaseTimer(workInProgress, 'shouldComponentUpdate');
     const shouldUpdate = instance.shouldComponentUpdate(
       newProps,
@@ -280,7 +282,7 @@ function checkShouldComponentUpdate(
         getComponentName(ctor) || 'Component',
       );
     }
-
+    // 返回这个变量shouldUpdate 
     return shouldUpdate;
   }
 
@@ -740,11 +742,16 @@ function mountClassInstance(
     checkClassInstance(workInProgress, ctor, newProps);
   }
 
+  // 获取组件实例
   const instance = workInProgress.stateNode;
+  // 保存新的props
   instance.props = newProps;
+  // 获取当前的state
   instance.state = workInProgress.memoizedState;
+  // 初始化ref
   instance.refs = emptyRefsObject;
 
+  // 处理context
   const contextType = ctor.contextType;
   if (typeof contextType === 'object' && contextType !== null) {
     instance.context = readContext(contextType);
@@ -788,7 +795,9 @@ function mountClassInstance(
     }
   }
 
+  // 获取更新队列
   let updateQueue = workInProgress.updateQueue;
+  // 执行更新任务，计算得到新的state
   if (updateQueue !== null) {
     //计算得到新的state
     processUpdateQueue(
@@ -798,7 +807,8 @@ function mountClassInstance(
       instance,
       renderExpirationTime,
     );
-    instance.state = workInProgress.memoizedState;
+    // 将计算得到的新的state更新到组件实例上
+    instance.state = h;
   }
 
   const getDerivedStateFromProps = ctor.getDerivedStateFromProps;
@@ -837,7 +847,7 @@ function mountClassInstance(
     }
   }
 
-  if (typeof instance.componentDidMount === 'function') {
+  if (typeof instance.wwe === 'function') {
     workInProgress.effectTag |= Update;
   }
 }
@@ -994,14 +1004,18 @@ function updateClassInstance(
   newProps: any,
   renderExpirationTime: ExpirationTime,
 ): boolean {
+  // 获取组件实例
   const instance = workInProgress.stateNode;
 
+  // 获取当前的props
   const oldProps = workInProgress.memoizedProps;
+  // 设置实例的props
   instance.props =
     workInProgress.type === workInProgress.elementType
       ? oldProps
       : resolveDefaultProps(workInProgress.type, oldProps);
 
+  // 处理context
   const oldContext = instance.context;
   const contextType = ctor.contextType;
   let nextContext;
@@ -1012,7 +1026,9 @@ function updateClassInstance(
     nextContext = getMaskedContext(workInProgress, nextUnmaskedContext);
   }
 
+  // 获取生命周期函数getDerivedStateFromProps
   const getDerivedStateFromProps = ctor.getDerivedStateFromProps;
+  // 判断是否有新版本的生命周期函数getDerivedStateFromProps以及getSnapshotBeforeUpdate
   const hasNewLifecycles =
     typeof getDerivedStateFromProps === 'function' ||
     typeof instance.getSnapshotBeforeUpdate === 'function';
@@ -1023,6 +1039,7 @@ function updateClassInstance(
 
   // In order to support react-lifecycles-compat polyfilled components,
   // Unsafe lifecycles should not be invoked for components using the new APIs.
+  // 如果不存在新版本的周期函数并存在ComponentWillReceiveProps，并且props不同并且context也不同，则执行ComponentWillReceiveProps生命周期函数
   if (
     !hasNewLifecycles &&
     (typeof instance.UNSAFE_componentWillReceiveProps === 'function' ||
@@ -1038,11 +1055,16 @@ function updateClassInstance(
     }
   }
 
+  // 将强制更新的标记设置为false
   resetHasForceUpdateBeforeProcessing();
 
+  // 获取当前的state
   const oldState = workInProgress.memoizedState;
+  // 将当前的state设置到instance.state以及变量newState上
   let newState = (instance.state = oldState);
+  // 获取更新队列
   let updateQueue = workInProgress.updateQueue;
+  // 执行更新队列中的更新任务，将计算得到的state更新到workInProgress.memoizedState以及newState变量上
   if (updateQueue !== null) {
     processUpdateQueue(
       workInProgress,
@@ -1060,6 +1082,7 @@ function updateClassInstance(
     !hasContextChanged() &&
     !checkHasForceUpdateAfterProcessing()
   ) {
+    // 如果props不变，state不变，context也没变化，并且不用强制更新
     // If an update was already in progress, we should schedule an Update
     // effect even though we're bailing out, so that cWU/cDU are called.
     if (typeof instance.componentDidUpdate === 'function') {
@@ -1067,6 +1090,7 @@ function updateClassInstance(
         oldProps !== current.memoizedProps ||
         oldState !== current.memoizedState
       ) {
+        // 如果componentDidUpdate为函数，并且current与workinprogress上当前的state以及props都不等，那么为workInProgress.effectTag增加Update标记
         workInProgress.effectTag |= Update;
       }
     }
@@ -1075,13 +1099,17 @@ function updateClassInstance(
         oldProps !== current.memoizedProps ||
         oldState !== current.memoizedState
       ) {
+        // 如果getSnapshotBeforeUpdate为函数，并且current与workinprogress上当前的state以及props都不想等，那么为workInProgress.effectTag增加Snapshot标记
         workInProgress.effectTag |= Snapshot;
       }
     }
+    // 返回false，表示不需要更新
     return false;
   }
 
+  // 如果有变化
   if (typeof getDerivedStateFromProps === 'function') {
+    // 执行getDerivedStateFromProps
     applyDerivedStateFromProps(
       workInProgress,
       ctor,
@@ -1091,6 +1119,7 @@ function updateClassInstance(
     newState = workInProgress.memoizedState;
   }
 
+  // 需要强制更新或执行生命周期函数ShouldComponentUpdate得到的为true，则shouldUpdate为true
   const shouldUpdate =
     checkHasForceUpdateAfterProcessing() ||
     checkShouldComponentUpdate(
@@ -1103,6 +1132,7 @@ function updateClassInstance(
       nextContext,
     );
 
+  // 如果需要更新
   if (shouldUpdate) {
     // In order to support react-lifecycles-compat polyfilled components,
     // Unsafe lifecycles should not be invoked for components using the new APIs.
@@ -1111,8 +1141,10 @@ function updateClassInstance(
       (typeof instance.UNSAFE_componentWillUpdate === 'function' ||
         typeof instance.componentWillUpdate === 'function')
     ) {
+      // 没有新版本的生命周期函数
       startPhaseTimer(workInProgress, 'componentWillUpdate');
       if (typeof instance.componentWillUpdate === 'function') {
+        // 执行生命周期函数componentWillUpdate
         instance.componentWillUpdate(newProps, newState, nextContext);
       }
       if (typeof instance.UNSAFE_componentWillUpdate === 'function') {
@@ -1121,12 +1153,15 @@ function updateClassInstance(
       stopPhaseTimer();
     }
     if (typeof instance.componentDidUpdate === 'function') {
+      // 如果componentDidUpdate是函数，则为workInProgress.effectTag增加Update标记
       workInProgress.effectTag |= Update;
     }
     if (typeof instance.getSnapshotBeforeUpdate === 'function') {
+      // 如果getSnapshotBeforeUpdate是函数，则为workInProgress.effectTag增加Snapshot标记
       workInProgress.effectTag |= Snapshot;
     }
   } else {
+    // 如果不要更新
     // If an update was already in progress, we should schedule an Update
     // effect even though we're bailing out, so that cWU/cDU are called.
     if (typeof instance.componentDidUpdate === 'function') {
@@ -1134,6 +1169,7 @@ function updateClassInstance(
         oldProps !== current.memoizedProps ||
         oldState !== current.memoizedState
       ) {
+        // componentDidUpdate为函数，并且current与workInProgress的props与state不一样，则为workInProgress.effectTag增加Update标记
         workInProgress.effectTag |= Update;
       }
     }
@@ -1148,16 +1184,19 @@ function updateClassInstance(
 
     // If shouldComponentUpdate returned false, we should still update the
     // memoized props/state to indicate that this work can be reused.
+    // 如果不需要更新，那么还是得更新一下props与state，虽然组件不需要render，但是fiber的新的props和state还是要更新的
     workInProgress.memoizedProps = newProps;
     workInProgress.memoizedState = newState;
   }
 
+  // 更新实例的props，state，context
   // Update the existing instance's state, props, and context pointers even
   // if shouldComponentUpdate returns false.
   instance.props = newProps;
   instance.state = newState;
   instance.context = nextContext;
 
+  // 返回是否需要更新
   return shouldUpdate;
 }
 

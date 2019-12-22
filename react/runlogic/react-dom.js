@@ -13458,6 +13458,7 @@
         }
 
         function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren, expirationTime) {
+            console.log('returnFiber⚽⚽⚽⚽⚽⚽⚽⚽',returnFiber,'currentFirstChild', currentFirstChild,'newChildren',newChildren)
             // This algorithm can't optimize by searching from boths ends since we
             // don't have backpointers on fibers. I'm trying to see how far we can get
             // with that model. If it ends up not being worth the tradeoffs, we can
@@ -13836,6 +13837,8 @@
         // itself. They will be added to the side-effect list as we pass through the
         // children and the parent.
         function reconcileChildFibers(returnFiber, currentFirstChild, newChild, expirationTime) {
+            
+            console.log('returnFiber🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔🍔',returnFiber,'currentFirstChild', currentFirstChild,'newChild',newChild)
             // This function is not recursive.
             // If the top level item is an array, we treat it as a set of children,
             // not as a fragment. Nested arrays on the other hand will be treated as
@@ -14218,7 +14221,7 @@
 
     function reconcileChildren(current$$1, workInProgress, nextChildren, renderExpirationTime) {
         if (current$$1 === null) {
-            console.log('reconcileChildren🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗');
+            console.log('mountChildFibers🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗',current$$1, workInProgress, nextChildren);
 
             // If this is a fresh new component that hasn't been rendered yet, we
             // won't update its child set by applying minimal side-effects. Instead,
@@ -14226,6 +14229,8 @@
             // we can optimize this reconciliation pass by not tracking side-effects.
             workInProgress.child = mountChildFibers(workInProgress, null, nextChildren, renderExpirationTime);
         } else {
+            console.log('reconcileChildFibers🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗',current$$1, workInProgress, nextChildren);
+
             // If the current child is the same as the work in progress, it means that
             // we haven't yet started any work on these children. Therefore, we use
             // the clone algorithm to create a copy of all the current children.
@@ -15140,9 +15145,8 @@
     function beginWork(current$$1, workInProgress, renderExpirationTime) {
         var updateExpirationTime = workInProgress.expirationTime;
 
-        if(current$$1 === null){
-            console.log('current$$1❕❕❕❕❕❕❕❕❕========================================================================>', workInProgress);
-        }
+        console.log('current$$1🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻========================================================================>', workInProgress);
+
 
         if (current$$1 !== null) {
             console.log('beginWork=========>', current$$1)
@@ -17992,6 +17996,7 @@
             workInProgress.memoizedProps = workInProgress.pendingProps;
         }
 
+        console.log('next🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥', next)
         {
             resetCurrentFiber();
             if (isReplayingFailedUnitOfWork) {

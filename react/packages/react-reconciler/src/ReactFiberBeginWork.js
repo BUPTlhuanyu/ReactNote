@@ -519,16 +519,21 @@ function finishClassComponent(
   renderExpirationTime: ExpirationTime,
 ) {
   // Refs should update even if shouldComponentUpdate returns false
+  // 处理ref
   markRef(current, workInProgress);
 
+  // 判断是否有错误被捕获
   const didCaptureError = (workInProgress.effectTag & DidCapture) !== NoEffect;
 
   if (!shouldUpdate && !didCaptureError) {
+    // 不需要更新并且没有错误发生
     // Context providers should defer to sCU for rendering
     if (hasContext) {
+      // 处理context
       invalidateContextProvider(workInProgress, Component, false);
     }
 
+    // 跳过当前节点，不需要调用组件的render方法了
     return bailoutOnAlreadyFinishedWork(
       current,
       workInProgress,
@@ -536,15 +541,18 @@ function finishClassComponent(
     );
   }
 
+  // 获取组件实例
   const instance = workInProgress.stateNode;
 
   // Rerender
+  // 
   ReactCurrentOwner.current = workInProgress;
   let nextChildren;
   if (
     didCaptureError &&
     typeof Component.getDerivedStateFromError !== 'function'
   ) {
+    // 如果发生错误，但是没有定义静态方法getDerivedStateFromError，那么无法渲染降级ui，具体见官网的介绍，这里不常用，也就直接跳过吧
     // If we captured an error, but getDerivedStateFrom catch is not defined,
     // unmount all the children. componentDidCatch will schedule an update to
     // re-render a fallback. This is temporary until we migrate everyone to
@@ -556,6 +564,7 @@ function finishClassComponent(
       stopProfilerTimerIfRunning(workInProgress);
     }
   } else {
+    // 如果没有发生错误则直接调用实例的render方法，并将返回值赋值给nextChildren
     if (__DEV__) {
       ReactCurrentFiber.setCurrentPhase('render');
       nextChildren = instance.render();
@@ -575,6 +584,7 @@ function finishClassComponent(
   // React DevTools reads this flag.
   workInProgress.effectTag |= PerformedWork;
   if (current !== null && didCaptureError) {
+    // 不是第一次渲染并且有错误发生，则调用forceUnmountCurrentAndReconcile重新调和子节点
     // If we're recovering from an error, reconcile without reusing any of
     // the existing children. Conceptually, the normal children and the children
     // that are shown on error are two different sets, so we shouldn't reuse
@@ -586,6 +596,7 @@ function finishClassComponent(
       renderExpirationTime,
     );
   } else {
+    // 没发生错误则会开始调度子节点
     reconcileChildren(
       current,
       workInProgress,
@@ -594,15 +605,18 @@ function finishClassComponent(
     );
   }
 
+  // 将实例上的state更新到workInProgress.memoizedState
   // Memoize state using the values we just used to render.
   // TODO: Restructure so we never read values from the instance.
   workInProgress.memoizedState = instance.state;
 
+  // 处理context
   // The context might have changed so we need to recalculate it.
   if (hasContext) {
     invalidateContextProvider(workInProgress, Component, true);
   }
 
+  // 返回workInProgress的第一个子节点
   return workInProgress.child;
 }
 
