@@ -322,7 +322,7 @@ function ChildReconciler(shouldTrackSideEffects) {
 
   function placeChild(
     newFiber: Fiber, // 当前的新的子节点
-    lastPlacedIndex: number, // 上一次被标记为placement的下标
+    lastPlacedIndex: number, // 
     newIndex: number, //当前新的子节点的下标
   ): number {
     // 将新的子节点的index设置为传入当前遍历对应的下标
@@ -334,21 +334,22 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
     // 如果是首次渲染,获取新的子节点的workinprogress
     const current = newFiber.alternate;
-    // 如果current存在，说明是复用的
+    // 如果current存在，说明传入的新的子节点复用了老节点
     if (current !== null) {
-      const oldIndex = current.index;
+      const oldIndex = current.index; // 获取老节点的下标
       if (oldIndex < lastPlacedIndex) {
-        // 如果老的节点位置小于新的节点位置,说明需要标记这个新的节点的effectTag为移动placement
+        // 如果当前被复用的老的节点位置比上一次被复用的老节点的下标小，由于这个新的子节点复用了原来的老的子节点，因此在dom更新上，需要将原来的排在后面的老节点移动到前面, 因此需要标记这个新的节点的effectTag为移动placement
         // This is a move.
         newFiber.effectTag = Placement;
         return lastPlacedIndex;
       } else {
-        // 否则不需要标记为移动
+        // 第一次进入该函数，lastPlacedIndex === 0, 因此返回当前被复用的老节点的下标，这个新的子节点不需要被标记为移动
+        // 如果当前被复用的老的节点位置不比上一次被复用的老节点的下标小，说明操作dom的时候被复用的前后两个老的子节点待在原来的位置即可，不需要被标记为移动
         // This item can stay in place.
         return oldIndex;
       }
     } else {
-      // 如果current不存在,那么标记新的子节点为Placement
+      // 如果current不存在,说明没有复用，标记新的子节点为Placement，lastPlacedIndex保持不变
       // This is an insertion.
       newFiber.effectTag = Placement;
       return lastPlacedIndex;
@@ -861,7 +862,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         if (oldFiber && newFiber.alternate === null) {
           // We matched the slot, but we didn't reuse the existing fiber, so we
           // need to delete the existing child.
-          // newFiber如果复用了oldFiber，那么alternate是存在的，所以到这里表示newFiber没有复用oldFiber，需要从父节点上删除这个老节点
+          // newFiber如果复用了oldFiber，那么alternate是存在的，所以到这里表示newFiber没有复用oldFiber，需要从父节点上删除这个老节点，因此调用deleteChild将oldFiber的effecttag标记为删除
           deleteChild(returnFiber, oldFiber);
         }
       }

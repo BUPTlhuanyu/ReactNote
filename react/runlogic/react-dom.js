@@ -13495,6 +13495,7 @@
             var newIdx = 0;
             var nextOldFiber = null;
             for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
+                console.log('oldFiber🌈🌈🌈🌈🌈🌈🌈🌈🌈', oldFiber)
                 if (oldFiber.index > newIdx) {
                     nextOldFiber = oldFiber;
                     oldFiber = null;
@@ -14220,6 +14221,7 @@
     }
 
     function reconcileChildren(current$$1, workInProgress, nextChildren, renderExpirationTime) {
+        console.log('reconcileChildren🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗');
         if (current$$1 === null) {
             console.log('mountChildFibers🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗🥗',current$$1, workInProgress, nextChildren);
 
@@ -14463,6 +14465,7 @@
 
         // React DevTools reads this flag.
         workInProgress.effectTag |= PerformedWork;
+        console.log('finishClassComponent🌱🌱🌱🌱🌱🌱🌱', current$$1);
         if (current$$1 !== null && didCaptureError) {
             // If we're recovering from an error, reconcile without reusing any of
             // the existing children. Conceptually, the normal children and the children
