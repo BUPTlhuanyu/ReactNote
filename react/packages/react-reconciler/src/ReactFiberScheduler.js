@@ -393,17 +393,21 @@ function resetStack() {
 
 function commitAllHostEffects() {
   while (nextEffect !== null) {
+    // 跳过
     if (__DEV__) {
       ReactCurrentFiber.setCurrentFiber(nextEffect);
     }
+    // 跳过
     recordEffect();
 
     const effectTag = nextEffect.effectTag;
 
+    // 处理content
     if (effectTag & ContentReset) {
       commitResetTextContent(nextEffect);
     }
 
+    // 处理ref
     if (effectTag & Ref) {
       const current = nextEffect.alternate;
       if (current !== null) {
@@ -415,6 +419,7 @@ function commitAllHostEffects() {
     // updates, and deletions. To avoid needing to add a case for every
     // possible bitmap value, we remove the secondary effects from the
     // effect tag and switch on that value.
+    // 处理移动更新删除
     let primaryEffectTag = effectTag & (Placement | Update | Deletion);
     switch (primaryEffectTag) {
       case Placement: {
@@ -452,6 +457,7 @@ function commitAllHostEffects() {
     nextEffect = nextEffect.nextEffect;
   }
 
+  // 跳过
   if (__DEV__) {
     ReactCurrentFiber.resetCurrentFiber();
   }
@@ -685,7 +691,7 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
       }
     } else {
       try {
-        // 
+        // 循环执行effect上的getSnapshotBeforeUpdate函数，并且nextEffect遍历到最后一个
         commitBeforeMutationLifecycles();
       } catch (e) {
         didError = true;
@@ -751,6 +757,7 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
       }
     }
   }
+  // 跳过
   stopCommitHostEffectsTimer();
 
   resetAfterCommit(root.containerInfo);
@@ -1839,7 +1846,7 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
       // 也就是当前的fiber为rootFiber，而在调用reactDOM.render的时候rootFiber.stateNode保存的就是fiberRoot。
     root = fiber.stateNode;
   } else {
-      // expirationTime为当前传入的fiber的到期时间，即发生更新的子节点的到期时间
+      // expirationTime为当前传入的fiber��到期时间，即发生更新的子节点的到期时间
       // 如果传入的fiber是fiber树中的非根节点，则用子节点的到期时间更新
       // 这里需要注意： 到期时间大的优先级会更高，fiber.childExpirationTime存储的是整个root树中优先级最高的更新事件对应的到期时间
     while (node !== null) {
