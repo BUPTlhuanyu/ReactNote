@@ -327,12 +327,12 @@ function ChildReconciler(shouldTrackSideEffects) {
   ): number {
     // 将新的子节点的index设置为传入当前遍历对应的下标
     newFiber.index = newIndex;
-    // 如果不是首次渲染,直接返回lastPlacedIndex
+    // 如果是首次渲染,直接返回lastPlacedIndex
     if (!shouldTrackSideEffects) {
       // Noop.
       return lastPlacedIndex;
     }
-    // 如果是首次渲染,获取新的子节点的workinprogress
+    // 如果不是首次渲染,获取新的子节点的workinprogress
     const current = newFiber.alternate;
     // 如果current存在，说明传入的新的子节点复用了老节点
     if (current !== null) {
@@ -343,6 +343,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         newFiber.effectTag = Placement;
         return lastPlacedIndex;
       } else {
+        // 1，5，6，2，4，3
         // 第一次进入该函数，lastPlacedIndex === 0, 因此返回当前被复用的老节点的下标，这个新的子节点不需要被标记为移动
         // 如果当前被复用的老的节点位置不比上一次被复用的老节点的下标小，说明操作dom的时候被复用的前后两个老的子节点待在原来的位置即可，不需要被标记为移动
         // This item can stay in place.
@@ -872,9 +873,10 @@ function ChildReconciler(shouldTrackSideEffects) {
           deleteChild(returnFiber, oldFiber);
         }
       }
-      // 
+      // lastPlacedIndex保存着按照当前排列顺序的所有老的子节点中顺序递增的最大的index，比如1，5，6，2，4，3都被复用了，那么lastPlacedIndex为6；1，2，3，4都被复用了，则lastPlacedIndex为4
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
 
+      // resultingFirstChild保存着第一个新的子节点，previousNewFiber为上一次循环得到的新的子节点，每个循环得到的新的子节点会通过previousNewFiber.sibling串联起来，最后会设置下一次循环需要处理的老节点为nextOldFiber
       if (previousNewFiber === null) {
         // TODO: Move out of the loop. This only happens for the first run.
         // 第一次进入循环,将第一得到的新的子节点保存到resultingFirstChild
