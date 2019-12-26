@@ -214,25 +214,30 @@ function safelyCallDestroy(current, destroy) {
 
 function commitBeforeMutationLifeCycles(
   current: Fiber | null,
-  finishedWork: Fiber,
+  finishedWork: Fiber, // worinprogressfiber，不一定是rootfiber
 ): void {
   switch (finishedWork.tag) {
     case FunctionComponent:
     case ForwardRef:
     case SimpleMemoComponent: {
+      // 处理hook
       commitHookEffectList(UnmountSnapshot, NoHookEffect, finishedWork);
       return;
     }
     case ClassComponent: {
+      // 如果传入的worinprogressfiber有生命周期函数getSnapshotBeforeUpdate()
       if (finishedWork.effectTag & Snapshot) {
         if (current !== null) {
           const prevProps = current.memoizedProps;
           const prevState = current.memoizedState;
+          // 跳过
           startPhaseTimer(finishedWork, 'getSnapshotBeforeUpdate');
+          // 获取fiber对应的类组件的组件实例
           const instance = finishedWork.stateNode;
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
           // TODO: revisit this when we implement resuming.
+          // 跳过
           if (__DEV__) {
             if (finishedWork.type === finishedWork.elementType) {
               warning(
@@ -249,12 +254,14 @@ function commitBeforeMutationLifeCycles(
               );
             }
           }
+          // 执行getSnapshotBeforeUpdate，返回的值会作为第三个参数传递给componenDidUpdate中
           const snapshot = instance.getSnapshotBeforeUpdate(
-            finishedWork.elementType === finishedWork.type
+            finishedWork.elementType === finishedWork.type // 如果是通过useFiber复用老的节点产生的新的fiber节点，那么可能会不一样。如果是新生成的fiber节点会调用createFiberFromTypeAndProps，那么这两者会相同？？？
               ? prevProps
-              : resolveDefaultProps(finishedWork.type, prevProps),
+              : resolveDefaultProps(finishedWork.type, prevProps), //浅复制baseProps为props，并将组件默认的defaultProps赋值给props中为undefined的属性上
             prevState,
           );
+          // 跳过
           if (__DEV__) {
             const didWarnSet = ((didWarnAboutUndefinedSnapshotBeforeUpdate: any): Set<
               mixed,
@@ -269,6 +276,7 @@ function commitBeforeMutationLifeCycles(
               );
             }
           }
+          // __reactInternalSnapshotBeforeUpdate在调用componenDidUpdate的时候会作为其第三个参数
           instance.__reactInternalSnapshotBeforeUpdate = snapshot;
           stopPhaseTimer();
         }
@@ -292,6 +300,7 @@ function commitBeforeMutationLifeCycles(
   }
 }
 
+// 处理hook，hook原理
 function commitHookEffectList(
   unmountTag: number,
   mountTag: number,

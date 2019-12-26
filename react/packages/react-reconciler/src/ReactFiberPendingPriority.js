@@ -54,6 +54,7 @@ export function markCommittedPriorityLevels(
 ): void {
   root.didError = false;
 
+  // 如果root以及子树上没有更新任务了，则重置root上所有的到期时间，并返回
   if (earliestRemainingTime === NoWork) {
     // Fast path. There's no remaining work. Clear everything.
     root.earliestPendingTime = NoWork;

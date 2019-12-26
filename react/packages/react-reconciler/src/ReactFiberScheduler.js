@@ -458,21 +458,28 @@ function commitAllHostEffects() {
 }
 
 function commitBeforeMutationLifecycles() {
+  // 
   while (nextEffect !== null) {
+    // 跳过
     if (__DEV__) {
       ReactCurrentFiber.setCurrentFiber(nextEffect);
     }
-
+    // 获取effectTag，表示如何操作fiber
     const effectTag = nextEffect.effectTag;
+    // 如果有生命周期函数getSnapshotBeforeUpdate()，则执行
     if (effectTag & Snapshot) {
+      // 跳过
       recordEffect();
+      // 获取为workinprogressfiber的effect对应的fiber
       const current = nextEffect.alternate;
+      // 
       commitBeforeMutationLifeCycles(current, nextEffect);
     }
-
+    // 获取下一个effect，以便于执行指向的fiber上的getSnapshotBeforeUpdate()
     nextEffect = nextEffect.nextEffect;
   }
 
+  // 跳过
   if (__DEV__) {
     ReactCurrentFiber.resetCurrentFiber();
   }
@@ -587,8 +594,10 @@ function flushPassiveEffects() {
 }
 
 function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
-  isWorking = true;
-  isCommitting = true;
+  isWorking = true;  // 设置标记
+  isCommitting = true; // 标记在提交阶段
+
+  // 跳过
   startCommitTimer();
 
   invariant(
@@ -597,26 +606,34 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
       'related to the return field. This error is likely caused by a bug ' +
       'in React. Please file an issue.',
   );
+
+  // 获取pendingCommitExpirationTime，也就是同步调度与异步调度的时候设定的root上的到期时间
   const committedExpirationTime = root.pendingCommitExpirationTime;
   invariant(
     committedExpirationTime !== NoWork,
     'Cannot commit an incomplete root. This error is likely caused by a ' +
       'bug in React. Please file an issue.',
   );
+  // 由于更新任务已经执行完成，到提交阶段，因此需要重置root.pendingCommitExpirationTime
   root.pendingCommitExpirationTime = NoWork;
 
   // Update the pending priority levels to account for the work that we are
   // about to commit. This needs to happen before calling the lifecycles, since
   // they may schedule additional updates.
+  // 在正式提交之前，保存root上最高优先级的到期时间以及子树上最高优先级任务的到期时间
   const updateExpirationTimeBeforeCommit = finishedWork.expirationTime;
   const childExpirationTimeBeforeCommit = finishedWork.childExpirationTime;
+  // 获取上面两者最高优先级任务的到期时间
   const earliestRemainingTimeBeforeCommit =
     childExpirationTimeBeforeCommit > updateExpirationTimeBeforeCommit
       ? childExpirationTimeBeforeCommit
       : updateExpirationTimeBeforeCommit;
+  // 
   markCommittedPriorityLevels(root, earliestRemainingTimeBeforeCommit);
 
   let prevInteractions: Set<Interaction> = (null: any);
+
+  // 跳过
   if (enableSchedulerTracing) {
     // Restore any pending interactions at this point,
     // So that cascading work triggered during the render phase will be accounted for.
@@ -627,6 +644,8 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
   // Reset this to null before calling lifecycles
   ReactCurrentOwner.current = null;
 
+  // 处理root的effect，如果rootfiber有更新，则需要将rootFiber添加到finishedWork的effect队列的末尾。
+  // 设置变量firstEffect指向finishedWork的第一个effect。
   let firstEffect;
   if (finishedWork.effectTag > PerformedWork) {
     // A fiber's effect list consists only of its children, not itself. So if
@@ -644,15 +663,21 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
     firstEffect = finishedWork.firstEffect;
   }
 
+  // 在提交之前，处理事件系统以及一些浏览器api的问题，比较有意思
   prepareForCommit(root.containerInfo);
 
-  // Invoke instances of getSnapshotBeforeUpdate before mutation.
+  // Invoke instances of getSnapshotBeforeUpdate before mutation
+  // 开始处理effect，初始化nextEffect为第一个effect
   nextEffect = firstEffect;
+  // 跳过
   startCommitSnapshotEffectsTimer();
+  // 
   while (nextEffect !== null) {
+    // 发生错误的标记设置为false
     let didError = false;
     let error;
     if (__DEV__) {
+      // 跳过
       invokeGuardedCallback(null, commitBeforeMutationLifecycles, null);
       if (hasCaughtError()) {
         didError = true;
@@ -660,12 +685,14 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
       }
     } else {
       try {
+        // 
         commitBeforeMutationLifecycles();
       } catch (e) {
         didError = true;
         error = e;
       }
     }
+    // 错误处理
     if (didError) {
       invariant(
         nextEffect !== null,
@@ -681,6 +708,7 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
   }
   stopCommitSnapshotEffectsTimer();
 
+  // 跳过
   if (enableProfilerTimer) {
     // Mark the current commit time to be shared by all Profilers in this batch.
     // This enables them to be grouped later.
@@ -696,6 +724,7 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
     let didError = false;
     let error;
     if (__DEV__) {
+      // 跳过
       invokeGuardedCallback(null, commitAllHostEffects, null);
       if (hasCaughtError()) {
         didError = true;
@@ -742,6 +771,7 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
     let didError = false;
     let error;
     if (__DEV__) {
+      // 跳过
       invokeGuardedCallback(
         null,
         commitAllLifeCycles,
@@ -799,6 +829,7 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
   stopCommitLifeCyclesTimer();
   stopCommitTimer();
   onCommitRoot(finishedWork.stateNode);
+  // 跳过
   if (__DEV__ && ReactFiberInstrumentation.debugTool) {
     ReactFiberInstrumentation.debugTool.onCommitWork(finishedWork);
   }
@@ -1333,6 +1364,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
     }
   }
 
+  // debug部分跳过
   let prevInteractions: Set<Interaction> = (null: any);
   // debug部分跳过
   if (enableSchedulerTracing) {
@@ -1342,6 +1374,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
     __interactionsRef.current = root.memoizedInteractions;
   }
 
+  // 初始化是否发生错误的标记
   let didFatal = false;
   // debug部分跳过 
   startWorkLoopTimer(nextUnitOfWork);
@@ -2057,6 +2090,7 @@ function onComplete(
   finishedWork: Fiber,
   expirationTime: ExpirationTime,
 ) {
+  // 在rnderRoot完成之后，会将expirationTime设置到root.pendingCommitExpirationTime
   root.pendingCommitExpirationTime = expirationTime;
   root.finishedWork = finishedWork;
 }
@@ -2603,11 +2637,13 @@ function completeRoot(
     }
   }
 
+  // 提交root之前将其设置为null
   // Commit the root.
   root.finishedWork = null;
 
   // Check if this is a nested update (a sync update scheduled during the
   // commit phase).
+  // 判断是否是级联的更新
   if (root === lastCommittedRootDuringThisBatch) {
     // If the next root is the same as the previous root, this is a nested
     // update. To prevent an infinite loop, increment the nested update count.
@@ -2617,6 +2653,7 @@ function completeRoot(
     lastCommittedRootDuringThisBatch = root;
     nestedUpdateCount = 0;
   }
+  // 开始进入提交阶段，不允许被打断
   commitRoot(root, finishedWork);
 }
 
