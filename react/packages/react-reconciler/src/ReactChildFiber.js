@@ -476,6 +476,12 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
   }
 
+  /**
+   * babel会调用createElement将jsx创建为不同类型的对象，createChild会根据这些对象不同的类型，创建对应的新的fiber节点，并指定fiber节点的父节点，最后返回创建的新的fiber节点
+   * @param {*} returnFiber 
+   * @param {*} newChild babel会调用createElement将jsx创建为不同类型的对象
+   * @param {*} expirationTime 
+   */
   function createChild(
     returnFiber: Fiber,
     newChild: any,
@@ -893,6 +899,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       return resultingFirstChild;
     }
 
+    // 如果老的子节点遍历完了，如果还存在新的react节点没有创建对应的fiber，那么遍历newChildren，给每个react对象创建对应的fiber
     if (oldFiber === null) {
       // If we don't have any more existing children we can choose a fast path
       // since the rest will all be insertions.
