@@ -62,6 +62,7 @@ function testInputComponent(){
         }
         changeValue(e){
             let that = this
+            let pos = e.target.value.length
             let amount = e.target.value
                 .replace(/^0/, '') // 第一个不能为 0
                 .replace(/[^\d\.]/g, '') //如果输入非数字，则替换为''
@@ -69,11 +70,14 @@ function testInputComponent(){
                 .replace('.','$##$').replace(/\./g,'').replace('$##$','.') //保证.只出现一次，而不能出现两次以上 
                 .replace(/^(\d+)\.(\d\d).*$/,'$1.$2') // 最多两位小数
             amount = formatMoney(amount)
-            setTimeout(()=>{
-                that.setState({
-                    amount: amount
-                })
-            },100)
+            // const callBack = function(){
+            //     e.target.selectionStart = pos
+            //     e.target.selectionEnd = pos
+            // }
+            // setTimeout(callBack)
+            that.setState({
+                amount: amount
+            })
         }
         componentDidMount(){
             console.log('Footer componentDidMount');

@@ -378,6 +378,7 @@ function commitLifeCycles(
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
           // TODO: revisit this when we implement resuming.
+          // 跳过
           if (__DEV__) {
             if (finishedWork.type === finishedWork.elementType) {
               warning(
@@ -394,7 +395,10 @@ function commitLifeCycles(
               );
             }
           }
+          
+          // 调用componentDidMount
           instance.componentDidMount();
+          // 跳过
           stopPhaseTimer();
         } else {
           const prevProps =
@@ -406,6 +410,7 @@ function commitLifeCycles(
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
           // TODO: revisit this when we implement resuming.
+          // 跳过
           if (__DEV__) {
             if (finishedWork.type === finishedWork.elementType) {
               warning(
@@ -432,6 +437,7 @@ function commitLifeCycles(
       }
       const updateQueue = finishedWork.updateQueue;
       if (updateQueue !== null) {
+        // 跳过
         if (__DEV__) {
           if (finishedWork.type === finishedWork.elementType) {
             warning(
@@ -669,14 +675,17 @@ function commitUnmount(current: Fiber): void {
       break;
     }
     case ClassComponent: {
+      // 卸载ref，使得获取到的dom为null：如果是通过函数创建的ref，则调用ref(null),表示获取到的dom是null，如果是不是通过函数创建的ref，那么将ref.current设置为null
       safelyDetachRef(current);
       const instance = current.stateNode;
       if (typeof instance.componentWillUnmount === 'function') {
+        // 调用componentWillUnmount方法
         safelyCallComponentWillUnmount(current, instance);
       }
       return;
     }
     case HostComponent: {
+      // 卸载ref
       safelyDetachRef(current);
       return;
     }
@@ -685,6 +694,7 @@ function commitUnmount(current: Fiber): void {
       // We are also not using this parent because
       // the portal will get pushed immediately.
       if (supportsMutation) {
+        // 调用unmountHostComponents
         unmountHostComponents(current);
       } else if (supportsPersistence) {
         emptyPortalContainer(current);
@@ -791,6 +801,7 @@ function commitContainer(finishedWork: Fiber) {
   }
 }
 
+// 找到传入的fiber的直系父节点中tag是HostComponent或HostRoot或者HostPortal的fiber节点
 function getHostParentFiber(fiber: Fiber): Fiber {
   let parent = fiber.return;
   while (parent !== null) {
@@ -822,6 +833,7 @@ function getHostSibling(fiber: Fiber): ?Instance {
   let node: Fiber = fiber;
   siblings: while (true) {
     // If we didn't find anything, let's try the next sibling.
+    // 通过遍历node的直系父节点，找到有兄弟节点的fiber。如果没有父节点或者父节点的tag是HostComponent或HostRoot或HostPortal，则结束getHostSibling，返回null
     while (node.sibling === null) {
       if (node.return === null || isHostParent(node.return)) {
         // If we pop out of the root or hit the parent the fiber we are the
@@ -830,25 +842,32 @@ function getHostSibling(fiber: Fiber): ?Instance {
       }
       node = node.return;
     }
+    // 当前node指向的fiber节点的兄弟节点的return指向当前node的父节点
     node.sibling.return = node.return;
+    // 将当前node指向当前node的兄弟节点
     node = node.sibling;
+    // 如果当前node的tag不是HostComponent以及HostText
     while (node.tag !== HostComponent && node.tag !== HostText) {
       // If it is not host node and, we might have a host node inside it.
       // Try to search down until we find one.
+      // 如果当前node的effectTag有Placement状态，那么继续处理node的下一个兄弟节点或者父节点
       if (node.effectTag & Placement) {
         // If we don't have a child, try the siblings instead.
         continue siblings;
       }
       // If we don't have a child, try the siblings instead.
       // We also skip portals because they are not part of this host tree.
+      // 如果当前的node没有fiber子节点，并且当前node是HostPortal，那么继续处理node的下一个兄弟节点或者父节点
       if (node.child === null || node.tag === HostPortal) {
         continue siblings;
       } else {
+        // 如果当前的node有fiber子节点，并且当前node不是HostPortal，则处理当前node的子节点
         node.child.return = node;
         node = node.child;
       }
     }
     // Check if this host node is stable or about to be placed.
+    // 当前遍历到的node不会被移动，并且是HostComponent或者HostText，那么返回这个node对应的dom节点
     if (!(node.effectTag & Placement)) {
       // Found it!
       return node.stateNode;
@@ -862,12 +881,14 @@ function commitPlacement(finishedWork: Fiber): void {
   }
 
   // Recursively insert all host nodes into the parent.
+  // 找到finishedWork直系父节点中tag是HostComponent或HostRoot或者HostPortal的fiber节点，存入变量parentFiber
   const parentFiber = getHostParentFiber(finishedWork);
 
   // Note: these two variables *must* always be updated together.
   let parent;
   let isContainer;
 
+  // 获取parentFiber对应的真实DOM对象，并设置isContainer
   switch (parentFiber.tag) {
     case HostComponent:
       parent = parentFiber.stateNode;
@@ -888,6 +909,7 @@ function commitPlacement(finishedWork: Fiber): void {
           'in React. Please file an issue.',
       );
   }
+  // 重置parentFiber对应的dom节点的文本内容，并清除effectTag上的ContentReset
   if (parentFiber.effectTag & ContentReset) {
     // Reset the text content of the parent before doing any insertions
     resetTextContent(parent);
@@ -895,19 +917,24 @@ function commitPlacement(finishedWork: Fiber): void {
     parentFiber.effectTag &= ~ContentReset;
   }
 
+  // 找到一个距离nextEffect最近的不会被移动并且是HostComponent或者HostText的fiber节点
   const before = getHostSibling(finishedWork);
   // We only have the top Fiber that was inserted but we need recurse down its
   // children to find all the terminal nodes.
   let node: Fiber = finishedWork;
+  // 如果finishedWork不是HostComponent或者HostText，那么说明需要将整个组件中HostComponent与HostText添加到父节点dom上。
   while (true) {
     if (node.tag === HostComponent || node.tag === HostText) {
       if (before) {
         if (isContainer) {
+          // 将node.stateNode插入到parent节点的before子节点前面
           insertInContainerBefore(parent, node.stateNode, before);
         } else {
+          // 将node.stateNode插入到parent节点的before子节点前面
           insertBefore(parent, node.stateNode, before);
         }
       } else {
+        // 将child添加到parentInstance节点中
         if (isContainer) {
           appendChildToContainer(parent, node.stateNode);
         } else {
@@ -919,19 +946,26 @@ function commitPlacement(finishedWork: Fiber): void {
       // down its children. Instead, we'll get insertions from each child in
       // the portal directly.
     } else if (node.child !== null) {
+      // node有子节点，则进行下一轮循环，处理当前节点的第一个子节点
       node.child.return = node;
       node = node.child;
       continue;
     }
+    // 经过上面的if判断，如果第一个循环中，node是HostComponent或者HostText，或者node不是HostComponent也不是HostText，并且没有子节点，那么到这里就会直接返回。
     if (node === finishedWork) {
       return;
     }
+    // 只有在react.fragment的时候，node.sibling !== null，一般情况下直接跳出
     while (node.sibling === null) {
+      // 如果有兄弟节点
       if (node.return === null || node.return === finishedWork) {
+        // 如果没有父节点，或者父节点是finishedWork，则直接返回
         return;
       }
+      // 进入下一个循环中
       node = node.return;
     }
+    // 如果有兄弟节点
     node.sibling.return = node.return;
     node = node.sibling;
   }
@@ -953,6 +987,7 @@ function unmountHostComponents(current): void {
   while (true) {
     if (!currentParentIsValid) {
       let parent = node.return;
+      // 通过return遍历直系父节点，直到父节点的tag是HostComponent或者HostRoot或者HostPortal
       findParent: while (true) {
         invariant(
           parent !== null,
@@ -975,13 +1010,17 @@ function unmountHostComponents(current): void {
         }
         parent = parent.return;
       }
+      // 找到之后将currentParentIsValid设置为true
       currentParentIsValid = true;
     }
 
+    // 如果node是HostComponent或者HostText
     if (node.tag === HostComponent || node.tag === HostText) {
+      // 调用
       commitNestedUnmounts(node);
       // After all the children have unmounted, it is now safe to remove the
       // node from the tree.
+      // 删除dom节点
       if (currentParentIsContainer) {
         removeChildFromContainer((currentParent: any), node.stateNode);
       } else {

@@ -352,6 +352,7 @@ export function appendChild(
   parentInstance: Instance,
   child: Instance | TextInstance,
 ): void {
+  // 将child添加到parentInstance节点中
   parentInstance.appendChild(child);
 }
 

@@ -495,6 +495,7 @@ function commitAllLifeCycles(
   finishedRoot: FiberRoot,
   committedExpirationTime: ExpirationTime,
 ) {
+  // 跳过
   if (__DEV__) {
     ReactStrictModeWarnings.flushPendingUnsafeLifecycleWarnings();
     ReactStrictModeWarnings.flushLegacyContextWarning();
@@ -507,6 +508,7 @@ function commitAllLifeCycles(
     const effectTag = nextEffect.effectTag;
 
     if (effectTag & (Update | Callback)) {
+      // 跳过
       recordEffect();
       const current = nextEffect.alternate;
       commitLifeCycles(
@@ -821,6 +823,7 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
     // event. To ensure serial execution, the callback will be flushed early if
     // we enter rootWithPendingPassiveEffects commit phase before then.
     let callback = commitPassiveEffects.bind(null, root, firstEffect);
+    // 跳过
     if (enableSchedulerTracing) {
       // TODO: Avoid this extra callback by mutating the tracing ref directly,
       // like we do at the beginning of commitRoot. I've opted not to do that
@@ -854,6 +857,7 @@ function commitRoot(root: FiberRoot, finishedWork: Fiber): void {
   }
   onCommit(root, earliestRemainingTimeAfterCommit);
 
+  // 跳过
   if (enableSchedulerTracing) {
     __interactionsRef.current = prevInteractions;
 

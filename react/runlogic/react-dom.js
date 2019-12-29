@@ -8779,6 +8779,7 @@
     }
 
     function commitUpdate(domElement, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
+        
         // Update the props handle so that we know which props are the ones with
         // with current event handlers.
         updateFiberProps(domElement, newProps);
@@ -16559,6 +16560,8 @@
         // We only have the top Fiber that was inserted but we need recurse down its
         // children to find all the terminal nodes.
         var node = finishedWork;
+        console.log('😂😂😂😂😂😂😂😂😂😂node', node);
+        
         while (true) {
             if (node.tag === HostComponent || node.tag === HostText) {
                 if (before) {
@@ -16587,11 +16590,13 @@
                 return;
             }
             while (node.sibling === null) {
+                
                 if (node.return === null || node.return === finishedWork) {
                     return;
                 }
                 node = node.return;
             }
+            console.log('😊😊😊😊😊😊😊😊😊😊😊😊node.sibling === null', node);
             node.sibling.return = node.return;
             node = node.sibling;
         }
@@ -16727,6 +16732,7 @@
             case HostComponent:
             {
                 var instance = finishedWork.stateNode;
+                console.log('🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻🐻/////', finishedWork);
                 if (instance != null) {
                     // Commit the work prepared earlier.
                     var newProps = finishedWork.memoizedProps;
@@ -16738,6 +16744,7 @@
                     // TODO: Type the updateQueue to be specific to host components.
                     var updatePayload = finishedWork.updateQueue;
                     finishedWork.updateQueue = null;
+                    
                     if (updatePayload !== null) {
                         commitUpdate(instance, updatePayload, type, oldProps, newProps, finishedWork);
                     }

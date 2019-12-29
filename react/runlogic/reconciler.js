@@ -119,7 +119,7 @@ class FilterableProductTable extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <SearchBar
                     filterText={this.state.filterText}
                     inStockOnly={this.state.inStockOnly}
@@ -131,7 +131,7 @@ class FilterableProductTable extends React.Component {
                     filterText={this.state.filterText}
                     inStockOnly={this.state.inStockOnly}
                 />
-            </div>
+            </React.Fragment>
         );
     }
 }
