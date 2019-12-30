@@ -109,28 +109,38 @@ if (supportsMutation) {
   ) {
     // We only have the top Fiber that was created but we need recurse down its
     // children to find all the terminal nodes.
+    // 获取第一个workInProgressfiber子节点
     let node = workInProgress.child;
+    // 
     while (node !== null) {
+      // 如果当前遍历到的node又真实的dom节点，则
       if (node.tag === HostComponent || node.tag === HostText) {
+        // parentInstance.appendChild(child)，将node.stateNode存储的dom添加到parent这个dom节点上
         appendInitialChild(parent, node.stateNode);
       } else if (node.tag === HostPortal) {
         // If we have a portal child, then we don't want to traverse
         // down its children. Instead, we'll get insertions from each child in
         // the portal directly.
       } else if (node.child !== null) {
+        // 如果有子节点，则继续遍历
         node.child.return = node;
         node = node.child;
         continue;
       }
+      // 如果遍历完成，则return
       if (node === workInProgress) {
         return;
       }
+      // 如果不存在兄弟节点
       while (node.sibling === null) {
+        // 无父节点，或者遍历到了子树的根节点，则返回
         if (node.return === null || node.return === workInProgress) {
           return;
         }
+        // 遍历父节点
         node = node.return;
       }
+      // 如果存在兄弟节点，开始处理兄弟节点
       node.sibling.return = node.return;
       node = node.sibling;
     }
@@ -581,7 +591,9 @@ function completeWork(
     case HostComponent: {
       popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();
+      // 获取当前HostComponent类型的workInProgress的dom类型
       const type = workInProgress.type;
+      // 如果是第一次渲染，并且dom存在
       if (current !== null && workInProgress.stateNode != null) {
         updateHostComponent(
           current,
@@ -605,6 +617,7 @@ function completeWork(
           break;
         }
 
+        // 处理context相关
         const currentHostContext = getHostContext();
         // TODO: Move createInstance to beginWork and keep it on a context
         // "stack" as the parent. Then append children as we go in beginWork
@@ -626,6 +639,7 @@ function completeWork(
             markUpdate(workInProgress);
           }
         } else {
+          // 调用createInstance创建dom节点，并存储在instance变量上
           let instance = createInstance(
             type,
             newProps,

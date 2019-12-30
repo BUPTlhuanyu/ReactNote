@@ -360,6 +360,7 @@ export function createElement(
 
   // We create tags in the namespace of their parent container, except HTML
   // tags get no namespace.
+  // 返回当前节点的顶层的 document 对象。
   const ownerDocument: Document = getOwnerDocumentFromRootContainer(
     rootContainerElement,
   );
@@ -369,6 +370,7 @@ export function createElement(
     namespaceURI = getIntrinsicNamespace(type);
   }
   if (namespaceURI === HTML_NAMESPACE) {
+    // 跳过
     if (__DEV__) {
       isCustomComponentTag = isCustomComponent(type, props);
       // Should this check be gated by parent namespace? Not sure we want to
@@ -412,6 +414,7 @@ export function createElement(
     domElement = ownerDocument.createElementNS(namespaceURI, type);
   }
 
+  // 跳过
   if (__DEV__) {
     if (namespaceURI === HTML_NAMESPACE) {
       if (

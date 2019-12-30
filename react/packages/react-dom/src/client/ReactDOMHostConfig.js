@@ -172,6 +172,7 @@ export function createInstance(
   internalInstanceHandle: Object,
 ): Instance {
   let parentNamespace: string;
+  // 跳过
   if (__DEV__) {
     // TODO: take namespace into account when validating.
     const hostContextDev = ((hostContext: any): HostContextDev);

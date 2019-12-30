@@ -7584,6 +7584,8 @@
     }
 
     function createElement(type, props, rootContainerElement, parentNamespace) {
+        console.log('type🍔🍔🍔🍔🍔🍔🥗🥗🥗🥗🥗', type , props.is);
+        
         var isCustomComponentTag = void 0;
 
         // We create tags in the namespace of their parent container, except HTML
@@ -12168,6 +12170,8 @@
 
     function getRootHostContainer() {
         var rootInstance = requiredContext(rootInstanceStackCursor.current);
+        console.log('rootInstance😂😂😂😂🍏🍏🍏', rootInstance);
+        
         return rootInstance;
     }
 
@@ -12199,6 +12203,7 @@
 
     function getHostContext() {
         var context = requiredContext(contextStackCursor$1.current);
+        console.log('getHostContext🍏🍏🍏😂😂😂😂', context);
         return context;
     }
 
