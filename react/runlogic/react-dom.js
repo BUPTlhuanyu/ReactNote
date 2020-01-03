@@ -11121,6 +11121,8 @@
     }
 
     function getStateFromUpdate(workInProgress, queue, update, prevState, nextProps, instance) {
+        console.log('🍏🍏🍏🥗🥗🥗', update);
+        
         switch (update.tag) {
             case ReplaceState:
             {
@@ -18759,6 +18761,8 @@
     function requestWork(root, expirationTime) {
         addRootToSchedule(root, expirationTime);
         if (isRendering) {
+            console.log('🍏🍏🥗🥗🥗');
+            
             // Prevent reentrancy. Remaining work will be scheduled at the end of
             // the currently rendering batch.
             return;
