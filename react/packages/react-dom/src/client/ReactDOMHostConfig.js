@@ -229,6 +229,7 @@ export function prepareUpdate(
   rootContainerInstance: Container,
   hostContext: HostContext,
 ): null | Array<mixed> {
+  // 跳过
   if (__DEV__) {
     const hostContextDev = ((hostContext: any): HostContextDev);
     if (

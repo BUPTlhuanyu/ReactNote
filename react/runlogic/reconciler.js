@@ -105,6 +105,13 @@ class FilterableProductTable extends React.Component {
         this.handleInStockInput = this.handleInStockInput.bind(this);
     }
 
+    componentWillMount(){
+        this.state = {
+            filterText: '1212',
+            inStockOnly: true            
+        }
+    }
+
     handleFilterTextInput(filterText) {
         this.setState({
             filterText: filterText

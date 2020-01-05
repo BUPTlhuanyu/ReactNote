@@ -113,7 +113,7 @@ if (supportsMutation) {
     let node = workInProgress.child;
     // 
     while (node !== null) {
-      // 如果当前遍历到的node又真实的dom节点，则
+      // 如果当前遍历到的node对应有真实的dom节点，则
       if (node.tag === HostComponent || node.tag === HostText) {
         // parentInstance.appendChild(child)，将node.stateNode存储的dom添加到parent这个dom节点上
         appendInitialChild(parent, node.stateNode);
@@ -160,6 +160,7 @@ if (supportsMutation) {
     // schedule a side-effect to do the updates.
     const oldProps = current.memoizedProps;
     if (oldProps === newProps) {
+      // 新老props没有变化不需要更新
       // In mutation mode, this is sufficient for a bailout because
       // we won't touch this node even if children changed.
       return;
@@ -169,6 +170,7 @@ if (supportsMutation) {
     // have newProps so we'll have to reuse them.
     // TODO: Split the update API as separate for the props vs. children.
     // Even better would be if children weren't special cased at all tho.
+    // 获取dom
     const instance: Instance = workInProgress.stateNode;
     const currentHostContext = getHostContext();
     // TODO: Experiencing an error where oldProps is null. Suggests a host
@@ -183,10 +185,12 @@ if (supportsMutation) {
       currentHostContext,
     );
     // TODO: Type this specific to this type of component.
+    // 更新updateQueue
     workInProgress.updateQueue = (updatePayload: any);
     // If the update payload indicates that there is a change or if there
     // is a new ref we mark this as an update. All the work is done in commitWork.
     if (updatePayload) {
+      // 标记update
       markUpdate(workInProgress);
     }
   };
@@ -593,7 +597,7 @@ function completeWork(
       const rootContainerInstance = getRootHostContainer();
       // 获取当前HostComponent类型的workInProgress的dom类型
       const type = workInProgress.type;
-      // 如果是第一次渲染，并且dom存在
+      // 如果不是第一次渲染，并且dom存在
       if (current !== null && workInProgress.stateNode != null) {
         updateHostComponent(
           current,

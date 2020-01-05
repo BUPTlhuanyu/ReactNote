@@ -56,6 +56,7 @@ function testInputComponent(){
         }
         constructor(props){
             super(props)
+            this.changeValue = this.changeValue.bind(this)
             this.state = {
                 amount: ''
             }
@@ -87,9 +88,10 @@ function testInputComponent(){
             return (
                 <div>
                     <input 
-                        onInput={(e) => {
-                            this.changeValue(e)
-                        }}
+                        // onInput={(e) => {
+                        //     this.changeValue(e)
+                        // }}
+                        onChange = {this.changeValue}
                         value = {this.state.amount}
                     ></input>
                 </div>

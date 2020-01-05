@@ -90,6 +90,7 @@ function handleTopLevel(bookKeeping) {
   // event handlers, because event handlers can modify the DOM, leading to
   // inconsistencies with ReactMount's node cache. See #1105.
   let ancestor = targetInst;
+  // 正常情况下，只有一轮循环，等同于执行bookKeeping.ancestors.push(ancestor);
   do {
     if (!ancestor) {
       bookKeeping.ancestors.push(ancestor);
@@ -103,6 +104,7 @@ function handleTopLevel(bookKeeping) {
     ancestor = getClosestInstanceFromNode(root);
   } while (ancestor);
 
+  // 正常情况下bookKeeping.ancestors.length===1，即只会对当前targetInst执行runExtractedEventsInBatch
   for (let i = 0; i < bookKeeping.ancestors.length; i++) {
     targetInst = bookKeeping.ancestors[i];
     runExtractedEventsInBatch(
@@ -191,10 +193,10 @@ export function dispatchEvent(
 ) {
   if (!_enabled) {
     return;
-  }
+  }s
 
   const nativeEventTarget = getEventTarget(nativeEvent);
-  let targetInst = getClosestInstanceFromNode(nativeEventTarget);
+  let targetInst = getClosestItnstanceFromNode(nativeEventTarget);
   if (
     targetInst !== null &&
     typeof targetInst.tag === 'number' &&

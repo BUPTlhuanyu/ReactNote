@@ -585,6 +585,7 @@ export function diffProperties(
   nextRawProps: Object,
   rootContainerElement: Element | Document,
 ): null | Array<mixed> {
+  // 跳过
   if (__DEV__) {
     validatePropertiesInDevelopment(tag, nextRawProps);
   }
@@ -633,15 +634,19 @@ export function diffProperties(
   let styleName;
   let styleUpdates = null;
   for (propKey in lastProps) {
+    // 遍历所有属性，包括原型链上继承的属性
     if (
-      nextProps.hasOwnProperty(propKey) ||
-      !lastProps.hasOwnProperty(propKey) ||
-      lastProps[propKey] == null
+      nextProps.hasOwnProperty(propKey) ||   // nextProps自身有的属性，跳过
+      !lastProps.hasOwnProperty(propKey) ||  // 属性不是lastProps自身有的，则跳过处理
+      lastProps[propKey] == null             // 该属性上的值为null的，跳过
     ) {
+      // 新的props有的属性或者老的props没有的属性或者老的props的属性的值为null，则不进行下面的操作，
       continue;
     }
     if (propKey === STYLE) {
+      // style属性
       const lastStyle = lastProps[propKey];
+      // 将旧的style作为key存储到styleUpdates对象上去
       for (styleName in lastStyle) {
         if (lastStyle.hasOwnProperty(styleName)) {
           if (!styleUpdates) {
@@ -672,17 +677,20 @@ export function diffProperties(
       (updatePayload = updatePayload || []).push(propKey, null);
     }
   }
+  // 遍历nextProps上的所有属性
   for (propKey in nextProps) {
     const nextProp = nextProps[propKey];
     const lastProp = lastProps != null ? lastProps[propKey] : undefined;
     if (
-      !nextProps.hasOwnProperty(propKey) ||
-      nextProp === lastProp ||
-      (nextProp == null && lastProp == null)
+      !nextProps.hasOwnProperty(propKey) || //新props自身没有这个属性
+      nextProp === lastProp ||  // props的值相等
+      (nextProp == null && lastProp == null)  // 新老props上的该属性值都是null
     ) {
+      // 处理下一个nextProps上的属性
       continue;
     }
     if (propKey === STYLE) {
+      // 跳过
       if (__DEV__) {
         if (nextProp) {
           // Freeze the next style object so that we can assume it won't be
@@ -690,8 +698,10 @@ export function diffProperties(
           Object.freeze(nextProp);
         }
       }
+      // 老的style存在
       if (lastProp) {
         // Unset styles on `lastProp` but not on `nextProp`.
+        // 首先遍历老的style上的自身属性，如果新的props上没有的属性，则styleUpdates[styleName] = ''，表示需要去除dom上styleName属性的值
         for (styleName in lastProp) {
           if (
             lastProp.hasOwnProperty(styleName) &&
@@ -703,6 +713,7 @@ export function diffProperties(
             styleUpdates[styleName] = '';
           }
         }
+        // 然后遍历新的style上的自身属性，如果与老的style上的值不同，那么styleUpdates[styleName] = nextProp[styleName]，表示需要更改dom上styleName属性的值
         // Update styles that changed since `lastProp`.
         for (styleName in nextProp) {
           if (
@@ -716,6 +727,7 @@ export function diffProperties(
           }
         }
       } else {
+        // 老的style不存在
         // Relies on `updateStylesByID` not mutating `styleUpdates`.
         if (!styleUpdates) {
           if (!updatePayload) {
@@ -723,6 +735,7 @@ export function diffProperties(
           }
           updatePayload.push(propKey, styleUpdates);
         }
+        // 将新的style保存到styleUpdates
         styleUpdates = nextProp;
       }
     } else if (propKey === DANGEROUSLY_SET_INNER_HTML) {
@@ -768,6 +781,7 @@ export function diffProperties(
       (updatePayload = updatePayload || []).push(propKey, nextProp);
     }
   }
+  // 将'style'以及styleUpdates依次添加到updatePayload数组
   if (styleUpdates) {
     (updatePayload = updatePayload || []).push(STYLE, styleUpdates);
   }

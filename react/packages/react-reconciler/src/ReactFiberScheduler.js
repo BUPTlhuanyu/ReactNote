@@ -2741,9 +2741,9 @@ function interactiveUpdates<A, B, R>(fn: (A, B) => R, a: A, b: B): R {
   // the previous event may influence which handlers are called during
   // this event.
   if (
-    !isBatchingUpdates &&
-    !isRendering &&
-    lowestPriorityPendingInteractiveExpirationTime !== NoWork
+    !isBatchingUpdates && // 批量更新，比如多个setState批处理
+    !isRendering && // 不处于performWorkOnRoot函数执行过程中，renderRoot与提交阶段结束之后performWorkOnRoot结束执行
+    lowestPriorityPendingInteractiveExpirationTime !== NoWork // 有挂起的交互事件
   ) {
     // Synchronously flush pending interactive updates.
     performWork(lowestPriorityPendingInteractiveExpirationTime, false);

@@ -281,7 +281,7 @@ export function createContainer(
   return createFiberRoot(containerInfo, isConcurrent, hydrate);
 }
 
-export function updateContainer(
+export function     (
   element: ReactNodeList,
   container: OpaqueRoot,
   parentComponent: ?React$Component<any, any>,

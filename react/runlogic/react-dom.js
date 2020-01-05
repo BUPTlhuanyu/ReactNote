@@ -12688,6 +12688,7 @@
     }
 
     function callComponentWillMount(workInProgress, instance) {
+        console.log('interruptedByinterruptedByinterruptedBy', workInProgress);
         startPhaseTimer(workInProgress, 'componentWillMount');
         var oldState = instance.state;
 
@@ -18576,6 +18577,7 @@
 
         if (!isWorking && nextRenderExpirationTime !== NoWork && expirationTime > nextRenderExpirationTime) {
             // This is an interruption. (Used for performance tracking.)
+            
             interruptedBy = fiber;
             resetStack();
         }
