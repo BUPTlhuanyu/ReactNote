@@ -652,6 +652,7 @@ function completeWork(
             workInProgress,
           );
 
+          // 调用appendAllChildren将当前节点的第一层子节点依次添加到当前节点对应的dom上。
           appendAllChildren(instance, workInProgress, false, false);
 
           // Certain renderers require commit-time effects for initial mount.
@@ -666,11 +667,14 @@ function completeWork(
               currentHostContext,
             )
           ) {
+            // 该 workInProgressfiber 需要自动聚焦，则为其对应的 workInProgressfiber 的effectTag添加update的标记
             markUpdate(workInProgress);
           }
+          // 将真实的dom保存到workInProgressfiber的stateNode属性上
           workInProgress.stateNode = instance;
         }
 
+        // 如果存在ref，则为其对应的 workInProgressfiber 的 effectTag 添加 Ref 的标记
         if (workInProgress.ref !== null) {
           // If there is a ref on a host node we need to schedule a callback
           markRef(workInProgress);

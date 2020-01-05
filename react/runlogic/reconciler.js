@@ -58,6 +58,16 @@ class SearchBar extends React.Component {
         super(props);
         this.handleFilterTextInputChange = this.handleFilterTextInputChange.bind(this);
         this.handleInStockInputChange = this.handleInStockInputChange.bind(this);
+        this.state = {
+            filterText: ""
+        }
+    }
+
+    componentWillMount(){
+        console.log('sss')
+        this.setState({
+            filterText: 'asdasd'
+        })
     }
 
     handleFilterTextInputChange(e) {
