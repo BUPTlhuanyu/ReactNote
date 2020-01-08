@@ -7,10 +7,22 @@ window.fiberStackTest = []
 
 function testEvents(){
     class APP extends React.Component{
+        state = {
+            a: 1
+        }
+        constructor(){
+            super()
+            this.changeVal = this.changeVal.bind(this)
+        }
+        changeVal(value){
+            this.setState({
+                a:  value
+            })
+        }
         render(){
             return (
                 <div>
-                    <Header/>
+                    <Header a={this.state.a} change = {this.changeVal}/>
                 </div>
             )
         }
@@ -23,6 +35,7 @@ function testEvents(){
         constructor(){
             super()
             this.mouseOver = this.mouseOver.bind(this)
+            this.onChange = this.onChange.bind(this)
         }
         mouseOver(e){
             e.stopPropagation()
@@ -44,6 +57,9 @@ function testEvents(){
                 a:  100
             })
         }
+        onChange(e){
+            this.props.change(e.target.value)
+        }
         render(){
             return (
                 <div>
@@ -64,9 +80,10 @@ function testEvents(){
                             </div>
                         </div>
                     </div>
-                    <p  >
+                    <p>
                         this is Header
                     </p>
+                    <input onInput={this.onChange} value={this.props.a}></input>
                 </div>
             )
         }

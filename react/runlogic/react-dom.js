@@ -2149,6 +2149,7 @@
         }
         isBatching = true;
         try {
+            console.log('topLevelType', bookkeeping.topLevelType)
             return _batchedUpdatesImpl(fn, bookkeeping);
         } finally {
             // Here we wait until all updates have propagated, which is important
@@ -2159,6 +2160,8 @@
             isBatching = false;
             var controlledComponentsHavePendingUpdates = needsStateRestore();
             if (controlledComponentsHavePendingUpdates) {
+                console.log('_flushInteractiveUpdatesImpl');
+                
                 // If a controlled event was fired, we may need to restore the state of
                 // the DOM node back to the controlled value. This is necessary when React
                 // bails out of the update without touching the DOM.
