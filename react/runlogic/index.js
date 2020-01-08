@@ -272,6 +272,21 @@ function testCLassComponent(){
                 a : 100
             })
             console.log('Header componentDidMount');
+            // this.setState({
+            //     a: this.state.a + 1
+            // })
+            // this.setState({
+            //     a: this.state.a + 1
+            // })
+            // this.setState({
+            //     a: this.state.a + 1
+            // })
+            // this.setState({
+            //     a: this.state.a + 1
+            // })
+            // this.setState({
+            //     a: this.state.a + 1
+            // })
         }
         render(){
             console.log(this.state.a)

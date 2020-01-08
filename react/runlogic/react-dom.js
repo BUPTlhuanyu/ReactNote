@@ -1075,6 +1075,7 @@
         }
         var listener = listenerAtPhase(inst, event, phase);
         if (listener) {
+            console.log('🔥🔥🔥🔥🔥🍏🍏🍏😂😂😂', listener, inst)
             event._dispatchListeners = accumulateInto(event._dispatchListeners, listener);
             event._dispatchInstances = accumulateInto(event._dispatchInstances, inst);
         }
@@ -2154,6 +2155,7 @@
             // when using controlled components within layers:
             // https://github.com/facebook/react/issues/1698
             // Then we restore state of any controlled component.
+            console.log('batchedUpdates')
             isBatching = false;
             var controlledComponentsHavePendingUpdates = needsStateRestore();
             if (controlledComponentsHavePendingUpdates) {
@@ -19127,6 +19129,7 @@
         } finally {
             isBatchingUpdates = previousIsBatchingUpdates;
             if (!isBatchingUpdates && !isRendering) {
+                console.log('batchedUpdates$1')
                 performSyncWork();
             }
         }
@@ -19162,6 +19165,8 @@
 
     function interactiveUpdates$1(fn, a, b) {
         if (isBatchingInteractiveUpdates) {
+            // console.log('isBatchingInteractiveUpdates🔥🔥🔥😂😂😂🍏🍏🍏' );
+            
             return fn(a, b);
         }
         // If there are any pending interactive updates, synchronously flush them.
@@ -19183,6 +19188,7 @@
             isBatchingInteractiveUpdates = previousIsBatchingInteractiveUpdates;
             isBatchingUpdates = previousIsBatchingUpdates;
             if (!isBatchingUpdates && !isRendering) {
+                console.log('isBatchingInteractiveUpdates$1' );
                 performSyncWork();
             }
         }

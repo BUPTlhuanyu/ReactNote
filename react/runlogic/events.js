@@ -20,6 +20,17 @@ function testEvents(){
         state = {
             a: 1
         }
+        constructor(){
+            super()
+            this.mouseOver = this.mouseOver.bind(this)
+        }
+        mouseOver(e){
+            e.stopPropagation()
+            e.preventDefault()
+            this.setState({
+                a : this.state.a + 10000
+            })
+        }
         clickHandler(){
             function makeError () {
                 var name = "geoff"
@@ -28,7 +39,7 @@ function testEvents(){
             }
 
             makeError()
-            alert("click")
+            // alert("click")
             this.setState({
                 a:  100
             })
@@ -36,7 +47,7 @@ function testEvents(){
         render(){
             return (
                 <div>
-                    <div onClick={this.clickHandler.bind(this)} >
+                    {/* <div onClick={this.clickHandler.bind(this)} >
                         <div onClick={this.clickHandler.bind(this)}>
                             <div onClick={this.clickHandler.bind(this)}>
                                 this is Header {this.state.a}
@@ -44,6 +55,16 @@ function testEvents(){
                         </div>
                     </div>
                     <p onClick={this.clickHandler.bind(this)} >
+                        this is Header
+                    </p> */}
+                    <div onClick={this.clickHandler.bind(this)} >
+                        <div onClick={this.clickHandler.bind(this)}>
+                            <div onClick={this.clickHandler.bind(this)}>
+                                this is Header {this.state.a}
+                            </div>
+                        </div>
+                    </div>
+                    <p  >
                         this is Header
                     </p>
                 </div>

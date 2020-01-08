@@ -193,7 +193,7 @@ export function dispatchEvent(
 ) {
   if (!_enabled) {
     return;
-  }s
+  }
 
   const nativeEventTarget = getEventTarget(nativeEvent);
   let targetInst = getClosestItnstanceFromNode(nativeEventTarget);
