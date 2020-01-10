@@ -30,7 +30,8 @@ function testEvents(){
 
     class Header extends React.Component{
         state = {
-            a: 1
+            a: 1,
+            value: ''
         }
         constructor(){
             super()
@@ -58,7 +59,16 @@ function testEvents(){
             })
         }
         onChange(e){
-            this.props.change(e.target.value)
+            let val = e.target.value + ''
+            val = val + ','
+            this.setState({
+                value:  val
+            })
+            setTimeout(() => {
+                this.setState({
+                    value: val + ';'
+                })
+            })
         }
         render(){
             return (
@@ -83,7 +93,7 @@ function testEvents(){
                     <p>
                         this is Header
                     </p>
-                    <input onInput={this.onChange} value={this.props.a}></input>
+                    <input type='text' onChange={this.onChange} value={this.state.value}></input>
                 </div>
             )
         }
