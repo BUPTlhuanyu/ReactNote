@@ -89,11 +89,21 @@ function testEvents(){
 
         }
         onChange(e){
-            let val = e.target.value + ','
+            // let val = e.target.value + ','
+            // this.setState({
+            //     value: val
+            // })
+            // this.props.change(val)
+            let val = e.target.value + ''
+            val = val + ','
             this.setState({
-                value: val
+                value:  val
             })
-            this.props.change(val)
+            setTimeout(() => {
+                this.setState({
+                    value: val + ';'
+                })
+            })
         }
         render(){
             return (
@@ -117,10 +127,15 @@ function testEvents(){
                     </div>
                     <button id="bt" onClick={this.repaint} style={{width:this.state.btWidth}}>
                         this is Header
+<<<<<<< HEAD
                     </button> */}
                     {/* <input onChange={this.onChange} value={this.props.a}></input>
                     <input onChange={this.onChange}  type="checkbox"></input> */}
                     <input onChange={this.onChange} value={this.state.value}></input>
+=======
+                    </p>
+                    <input type='text' onChange={this.onChange} value={this.state.value}></input>
+>>>>>>> 95ac73b20e4b4230ee1ac6571d850419c5223292
                 </div>
             )
         }

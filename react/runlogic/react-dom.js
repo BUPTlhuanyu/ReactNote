@@ -3341,6 +3341,7 @@
     }
 
     function updateWrapper(element, props) {
+        console.log('updateWrapper props', props)
         var node = element;
         {
             var _controlled = isControlled(props);
