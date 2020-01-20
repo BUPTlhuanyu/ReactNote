@@ -834,7 +834,7 @@ function step(timestamp) {
     }
     var progress = timestamp - start;
     element.style.left = Math.min(progress / 10, 200) + 'px';
-    if (progress < 400) {
+    if (progress < 1400) {
         window.requestAnimationFrame(step);
     }
 }

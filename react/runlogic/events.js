@@ -30,12 +30,30 @@ function testEvents(){
 
     class Header extends React.Component{
         state = {
-            a: 1
+            a: 1,
+            value: ''
         }
         constructor(){
             super()
             this.mouseOver = this.mouseOver.bind(this)
             this.onChange = this.onChange.bind(this)
+            this.repaint = this.repaint.bind(this)
+        }
+
+        componentDidMount(){
+            // this.setState({
+            //     btWidth: '500px'
+            // })
+            // let dom  =  document.getElementById('bt')
+            // console.log('componentDidMount Header', dom.style.width)
+            // dom.style.width = '50px'
+        }
+
+        componentWillReceiveProps(nextProps){
+            let value = nextProps.a + ':'
+            this.setState({
+                value
+            })
         }
         mouseOver(e){
             e.stopPropagation()
@@ -43,6 +61,12 @@ function testEvents(){
             this.setState({
                 a : this.state.a + 10000
             })
+        }
+        repaint(e){
+            
+            let dom  =  document.getElementById('bt')
+            console.log('e', dom.style.width)
+            dom.style.width = '200px'
         }
         clickHandler(){
             function makeError () {
@@ -53,12 +77,23 @@ function testEvents(){
 
             makeError()
             // alert("click")
-            this.setState({
-                a:  100
-            })
+            setTimeout(() => {
+                let dom  =  document.getElementById('bt')
+                console.log('componentDidMount Header', dom.style.width)
+                dom.style.width = '10px'
+                this.setState({
+                    btWidth: '800px'
+                })
+
+            }, 3000)
+
         }
         onChange(e){
-            this.props.change(e.target.value)
+            let val = e.target.value + ','
+            this.setState({
+                value: val
+            })
+            this.props.change(val)
         }
         render(){
             return (
@@ -73,17 +108,19 @@ function testEvents(){
                     <p onClick={this.clickHandler.bind(this)} >
                         this is Header
                     </p> */}
-                    <div onClick={this.clickHandler.bind(this)} >
+                    {/* <div onClick={this.clickHandler.bind(this)} >
                         <div onClick={this.clickHandler.bind(this)}>
                             <div onClick={this.clickHandler.bind(this)}>
                                 this is Header {this.state.a}
                             </div>
                         </div>
                     </div>
-                    <p>
+                    <button id="bt" onClick={this.repaint} style={{width:this.state.btWidth}}>
                         this is Header
-                    </p>
-                    <input onInput={this.onChange} value={this.props.a}></input>
+                    </button> */}
+                    {/* <input onChange={this.onChange} value={this.props.a}></input>
+                    <input onChange={this.onChange}  type="checkbox"></input> */}
+                    <input onChange={this.onChange} value={this.state.value}></input>
                 </div>
             )
         }

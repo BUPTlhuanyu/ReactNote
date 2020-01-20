@@ -1050,6 +1050,7 @@
      */
     function listenerAtPhase(inst, event, propagationPhase) {
         var registrationName = event.dispatchConfig.phasedRegistrationNames[propagationPhase];
+        console.log('registrationName', registrationName, propagationPhase)
         return getListener(inst, registrationName);
     }
 
@@ -1075,7 +1076,7 @@
         }
         var listener = listenerAtPhase(inst, event, phase);
         if (listener) {
-            console.log('🔥🔥🔥🔥🔥🍏🍏🍏😂😂😂', listener, inst)
+            console.log('🔥🔥🔥🔥🔥🍏🍏🍏😂😂😂', listener, inst, event)
             event._dispatchListeners = accumulateInto(event._dispatchListeners, listener);
             event._dispatchInstances = accumulateInto(event._dispatchInstances, inst);
         }
@@ -2053,6 +2054,7 @@
         eventTypes: eventTypes,
 
         extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+            console.log('BeforeInputEventPlugin extractEvents', topLevelType);
             var composition = extractCompositionEvent(topLevelType, targetInst, nativeEvent, nativeEventTarget);
 
             var beforeInput = extractBeforeInputEvent(topLevelType, targetInst, nativeEvent, nativeEventTarget);
@@ -2156,11 +2158,10 @@
             // when using controlled components within layers:
             // https://github.com/facebook/react/issues/1698
             // Then we restore state of any controlled component.
-            console.log('batchedUpdates')
             isBatching = false;
             var controlledComponentsHavePendingUpdates = needsStateRestore();
             if (controlledComponentsHavePendingUpdates) {
-                console.log('_flushInteractiveUpdatesImpl');
+                console.log('处理受控组件', bookkeeping.topLevelType)
                 
                 // If a controlled event was fired, we may need to restore the state of
                 // the DOM node back to the controlled value. This is necessary when React
@@ -2381,6 +2382,7 @@
 
         var lastValue = tracker.getValue();
         var nextValue = getValueFromNode(node);
+        console.log('lastValue nextValue', lastValue, nextValue)
         if (nextValue !== lastValue) {
             tracker.setValue(nextValue);
             return true;
@@ -3646,6 +3648,7 @@
     function getInstIfValueChanged(targetInst) {
         var targetNode = getNodeFromInstance$1(targetInst);
         if (updateValueIfChanged(targetNode)) {
+            console.log('updateValueIfChanged', targetNode)
             return targetInst;
         }
     }
@@ -3791,6 +3794,8 @@
         _isInputEventSupported: isInputEventSupported,
 
         extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+            console.log('ChangeEventPlugin extractEvents', topLevelType);
+            
             var targetNode = targetInst ? getNodeFromInstance$1(targetInst) : window;
 
             var getTargetInstFunc = void 0,
@@ -3811,6 +3816,7 @@
             if (getTargetInstFunc) {
                 var inst = getTargetInstFunc(topLevelType, targetInst);
                 if (inst) {
+                    console.log('创建change的合成事件', topLevelType);
                     var event = createAndAccumulateChangeEvent(inst, nativeEvent, nativeEventTarget);
                     return event;
                 }
@@ -3978,6 +3984,7 @@
          * the `mouseover` top-level event.
          */
         extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+            console.log('EnterLeaveEventPlugin extractEvents', topLevelType);
             var isOverEvent = topLevelType === TOP_MOUSE_OVER || topLevelType === TOP_POINTER_OVER;
             var isOutEvent = topLevelType === TOP_MOUSE_OUT || topLevelType === TOP_POINTER_OUT;
 
@@ -4750,6 +4757,7 @@
 
 
         extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+            console.log('SimpleEventPlugin extractEvents', topLevelType);
             var dispatchConfig = topLevelEventsToDispatchConfig[topLevelType];
             if (!dispatchConfig) {
                 return null;
@@ -5670,6 +5678,7 @@
         eventTypes: eventTypes$3,
 
         extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+            console.log('SelectEventPlugin extractEvents', topLevelType);
             var doc = getEventTargetDocument(nativeEventTarget);
             // Track whether all listeners exists for this plugin. If none exist, we do
             // not extract events. See #3639.
@@ -18581,10 +18590,10 @@
             }
             return;
         }
-
+        console.log('scheduleWork', isWorking, nextRenderExpirationTime, expirationTime, fiber)
         if (!isWorking && nextRenderExpirationTime !== NoWork && expirationTime > nextRenderExpirationTime) {
             // This is an interruption. (Used for performance tracking.)
-            
+            console.log('interruptedBy', fiber)
             interruptedBy = fiber;
             resetStack();
         }
@@ -18889,6 +18898,7 @@
             return true;
         }
         if (unstable_shouldYield()) {
+            console.log('unstable_shouldYield')
             didYield = true;
             return true;
         }
