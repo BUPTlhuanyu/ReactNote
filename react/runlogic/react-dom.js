@@ -3767,6 +3767,7 @@
     }
 
     function handleControlledInputBlur(node) {
+        console.log('handleControlledInputBlur====<<')
         var state = node._wrapperState;
 
         if (!state || !state.controlled || node.type !== 'number') {

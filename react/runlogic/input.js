@@ -88,12 +88,21 @@ function testInputComponent(){
             return (
                 <div>
                     <input 
+                        style = {{width: '600px', height: '100px',fontSize: '50px', padding: '20px'}}
+                        type = "text"
                         // onInput={(e) => {
                         //     this.changeValue(e)
                         // }}
-                        onChange = {this.changeValue}
+                        onBlur = {()=>{console.log('blur==============>');}}
+                        onInput = {this.changeValue}
                         value = {this.state.amount}
                     ></input>
+                    <div
+                        style = {{width: '100px', height: '100px', fontSize: '50px'}} 
+                        onTouchStart = {() => {this.setState({
+                            amount: ''
+                        })}}
+                    >点击</div>
                 </div>
             )
         }

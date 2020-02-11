@@ -24,6 +24,7 @@ const removeClass = (node, classes) => node && classes && classes.split(' ').for
  * added in the next tick. This is a convention based on the `classNames` prop.
  */
 class CSSTransition extends React.Component {
+  // 在didMount的时候会执行，也就是在dom添加到dom树上之后会为此dom添加一个class，并且这个动作会在屏幕渲染之前完成
   onEnter = (node, appearing) => {
     const { className } = this.getClassNames(appearing ? 'appear' : 'enter')
 
@@ -35,6 +36,9 @@ class CSSTransition extends React.Component {
     }
   }
 
+  // 这个函数的执行时机是在didMount中的setState对应的回调函数中执行，这个setState是同步更新，
+  // 这个更新进入commit阶段中执行setState的回调函数，其中会调用onEntering，
+  // onEntering会导致重绘，会触发浏览器的layout，但不是屏幕的刷新，然后添加添加*-apeear-active的动画类，开始执行动画。
   onEntering = (node, appearing) => {
     const { activeClassName } = this.getClassNames(
       appearing ? 'appear' : 'enter'
@@ -47,6 +51,8 @@ class CSSTransition extends React.Component {
     }
   }
 
+  // 在props.timeouts时间过后，会将appear或者enter相关的样式去除，如果在动画结束之前去除了，那么动画会立即结束
+  // 因此这里的props.timeouts必须大于动css动画的时长
   onEntered = (node, appearing) => {
     const { doneClassName } = this.getClassNames('enter');
 
