@@ -915,6 +915,8 @@
     var localRequestAnimationFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : undefined;
     var localCancelAnimationFrame = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : undefined;
 
+    console.log('localRequestAnimationFrame function', localRequestAnimationFrame);
+
     var getCurrentTime;
 
 // requestAnimationFrame does not run when the tab is in the background. If
@@ -926,8 +928,16 @@
     var rAFID;
     var rAFTimeoutID;
     var requestAnimationFrameWithTimeout = function (callback) {
+        console.log('requestAnimationFrameWithTimeout');
         // schedule rAF and also a setTimeout
         rAFID = localRequestAnimationFrame(function (timestamp) {
+            console.log('localRequestAnimationFrame');
+            
+            // let i = 0, a
+            // while(i<1000000){
+            //     a += i 
+            //     i++
+            // }
             // cancel the setTimeout
             localClearTimeout(rAFTimeoutID);
             callback(timestamp);

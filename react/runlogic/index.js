@@ -146,9 +146,9 @@ function testCLassComponent(){
 
             }
         }
-        componentDidMount(){
-            console.log('APP componentDidMount');
-        }
+        // componentDidMount(){
+        //     console.log('APP componentDidMount');
+        // }
         render(){
             console.log("APP render")
             return (
@@ -172,12 +172,22 @@ function testCLassComponent(){
             }
         }
         componentDidMount(){
-            console.log('Footer componentDidMount');
+            // const dom = document.getElementById('footer')
+            const dom = document.querySelector('#footer')
+            const res = dom.getBoundingClientRect()
+            console.log('Footer componentDidMount', dom.style.height, dom.style.width, res);
+            this.setState({
+                width: res.width,
+                height: res.height
+            })
+
         }
         render(){
             console.log("Footer render")
             return (
-                <div>
+                <div id="footer">
+                    {this.state.width} <br/>
+                    {this.state.height} <br/>
                     this is Footer {this.props.children}
                 </div>
             )
@@ -272,27 +282,27 @@ function testCLassComponent(){
         //     })
         // }
 
-        componentDidMount(){
-            this.setState({
-                a : 100
-            })
-            console.log('Header componentDidMount');
-            // this.setState({
-            //     a: this.state.a + 1
-            // })
-            // this.setState({
-            //     a: this.state.a + 1
-            // })
-            // this.setState({
-            //     a: this.state.a + 1
-            // })
-            // this.setState({
-            //     a: this.state.a + 1
-            // })
-            // this.setState({
-            //     a: this.state.a + 1
-            // })
-        }
+        // componentDidMount(){
+        //     this.setState({
+        //         a : 100
+        //     })
+        //     console.log('Header componentDidMount');
+        //     // this.setState({
+        //     //     a: this.state.a + 1
+        //     // })
+        //     // this.setState({
+        //     //     a: this.state.a + 1
+        //     // })
+        //     // this.setState({
+        //     //     a: this.state.a + 1
+        //     // })
+        //     // this.setState({
+        //     //     a: this.state.a + 1
+        //     // })
+        //     // this.setState({
+        //     //     a: this.state.a + 1
+        //     // })
+        // }
         render(){
             console.log(this.state.a)
             console.log("Header render")
