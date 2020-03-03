@@ -195,6 +195,11 @@ function testCLassComponent(){
             }
         }
 
+        shouldComponentUpdate(){
+            this.setState({
+                a: 2222
+            })
+        }
         // clickHandler(){
         //     for(let i=0;i<10000;i++){
         //         (function(){})()
