@@ -33,7 +33,7 @@ function testInputComponent(){
         constructor(props){
             super(props)
             this.state = {
-
+                a: 2
             }
         }
         componentDidMount(){
@@ -42,8 +42,9 @@ function testInputComponent(){
         render(){
             console.log("APP render")
             return (
-                <div>
-                    <Footer/>
+                <div onClick={() => {this.setState({a: 898})}}>
+                    点击一下
+                    <Footer test ={this.state.a}/>
                 </div>
             )
         }
