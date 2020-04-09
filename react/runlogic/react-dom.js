@@ -12954,7 +12954,7 @@
             processUpdateQueue(workInProgress, updateQueue, newProps, instance, renderExpirationTime);
             newState = workInProgress.memoizedState;
         }
-
+        console.log('oldProps === newProps', oldProps === newProps)
         if (oldProps === newProps && oldState === newState && !hasContextChanged() && !checkHasForceUpdateAfterProcessing()) {
             // If an update was already in progress, we should schedule an Update
             // effect even though we're bailing out, so that cWU/cDU are called.
