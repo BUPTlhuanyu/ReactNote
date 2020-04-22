@@ -1,3 +1,10 @@
+<!--
+ * @Descripttion: 
+ * @Author: lhuanyu
+ * @Date: 2019-10-16 18:01:13
+ * @LastEditors: lhuanyu
+ * @LastEditTime: 2020-04-09 10:35:02
+ -->
 ## Route ##
 ### 使用 ###
 
@@ -7,7 +14,7 @@
 	<Route render>
 	<Route children>
 
-优先级从高到低，其他的将被忽略。
+优先级从低到高。
 
 ##### Route自动传入的Porps： #####
 
@@ -71,15 +78,23 @@
 	          return (
 	              // Route可以通过children,component,render来渲染路径对应的组件，优先级从高到低。
 	            <RouterContext.Provider value={props}>
-	              {children && !isEmptyChildren(children) //如果children存在并且非空则返回children
-	                ? children
-	                : props.match //不存在children时，并且路径匹配的时候返回后续执行结果
-	                  ? component //当component存在的时候，后续执行结果为React.createElement(component, props)，props合并到component上
-	                    ? React.createElement(component, props)
-	                    : render  //当component不存在，返回后续结果
-	                      ? render(props)//route上props中存在render的时候，后续结果为render(props)
-	                      : null //当render不存在，返回null
-	                  : null}
+                    {props.match?  // 如果路径匹配成功了
+                        children?  // children存在
+                            typeof children === "function"?  // 如果children是个函数
+                              children(props)
+                              : 
+                              children
+                            : 
+                            component? //当component存在的时候，后续执行结果为React.createElement(component, props)，props合并到component上
+                              React.createElement(component, props)
+                                : 
+                              render?  // render存在
+                                render(props)
+                                : 
+                                null
+                          : 
+                        null
+                      }
 	            </RouterContext.Provider>
 	          );
 	        }}

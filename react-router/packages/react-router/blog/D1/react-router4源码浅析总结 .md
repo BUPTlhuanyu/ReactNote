@@ -135,6 +135,7 @@ if (canUseHistory) {
   function setState(nextState) {
     Object.assign(history, nextState);
     history.length = globalHistory.length;
+    // 这里的transitionManager.notifyListeners触发的就是history.listen注册的监听器，Router组件构造函数就调用了history.listen添加了一个
     transitionManager.notifyListeners(history.location, history.action);
   }
 ```
@@ -184,6 +185,9 @@ Switch组件是一个RouterContext.Consumer。其value的提供方就是Router�
 
 #### 2.2 Route渲染对应的组件以及单独使用的时候，location变化也会引起Route的更新
 
+如果Route在Switch中使用，那么Switch会将location.pathname和Route的porps.path进行match，Route会根据这个math是否存在来判断是否匹配成功，如果Route单独使用，则Route自己会将location.pathname和Route的porps.path进行match。渲染的时候，优先级从高到低children/component/render。
+
+注意：仓库中的代码是2018年的react-router，之前Route这块逻辑是错误的，目前新版已经修正了。
 ```
 class Route extends React.Component {
   render() {
@@ -191,19 +195,32 @@ class Route extends React.Component {
       <RouterContext.Consumer>
         {context => {
           const location = this.props.location || context.location;
+          const match = this.props.computedMatch
+            ? this.props.computedMatch // <Switch> already computed the match for us
+            : this.props.path
+              ? matchPath(location.pathname, this.props)
+              : context.match;          
           const props = { ...context, location, match };
           let { children, component, render } = this.props;
           return (
             <RouterContext.Provider value={props}>
-              {children && !isEmptyChildren(children) 
-                ? children
-                : props.match
-                  ? component
-                    ? React.createElement(component, props)
-                    : render  
-                      ? render(props)
-                      : null
-                  : null}
+              {props.match?  // 如果路径匹配成功了
+                children?  // children存在
+                    typeof children === "function"?  // 如果children是个函数
+                      children(props)
+                      : 
+                      children
+                    : 
+                    component? //当component存在的时候，后续执行结果为React.createElement(component, props)，props合并到component上
+                      React.createElement(component, props)
+                        : 
+                      render?  // render存在
+                        render(props)
+                        : 
+                        null
+                  : 
+                null
+              }
             </RouterContext.Provider>
           );
         }}
