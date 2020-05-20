@@ -4,17 +4,17 @@
 - 在线链接: http://note.youdao.com/noteshare?id=2370b87ac165e2ddd8e88f078d180e5f
 - 永久地址： https://github.com/BUPTlhuanyu/ReactNote/tree/master/react/ReactDOM_render.png
 
-这个源码阅读计划是从毕业的前几个月开始的，花了将近一个月的时间逐行阅读到react调度更新部分之后，虽然有所收获，
-但是还有很多地方有点不理解与模糊，并没有带着问题阅读源码，因此就停下来了。
+读源码大致总结了一下几个阶段，也是为什么我需要总结这样的一个流程图，`流程图把握整体，文章深入细节`：
+1. 通过文字的形式记录，逻辑理清楚了，能说明白就很不容易了；但是从文字上很难把握全局，后期回顾的时候比较慢，查 bug 原因会有少阻力。
+2. 通过流程图的形式记录，鸟瞰整体，能清楚那些阶段是负责什么样的功能，后期回顾的时候比较快，查 bug 原因相对轻松。
 
-最近把官网的hook文章都仔细过了一遍，也仔细研究了`前端精读`公众号上所有关于hook的文章，并且用hook写了一个表单组件库，感受到了react的牛逼之处，最近这几天通过`react status`这个订阅号，发现目前一个新的表单库，用hook写的，叫做react-hook-form，只能说文档是非常完善的，等我把源码研究透彻之后，可能会放到这个仓库，稍微提一下，这个库的特点是：自动或者手动收集表单组件的字段并整合到一个对象里，非常不可思议的是不用useState来保存字段状态以及更新状态渲染组件，所有的字段都被存放在useRef中，然后利用一个useState返回的set进行手动强制渲染，因此减少了很多的重新渲染的操作。
+流程图中也总结了一些 react 中比较常用的概念以及一些很容易误解的地方，比如 
+-  setState 何时何地是同步或者异步，原因是什么（是否空闲，是否是concurrent模式，处于react什么阶段决定了其到期时间，也就决定了是异步还是同步）？
+-  常说绑定事件函数在构造函数里 bind，props的属性不要传字面量对象，这些措施一定就有效，什么场景有效（结合 shouldComponentDidUpdate，pureComponent，还有一些入参是 nextProps的手动比较的地方，这些都应该考虑在内）？
 
-另一个有意思的事情是，之前看react源码，中间多次出现concurrent这个模式，一直没明白同步到底是干啥，现在react16.11.1版本的已经给出了文档，不过这个模式还是一个试验性的功能，该功能能够打断渲染，这个渲染不是说浏览器的渲染，而是react的调度阶段的一些操作。
+PS： 推荐一下 react status，这个周刊会一直推送给你最新的react进展与相关的代码库。
 
-总之，是时候把之前的源码捡起来，好好梳理总结一下。在这个过程中，我也会结合当前慕课网上的react源码解析教程来对原来写下来的文章进行总结与梳理，希望能够有更深的理解。
-
-PS： 真心给react粉丝们一个非常好的订阅号，react status，这个周刊会一直推送给你最新的react进展与相关的代码库。
-非常希望大家能和我一起讨论，不管是react源码还是react status中有趣的文章，欢迎在issue中留言。等react源码总结完了，我也会陆陆续续在issue中发一些关于react的文章的读书笔记与实践的思考。如果感兴趣，可以点个star关注一下这个仓库的更新。
+非常希望大家能和我一起讨论，不管是react源码还是react status中有趣的文章，欢迎在issue中留言。如果感兴趣，可以点个star关注一下这个仓库的更新。
 ### ToDo 深入分析
 - [ ] react
     - [x] shared  整个项目通用代码
@@ -25,12 +25,18 @@ PS： 真心给react粉丝们一个非常好的订阅号，react status，这个
         - [x] 到期时间是如何确定的
         - [ ] context的实现机制
         - [ ] ...
-    - [x] events 合成事件系统
+    - [ ] events 合成事件系统
+        - [ ] 事件注册与触发 
     - [x] react的错误处理机制
         - [x] 从invokeGuardedCallbackAndCatchFirstError，invokeGuardedCallback，invokeGuardedCallbackImpl看是如何对错误进行处理的
         - [ ] ...
     - [x] react-dom  DOM渲染
     - [ ] 各类型组件的运行机制
+    - [ ] 专题
+        - [ ] 结合 react 源码图解实例分析 react diff 以及存在的坑
+        - [ ] react 内部是如何在挂在以及卸载的时候处理 ref 的
+        - [ ] concurrent
+        - [ ] ...  
     - [ ] 总结
 - [x] react-router4各个API的使用与源码分析
 - [ ] react-transition-group
