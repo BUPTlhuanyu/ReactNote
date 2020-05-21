@@ -11,15 +11,22 @@ function testCLassComponent(){
         constructor(props){
             super(props)
             this.state = {
-
+                showHeader: false
             }
+        }
+        clickHandler(){
+            this.setState({
+                showHeader: !this.state.showHeader
+            })
         }
         render(){
             return (
-                <div>
+                <div onClick={this.clickHandler.bind(this)}>                   
                     <div>item 1</div>
+                    {
+                        this.state.showHeader && <Header/>
+                    } 
                     <div>item 2</div>
-                    <Header/>
                     <Footer/>
                 </div>
             )
@@ -43,10 +50,6 @@ function testCLassComponent(){
         }
     }
     class Header extends React.Component{
-        static getDerivedStateFromProps(){
-            console.log('Header getDerivedStateFromProps');
-            return {}
-        }
         constructor(props){
             super(props)
             this.state = {
@@ -57,7 +60,7 @@ function testCLassComponent(){
             console.log(this.state.a)
             console.log("Header render")
             return (
-                <div onClick={this.clickHandler.bind(this)}>
+                <div>
                     this Header will be deleted
                 </div>
             )
