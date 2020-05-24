@@ -2,7 +2,7 @@
 [react核心流程图](https://juejin.im/post/5e1873c0e51d451c883618f0)
 高清大图： 
 - 在线链接: http://note.youdao.com/noteshare?id=2370b87ac165e2ddd8e88f078d180e5f
-- 永久地址： https://github.com/BUPTlhuanyu/ReactNote/tree/master/react/ReactDOM_render.png
+- 永久地址： 链接:https://pan.baidu.com/s/1sb1XqteOszpW6v0NnEG5nQ  密码:s364
 
 读源码大致总结了一下几个阶段，也是为什么我需要总结这样的一个流程图，`流程图把握整体，文章深入细节`：
 1. 通过文字的形式记录，逻辑理清楚了，能说明白就很不容易了；但是从文字上很难把握全局，后期回顾的时候比较慢，查 bug 原因会有不少阻力。
@@ -33,7 +33,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
     - [x] react-dom  DOM渲染
     - [ ] 各类型组件的运行机制
     - [ ] 专题
-        - [ ] 结合 react 源码图解实例分析 react diff 以及存在的坑
+        - [x] [结合 react 源码图解实例分析 react diff 以及存在的坑](https://juejin.im/post/5eca28fa6fb9a0479b449b9d)
         - [ ] react 内部是如何在挂在以及卸载的时候处理 ref 的
         - [ ] concurrent
         - [ ] ...  

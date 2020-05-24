@@ -835,7 +835,9 @@ function ChildReconciler(shouldTrackSideEffects) {
     for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
       // 如果还没有遍历完newChildren并且还有老的子节点，则执行for循环的新一轮遍历
       if (oldFiber.index > newIdx) {
-        // ！如果老的子节点位置比当前新的子节点位置靠后，说明新的子节点往前移动了
+        // 如果是在原来的 oldfiber 中增加节点，那么会进入到这个条件块中
+        // 那么相同的位置将 oldfiber 设置为 null，新的元素对应的这个 oldfiber 就是 null，
+        // 后续updateSlot 接收到的 oldfiber为 null，返回的 newFiber 也是 null，因此会 break，跳出这个 for 循环。
         nextOldFiber = oldFiber;
         oldFiber = null;
       } else {
@@ -863,7 +865,7 @@ function ChildReconciler(shouldTrackSideEffects) {
         // 跳出循环
         break;
       }
-      // 如果是首次渲染，shouldTrackSideEffects为true，
+      // 如果不是首次渲染，shouldTrackSideEffects为true，
       // 如果没有复用老节点，则将其删除
       if (shouldTrackSideEffects) {
         if (oldFiber && newFiber.alternate === null) {
