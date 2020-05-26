@@ -33,7 +33,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
     - [ ] 各类型组件的运行机制
     - [ ] 专题
         - [x] [结合 react 源码图解实例分析 react diff 以及存在的坑](https://juejin.im/post/5eca28fa6fb9a0479b449b9d)
-        - [ ] react 内部是如何在挂在以及卸载的时候处理 ref 的
+        - [x] react 内部是如何在挂在以及卸载的时候处理 ref 的: 相见图解中的 “非常重要” 部分的文字描述，以及图中其他相关文字的提示。
         - [ ] concurrent
         - [ ] ...  
     - [ ] 总结
