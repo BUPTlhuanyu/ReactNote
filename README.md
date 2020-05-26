@@ -1,8 +1,7 @@
 # 🔥🔥🔥对react相关代码库以及框架的源码进行了一定的分析
 [react核心流程图](https://juejin.im/post/5e1873c0e51d451c883618f0)
 高清大图： 
-- 在线链接: http://note.youdao.com/noteshare?id=2370b87ac165e2ddd8e88f078d180e5f
-- 永久地址： 链接:https://pan.baidu.com/s/1sb1XqteOszpW6v0NnEG5nQ  密码:s364
+- 永久地址： 链接:https://pan.baidu.com/s/1fLA7uIT5QKmBcdGHFx_yhA  密码:u09n
 
 读源码大致总结了一下几个阶段，也是为什么我需要总结这样的一个流程图，`流程图把握整体，文章深入细节`：
 1. 通过文字的形式记录，逻辑理清楚了，能说明白就很不容易了；但是从文字上很难把握全局，后期回顾的时候比较慢，查 bug 原因会有不少阻力。
