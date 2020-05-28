@@ -48,6 +48,8 @@ function getValueFromNode(node: HTMLInputElement): string {
   return value;
 }
 
+// 注意 input 节点的 dom 的引用对象上本省是不存在 value 这个属性的，但是这对象能通过原型链搜索到 node.constructor.prototype 上的 value
+// 这个函数的作用就是将 value 直接注入到 node 对象上，因此你可以使用 ref.current.value 或者 event.target.value 来修改或者访问 value
 function trackValueOnNode(node: any): ?ValueTracker {
   const valueField = isCheckable(node) ? 'checked' : 'value';
   const descriptor = Object.getOwnPropertyDescriptor(

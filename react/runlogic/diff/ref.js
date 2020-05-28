@@ -39,6 +39,7 @@ function testCLassComponent(){
             return (
                 <div>
                     this Header will be deleted
+                    <input />
                 </div>
             )
         }
