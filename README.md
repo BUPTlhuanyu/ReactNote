@@ -1,7 +1,7 @@
 # 🔥🔥🔥对react相关代码库以及框架的源码进行了一定的分析
 [react核心流程图](https://juejin.im/post/5e1873c0e51d451c883618f0)
 高清大图： 
-- 永久地址： 链接:https://pan.baidu.com/s/1fLA7uIT5QKmBcdGHFx_yhA  密码:u09n
+- 永久地址： 链接:https://pan.baidu.com/s/1EfTWzqC4psW8kq5kYP-v9A  密码:8nqr
 
 读源码大致总结了一下几个阶段，也是为什么我需要总结这样的一个流程图，`流程图把握整体，文章深入细节`：
 1. 通过文字的形式记录，逻辑理清楚了，能说明白就很不容易了；但是从文字上很难把握全局，后期回顾的时候比较慢，查 bug 原因会有不少阻力。
@@ -22,7 +22,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
     - [x] scheduler 规划 React 初始化，更新等等
     - [x] react-reconciler  React调度器
         - [x] 到期时间是如何确定的
-        - [ ] context的实现机制
+        - [x] context的实现机制
         - [ ] ...
     - [x] events 合成事件系统
         - [x] 事件注册与触发

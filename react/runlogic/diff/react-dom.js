@@ -9476,6 +9476,8 @@
         }
 
         cursor.current = value;
+        console.log('%cpush','color: red',value);
+        
     }
 
     function checkThatStackIsEmpty() {
@@ -12918,6 +12920,15 @@
         var instance = workInProgress.stateNode;
 
         var oldProps = workInProgress.memoizedProps;
+        console.group('updateClassInstance')
+        console.log(workInProgress.elementType)
+        if(oldProps === newProps){
+            console.log('%ctrue', 'color: green', oldProps)
+        }else{
+            console.log('%cfalse', 'color: green', oldProps, newProps)
+        }
+        console.groupEnd()
+
         instance.props = workInProgress.type === workInProgress.elementType ? oldProps : resolveDefaultProps(workInProgress.type, oldProps);
 
         var oldContext = instance.context;
@@ -14407,6 +14418,9 @@
     }
 
     function updateClassComponent(current$$1, workInProgress, Component, nextProps, renderExpirationTime) {
+        if(workInProgress.pendingProps && workInProgress.memoizedProps && workInProgress.pendingProps.children === workInProgress.memoizedProps.children){
+            console.log('%cupdateClassComponent', 'color: blue', workInProgress.elementType)
+        }
         // Push context providers early to prevent context stack mismatches.
         // During mounting we don't know the child context yet as the instance doesn't exist.
         // We will invalidate the child context in finishClassComponent() right after rendering.
@@ -15055,6 +15069,9 @@
     }
 
     function updateContextProvider(current$$1, workInProgress, renderExpirationTime) {
+        if(workInProgress.pendingProps && workInProgress.memoizedProps && workInProgress.pendingProps.children === workInProgress.memoizedProps.children){
+            console.log('%cupdateContextProvider', 'color: blue', workInProgress.elementType)
+        }
         var providerType = workInProgress.type;
         var context = providerType._context;
 
@@ -15180,6 +15197,14 @@
             // console.log('beginWork=========>', current$$1)
             var oldProps = current$$1.memoizedProps;
             var newProps = workInProgress.pendingProps;
+            console.group('beginWork')
+            console.log(workInProgress.elementType)
+            if(oldProps === newProps){
+                console.log('%ctrue', 'color: red', oldProps)
+            }else{
+                console.log('%cfalse', 'color: red', oldProps, newProps)
+            }
+            console.groupEnd()
             if (oldProps === newProps && !hasContextChanged() && updateExpirationTime < renderExpirationTime) {
                 // This fiber does not have any pending work. Bailout without entering
                 // the begin phase. There's still some bookkeeping we that needs to be done

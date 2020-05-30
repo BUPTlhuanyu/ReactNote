@@ -29,7 +29,7 @@ function testCLassComponent(){
         render(){
             return (
                 <div onClick={this.clickHandler.bind(this)} ref = {this.refContainer}>                   
-                    <Header/>
+                    <Header a =''/>
                 </div>
             )
         }

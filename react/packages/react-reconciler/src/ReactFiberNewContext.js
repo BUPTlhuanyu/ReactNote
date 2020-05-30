@@ -147,10 +147,12 @@ export function propagateContextChange(
     let nextFiber;
 
     // Visit this fiber.
+    // 往下遍历，在遍历的过程中会判断 type
     let dependency = fiber.firstContextDependency;
     if (dependency !== null) {
       do {
         // Check if the context matches.
+        // 如果provider的value 有变化，并且是当前的context
         if (
           dependency.context === context &&
           (dependency.observedBits & changedBits) !== 0
@@ -158,16 +160,19 @@ export function propagateContextChange(
           // Match! Schedule an update on this fiber.
 
           if (fiber.tag === ClassComponent) {
+            // 创建一个 update， 到期时间为当前更新的时候到期时间
             // Schedule a force update on the work-in-progress.
             const update = createUpdate(renderExpirationTime);
+            // 强制更新
             update.tag = ForceUpdate;
             // TODO: Because we don't have a work-in-progress, this will add the
             // update to the current fiber, too, which means it will persist even if
             // this render is thrown away. Since it's a race condition, not sure it's
             // worth fixing.
+            // 将更新任务添加到 fiber 更新链表上
             enqueueUpdate(fiber, update);
           }
-
+          // 更新到期时间
           if (fiber.expirationTime < renderExpirationTime) {
             fiber.expirationTime = renderExpirationTime;
           }
@@ -178,6 +183,7 @@ export function propagateContextChange(
           ) {
             alternate.expirationTime = renderExpirationTime;
           }
+          // 更新到期时间
           // Update the child expiration time of all the ancestors, including
           // the alternates.
           let node = fiber.return;
@@ -208,17 +214,32 @@ export function propagateContextChange(
         dependency = dependency.next;
       } while (dependency !== null);
     } else if (fiber.tag === ContextProvider) {
+      // 当遇到相同的context的provider，那么不会遍历其child，而是在下一个 if 中往右往上遍历。
+      // 如果当前遍历到的 fiber 与 传入的 providerFiber 是同一个 context，比如 MyContext.Provider
+      // 则将 nextFiber 设置为 null，否则继续遍历 fiber 的子节点。 
       // Don't scan deeper if this is a matching provider
       nextFiber = fiber.type === workInProgress.type ? null : fiber.child;
     } else {
+      // 继续往下遍历
       // Traverse down.
       nextFiber = fiber.child;
     }
 
+    // 往右往上遍历
     if (nextFiber !== null) {
+      // 设置父节点？？？
       // Set the return pointer of the child to the work-in-progress fiber.
       nextFiber.return = fiber;
     } else {
+//              A
+//            /   \
+//          B       C
+//          |     /   \
+//          D    E     F
+//    B , D, C, F 都没有兄弟节
+//    1. 比如上面的 fiber 是 F，由于 F 右边没有兄弟节点，所以 while 循环往上搜寻到 C，
+//    C 右边也没有兄弟，继续往上到 A，此时 A 已经是 传入的 workinprogress 了， while 循环结束。
+//    2. 如果上面的 fiber 是 E ，那么 while 结束，该函数需要处理的下一个节点就是 F。
       // No child. Traverse to next sibling.
       nextFiber = fiber;
       while (nextFiber !== null) {
@@ -227,14 +248,17 @@ export function propagateContextChange(
           nextFiber = null;
           break;
         }
+        // 遍历到兄弟节点
         let sibling = nextFiber.sibling;
         if (sibling !== null) {
+          // 将当前的 fiber 节点的兄弟节点的父节点设置为当前的 fiber 节点的父节点，然后推出循环
           // Set the return pointer of the sibling to the work-in-progress fiber.
           sibling.return = nextFiber.return;
           nextFiber = sibling;
           break;
         }
         // No more siblings. Traverse up.
+        // 往上遍历
         nextFiber = nextFiber.return;
       }
     }

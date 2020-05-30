@@ -16,8 +16,10 @@ export type StackCursor<T> = {
   current: T,
 };
 
+// 用于存储 value 的栈
 const valueStack: Array<any> = [];
 
+// 用于存储 fiber 的栈
 let fiberStack: Array<Fiber | null>;
 
 if (__DEV__) {
@@ -26,6 +28,7 @@ if (__DEV__) {
 //index用于指示栈中元素的数量
 let index = -1;
 
+// 创建一个指针，该指针的 current 指向当前的值
 function createCursor<T>(defaultValue: T): StackCursor<T> {
   return {
     current: defaultValue,
