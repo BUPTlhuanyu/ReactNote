@@ -22,7 +22,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
     - [x] scheduler 规划 React 初始化，更新等等
     - [x] react-reconciler  React调度器
         - [x] 到期时间是如何确定的
-        - [x] context的实现机制
+        - [x] [context的实现机制](https://juejin.im/post/5ed24a7de51d455fbd1804ac)
         - [ ] ...
     - [x] events 合成事件系统
         - [x] 事件注册与触发
