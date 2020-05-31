@@ -78,7 +78,8 @@ function SyntheticEvent(
   this._targetInst = targetInst;
   this.nativeEvent = nativeEvent;
 
-  //文件开头定义了EventInterface对象，并给该对象自定义了一些属性
+  // 1. 将原生对象的一些属性值放置到SyntheticEvent实例对象上相同属性名称上；
+  // 2. 将原生对象通过自定义的一些函数处理之后将结果保存到SyntheticEvent实例对象上的某些属性上，比如做一些兼容处理，降级处理等等
   const Interface = this.constructor.Interface;
   for (const propName in Interface) {
     if (!Interface.hasOwnProperty(propName)) {
@@ -98,6 +99,7 @@ function SyntheticEvent(
         //如果自身属性是'target',则将原生事件对应的DOM存储在合成事件的target属性上
         this.target = nativeEventTarget;
       } else {
+        // 将原生事件的一些属性值设置到实例对象上相同名称的属性上
         this[propName] = nativeEvent[propName];
       }
     }
@@ -234,12 +236,15 @@ SyntheticEvent.Interface = EventInterface;
  * Helper to reduce boilerplate when creating subclasses.
  */
 SyntheticEvent.extend = function(Interface) {
+  // SyntheticEvent.extend() 执行的时候 Super 就是这个 SyntheticEvent
   const Super = this;
 
+  // 构造子类的原型对象
   const E = function() {};
   E.prototype = Super.prototype;
   const prototype = new E();
 
+  // 设置原型对象以及设置构造函数
   function Class() {
     return Super.apply(this, arguments);
   }
@@ -247,6 +252,7 @@ SyntheticEvent.extend = function(Interface) {
   Class.prototype = prototype;
   Class.prototype.constructor = Class;
 
+  // 添加静态方法，扩展Interface属性
   Class.Interface = Object.assign({}, Super.Interface, Interface);
   Class.extend = Super.extend;
   addEventPoolingTo(Class);
@@ -302,7 +308,14 @@ function getPooledWarningPropertyDefinition(propName, getVal) {
     );
   }
 }
-
+/**
+ * 从事件池中获取一个空的合成事件对象，并设将入参设置到事件对象对应的属性上
+ * 如果事件池为空则利用入参创建一个新的合成事件对象
+ * @param {*} dispatchConfig 
+ * @param {*} targetInst 
+ * @param {*} nativeEvent 
+ * @param {*} nativeInst 
+ */
 function getPooledEvent(dispatchConfig, targetInst, nativeEvent, nativeInst) {
   const EventConstructor = this;
   if (EventConstructor.eventPool.length) {
@@ -323,7 +336,10 @@ function getPooledEvent(dispatchConfig, targetInst, nativeEvent, nativeInst) {
     nativeInst,
   );
 }
-//重置event上的属性值，并添加到事件对象池的空余位置
+/**
+ * 重置event上的属性值，并添加到事件对象池的空余位置
+ * @param {*} event 
+ */
 function releasePooledEvent(event) {
   const EventConstructor = this;
   invariant(
