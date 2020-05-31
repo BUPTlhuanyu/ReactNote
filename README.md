@@ -27,7 +27,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
     - [x] events 合成事件系统
         - [x] 事件[注册]((https://juejin.im/post/5d0af976e51d454fbf540a0f))与[触发](https://juejin.im/editor/posts/5d0afbd2e51d4510bf1d6690)
         - [x] 为什么需要合成事件，为什么需要有自己单独的事件机制：事件委托，事件兼容处理，可控的调度更新任务。
-        - [ ] [如何封装可扩展的 SyntheticEvent 对象](https://juejin.im/post/5ed337cee51d4574d067dbfe)
+        - [x] [如何封装可扩展的 SyntheticEvent 对象](https://juejin.im/post/5ed337cee51d4574d067dbfe)
         - [x] [event.persist() 的原理](https://juejin.im/editor/posts/5d0afbd2e51d4510bf1d6690)：由于事件触发比较频繁导致生成的合成事件对象的数量也非常大，react 为了节约内存，构建了一个容量为 10 的事件池，在每次事件处理函数同步代码执行完毕之后，会重置这个合成事件，然后将这个空的合成事件对象存到事件池中，下次生成合成事件的时候再取出来设置一些属性。因此当你的事件处理函数涉及到异步的时候，事件处理函数返回，此时合成事件对象被重置，你异步代码中就无法访问到的正确的值，因此event.persistent()就是为了解决这样的问题，这个函数调用之后会给合成事件对象标记为isPersist，后续也就不会 release 这个合成事件，release 会重置合成事件的属性值（包括target指向的原生事件对象），然后将空的合成事件对象添加到池中的空余位置。
     - [x] react的错误处理机制
         - [x] 从invokeGuardedCallbackAndCatchFirstError，invokeGuardedCallback，invokeGuardedCallbackImpl看是如何对错误进行处理的
