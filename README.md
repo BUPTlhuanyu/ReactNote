@@ -16,7 +16,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
 非常希望大家能和我一起讨论，不管是react源码还是react status中有趣的文章，欢迎在issue中留言。如果感兴趣，可以点个star关注一下这个仓库的更新。
 
 更多文章敬请关注公众号：
-<img src="https://github.com/BUPTlhuanyu/ReactNote/blob/master/wx.png" alt="wx"/>
+<img src="https://github.com/BUPTlhuanyu/ReactNote/blob/master/wx.jpg" alt="wx"/>
 
 ### ToDo 深入分析
 - [ ] react
