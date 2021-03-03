@@ -69,8 +69,8 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
 <details>
 <summary>🍺D3 react</summary>
 
-- [1、React源码随笔3.1-组件与ReactElement的关系](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D3/react%e6%ba%90%e7%a0%81%e6%b5%85%e6%9e%90(%e4%b8%89)%ef%bc%9areact%e6%96%87%e4%bb%b6%e5%a4%b9-%e6%ba%90%e7%a0%81%e5%85%a5%e5%8f%a3.md)
-- [2、React源码随笔3.2-ReactElement以及Children](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D3/react%e6%ba%90%e7%a0%81%e6%b5%85%e6%9e%90(%e4%b8%89)%ef%bc%9aReactNoopUpdateQueue.md)
+- [1、React源码随笔3.1-组件与ReactElement的关系](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D3/React%E6%BA%90%E7%A0%81%E9%9A%8F%E7%AC%943.1-%E7%BB%84%E4%BB%B6%E4%B8%8EReactElement%E7%9A%84%E5%85%B3%E7%B3%BB.md)%ef%bc%9areact%e6%96%87%e4%bb%b6%e5%a4%b9-%e6%ba%90%e7%a0%81%e5%85%a5%e5%8f%a3.md)
+- [2、React源码随笔3.2-ReactElement以及Children](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D3/React%E6%BA%90%E7%A0%81%E9%9A%8F%E7%AC%943.2-ReactElement%E4%BB%A5%E5%8F%8AChildren.md)
 </details>
 
 
