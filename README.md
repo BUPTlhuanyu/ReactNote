@@ -79,7 +79,8 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
 
 ###### <i>梳理react中的类型，两大类型的构建过程</i>
 
-- [react源码浅析(四)：react-is](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D4/react%e6%ba%90%e7%a0%81%e6%b5%85%e6%9e%90(%e5%9b%9b)%ef%bc%9areact-is.md)
+- [React源码随笔4-1-为什么需要scheduler](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D4/React%E6%BA%90%E7%A0%81%E9%9A%8F%E7%AC%944-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81scheduler.md)
+- [React源码随笔4-2-新版scheduler](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D4/React%E6%BA%90%E7%A0%81%E9%9A%8F%E7%AC%944-2-%E6%96%B0%E7%89%88scheduler.md)
 </details>
 
 
