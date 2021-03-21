@@ -75,7 +75,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
 
 
 <details>
-<summary>🍺D4 react-is</summary>
+<summary>🍺D4 scheduler</summary>
 
 ###### <i>梳理react中的类型，两大类型的构建过程</i>
 
@@ -84,21 +84,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
 
 
 <details>
-<summary>🍺D5 scheduler</summary>
-
-###### <i>scheduler调度器原理，大致基本流程已给出图示，以后再给出更详细具体的调度解析，其实知道了设计思想，往后的内容都基本没问题了。</i>
-
-###### <i>tracing及其TracingSubscriptions实现的是一个订阅监听者设计模式，暂时不对其总结</i>
-
-- [react源码浅析(五)：scheduler](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D5/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%BA%94)%EF%BC%9Ascheduler.md)
-- [react源码浅析(五)：scheduler之Tracing.js](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D5/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%BA%94)%EF%BC%9Ascheduler%E4%B9%8BTracing.js.md)
-- [react源码浅析(五)：scheduler之TracingSubscriptions.js](https://github.com/BUPTlhuanyu/ReactNote/blob/master/react/blog/D5/react%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90(%E4%BA%94)%EF%BC%9Ascheduler%E4%B9%8BTracingSubscriptions.js.md)
-</details>
-
-
-
-<details>
-<summary>🍺D6 react-reconciler</summary>
+<summary>🍺D5 react-reconciler</summary>
 
 ###### <i>react-reconciler源码分析，直接记在我的有道云笔记中，之后会整理成md文件</i>
 
@@ -123,7 +109,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
 </details>
 
 <details>
-<summary>🍺D7 events</summary>
+<summary>🍺D6 events</summary>
 
 ###### <i>react事件系统是一个非常值得深入分析的部分,猜想跨平台开发框架对不同平台的事件的兼容方案莫过于此吧</i>
 
@@ -132,7 +118,7 @@ PS： 推荐一下 react status，这个周刊会一直推送给你最新的reac
 </details>
 
 <details>
-<summary>🍺D8 错误处理机制</summary>
+<summary>🍺D7 错误处理机制</summary>
 
 - [react中的错误处理](https://juejin.im/post/5d0c8f34e51d45590a445b4c)
 </details>
