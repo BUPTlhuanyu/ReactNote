@@ -113,7 +113,7 @@ React.createElement(ClassType, null);
 
 那么我们可以做如下总结：你所写的组件的构造函数或者说函数都会被挂在`ReactElement.type`属性上，`React`可以在合适的时机通过它来执行特定的函数，从而表现出你想要的行为。
 
-思考：什么时候会执行这些构造函数或者函数呢？这个后续文章会说明，等不及的可以先去图里找`updateClassComponent`函数(GitHub: https://github.com/BUPTlhuanyu/ReactNote  内附【20Mb】 React 原理图)。
+思考：什么时候会执行这些构造函数或者函数呢？这个后续文章会说明，等不及的可以先去[图里](https://buptlhuanyu.github.io/ReactNote/docs/react/react/intro)找`updateClassComponent`函数。
 
 ### 类组件超类 React.Component 与React.PureComponent
 
@@ -160,8 +160,7 @@ Object.assign(pureComponentPrototype, Component.prototype);
 
 #### updater
 
-在类组件的实例属性中有个`updater`有点奇怪，我们在写组件的时候，构造函数只传入了两个参数， `props`与`context`，第三个参数始终是`undefined`，这个地方需要注意了，组件处理`state`的逻辑是由`updater`提供的，React 内部在实例化组件之后，会立即给`updater`赋值为`constructClassInstance`，可以先去图里找`updateClassComponent`函数(GitHub: https://github.com/BUPTlhuanyu/ReactNote  内附【20Mb】 React 原理图)。
-
+在类组件的实例属性中有个`updater`有点奇怪，我们在写组件的时候，构造函数只传入了两个参数， `props`与`context`，第三个参数始终是`undefined`，这个地方需要注意了，组件处理`state`的逻辑是由`updater`提供的，React 内部在实例化组件之后，会立即给`updater`赋值为`constructClassInstance`，可以先去[图里](https://buptlhuanyu.github.io/ReactNote/docs/react/react/intro)找`updateClassComponent`函数。
 `updater` 对象如下：
 
 ```

@@ -1,13 +1,13 @@
 ---
 id: project-directory
 sidebar_label: 目录结构
-slug: '/react/react/react'
+slug: '/react/react/project-directory'
 title: ''
 ---
 
 # React 源码随笔-项目结构
 
-​		本文是 React 源码系列的开端，在此之前有必要说明一下背景，这个系列的部分初稿是本人在毕业（2019 年 6 月份）的前几个月完成的，React 的版本是当时最新的 16.6 版本（目前为 17.0.1），其实 fiber 的大体架构差不多，16.6 也有一部分 HOOK 相关的代码，16.6 的 HOOK 还是试验性的，因此本系列重点是 Fiber 相关的源码与实例解析，对于 HOOK 部分后续会跟进，不在本系列之中（立个 flag：下一个 electron 应用就用 hook 写），初稿可见 https://github.com/BUPTlhuanyu/ReactNote。
+​		本文是 React 源码系列的开端，在此之前有必要说明一下背景，这个系列的部分初稿是本人在毕业（2019 年 6 月份）的前几个月完成的，React 的版本是当时最新的 16.6 版本（目前为 17.0.1），其实 fiber 的大体架构差不多，16.6 也有一部分 HOOK 相关的代码，16.6 的 HOOK 还是试验性的，因此本系列重点是 Fiber 相关的源码与实例解析，对于 HOOK 部分后续会跟进，不在本系列之中（立个 flag：下一个 electron 应用就用 hook 写），初稿可见 https://github.com/BUPTlhuanyu/ReactNote 。
 
 ​		工作之后，在闲暇时间又梳理了一遍 react，并将之前对项目以及源码的理解绘制了一张全网最细节的 react 流程图。当然细节还不够完善，有些地方可能还有一些问题，欢迎拍砖。贴上一个链接，图址 https://pan.baidu.com/s/1EfTWzqC4psW8kq5kYP-v9A ，密码 8nqr。
 
