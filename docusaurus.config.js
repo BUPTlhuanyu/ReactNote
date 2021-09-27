@@ -10,7 +10,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   url: 'https://BUPTlhuanyu.github.io', // Your website URL
   baseUrl: '/ReactNote/',
 
-  projectName: 'BUPTlhuanyu.github.io', // Usually your repo name.
+  projectName: 'ReactNote', // Usually your repo name.
   organizationName: 'BUPTlhuanyu', // Usually your GitHub org/user name.
 
   onBrokenLinks: 'ignore',
