@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://BUPTlhuanyu.github.io/blog</id>
+    <id>https://BUPTlhuanyu.github.io/ReactNote/blog</id>
     <title>React Note Blog</title>
     <updated>2021-09-27T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://BUPTlhuanyu.github.io/blog"/>
+    <link rel="alternate" href="https://BUPTlhuanyu.github.io/ReactNote/blog"/>
     <subtitle>React Note Blog</subtitle>
-    <icon>https://BUPTlhuanyu.github.io/img/favicon.ico</icon>
+    <icon>https://BUPTlhuanyu.github.io/ReactNote/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[First Blog Post]]></title>
         <id>first-blog-post</id>
-        <link href="https://BUPTlhuanyu.github.io/blog/first-blog-post"/>
+        <link href="https://BUPTlhuanyu.github.io/ReactNote/blog/first-blog-post"/>
         <updated>2021-09-27T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[This is my first blog posted using docusaurus.]]></summary>
         <author>
@@ -21,7 +21,7 @@
     <entry>
         <title type="html"><![CDATA[Welcome]]></title>
         <id>welcome</id>
-        <link href="https://BUPTlhuanyu.github.io/blog/welcome"/>
+        <link href="https://BUPTlhuanyu.github.io/ReactNote/blog/welcome"/>
         <updated>2021-09-27T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Welcome to my blog here!]]></summary>
         <author>
