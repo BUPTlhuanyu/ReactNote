@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>React Note Blog</title>
+        <link>https://BUPTlhuanyu.github.io/blog</link>
+        <description>React Note Blog</description>
+        <lastBuildDate>Mon, 27 Sep 2021 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[First Blog Post]]></title>
+            <link>https://BUPTlhuanyu.github.io/blog/first-blog-post</link>
+            <guid>first-blog-post</guid>
+            <pubDate>Mon, 27 Sep 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[This is my first blog posted using docusaurus.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Welcome]]></title>
+            <link>https://BUPTlhuanyu.github.io/blog/welcome</link>
+            <guid>welcome</guid>
+            <pubDate>Mon, 27 Sep 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[Welcome to my blog here!]]></description>
+        </item>
+    </channel>
+</rss>
