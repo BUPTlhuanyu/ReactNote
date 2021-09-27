@@ -13,7 +13,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   projectName: 'BUPTlhuanyu.github.io', // Usually your repo name.
   organizationName: 'BUPTlhuanyu', // Usually your GitHub org/user name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'ignore',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
 
