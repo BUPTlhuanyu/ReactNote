@@ -1,30 +1,24 @@
-# Website
+# 在线阅读
+[猛戳这里👉react-note👈](https://buptlhuanyu.github.io/ReactNote/docs/react/react/intro)
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+包涵如下代码解析：
+- react（全网首张唯一react源码流程高清大图）
+- react-router
+- react-hook-form
+- react-transition-group
+- 实用开发笔记
 
-### Installation
+### 缩略图如下：
+![](./tiny.png)
 
+# 开发
 ```
-$ yarn
-```
-
-### Local Development
-
-```
-$ yarn start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-### Build
-
-```
-$ yarn build
+yarn
+yarn start
+yarn build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-### Deployment
+# 远程部署
 
 ```
 $ GIT_USER=<Your GitHub username> USE_SSH=true yarn deploy
