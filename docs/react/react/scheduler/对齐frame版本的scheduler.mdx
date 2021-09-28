@@ -6,11 +6,11 @@ sidebar_position: 3
 title: ''
 ---
 
-# 帧对齐方案scheduler
+## 帧对齐方案scheduler
 
 这一部分主要讨论的是如何实现帧对齐，而不会过多的去探究旧版方案的调度流程。如果想了解可以直接看源码，或者去到这里[scheduler](https://juejin.cn/post/6844903792110993421)
 
-### 必要的回顾
+#### 必要的回顾
 
 早在之前的文章中介绍了`requestAnimation`的几个重要的特性：
 
@@ -24,7 +24,7 @@ title: ''
 
 上图为`chrome performance`面板中获取到的各个帧的截图，红框的长度表示一帧间隔，同一个红框当中执行的`requestAnimation`回调函数接收到的时间戳都是相同的值。一般而言，对于一个刷新频率为`60hz`的屏幕来说，回调函数会在`16.7ms`之后执行。那么`react-scheduler`则需要动态的识别浏览器的刷新频率。
 
-### 新老scheduler的对比
+#### 新老scheduler的对比
 
 ![scheduler](./scheduler.png)
 
@@ -34,7 +34,7 @@ title: ''
 
 同时为了保证任务的有序进行，在每一帧中`react-scheduler`通过`requestAnimation`注册的回调函数只能存在一个。
 
-### 动态获取屏幕的帧率
+#### 动态获取屏幕的帧率
 
 ```javascript
 // var nextFrameTime = activeFrameTime‘ + activeFrameTime;
@@ -60,7 +60,7 @@ frameDeadline = rafTime + activeFrameTime;
 
 如果帧率预测过高，即时间间隔预测过低，那么将此次的时间间隔给保存到`previousFrameTime`。
 
-### 总结
+#### 总结
 
 `activeFrameTime`初始值为`33`，并且当实际的时间间隔在连续两次都小于当前`activeFrameTime`的时候才会更新`activeFrameTime`。所以`activeFrameTime`的取值为`8`到`33ms`，对应的频率范围是`30hz`到`120hz`，并且`activeFrameTime`在减少之后无法再增加。因此旧版的`scheduler`只能够获取到当前系统屏幕的帧率，并且只能够向上调整帧率（即向下调整时间间隔）。
 

@@ -6,7 +6,7 @@ sidebar_position: 2
 title: ''
 ---
 
-# 新版scheduler
+## 新版scheduler
 
 上节说到了在`react16.8`版本的`scheduler`由`requestAnimation`以及`postmessage`实现，即对齐`frame`的方案。根据`react`官方相关[issue]([facebook/react#16271](https://github.com/facebook/react/pull/16271))的描述，`scheduler` 中 `requestAnimation` 构成的循环对`CPU`的利用率低于新版本`scheduler`中 `message` 构成的循环。此外通过一些[issue](https://github.com/facebook/react/pull/16271)也能看到`react`对代码质量的诸多考量。
 
@@ -20,9 +20,9 @@ title: ''
 
 ![新版scheduler](./新版scheduler.png)
 
-## 工具
+### 工具
 
-### 获取当前时间
+#### 获取当前时间
 
 > 代码质量体现在细节上：这里是直接替换掉getCurrentTime，而不是每次在函数中判断是否存在performance.now
 
@@ -43,7 +43,7 @@ if (hasNativePerformanceNow) {
 }
 ```
 
-### 定义优先级对应的时间
+#### 定义优先级对应的时间
 
 > 预期的用户交互的时间：USER_BLOCKING_PRIORITY_TIMEOUT
 
@@ -69,7 +69,7 @@ const priorityMap = {
 }
 ```
 
-### 一个简单的定时器
+#### 一个简单的定时器
 
 ```
 function requestHostTimeout(callback, ms) {
@@ -79,7 +79,7 @@ function requestHostTimeout(callback, ms) {
 }
 ```
 
-### [最小堆](https://www.cxyxiaowu.com/1943.html)
+#### [最小堆](https://www.cxyxiaowu.com/1943.html)
 
 > 最小堆必定是一个完全二叉树，而完全二叉树的父子节点之间的位置关系是确定的，因此可以通过数组来实现一个最小堆
 
@@ -93,7 +93,7 @@ function requestHostTimeout(callback, ms) {
 
 4. 最小堆删除最小值元素：将最后一个节点替换到第一个节点的位置，然后将第一个节点下沉(满足节点是其子树的最小值即可)。
 
-## 添加任务
+### 添加任务
 
 伪代码如下，接收的参数描述如下
 
@@ -148,7 +148,7 @@ scheduleCallback首先会构建一个堆节点，其到期时间`expirationTime=
 
 可以看到这里添加一个新的任务不一定会开启新一轮的调度，因为有可能正在调度中，或者正在读秒，读秒之后就开始调度。为了确保调度机制的完整，需要在调度函数`workLoop`函数结束之前判断最小堆的状态来开启新一轮的调度。
 
-### delay时间之后再决定是否开启调度
+#### delay时间之后再决定是否开启调度
 
 `advanceTimers`用于将`timerQueue`中`timeout`的任务添加到`taskQueue`中，这里需要注意下面一点
 
@@ -198,7 +198,7 @@ function handleTimeout(currentTime) {
 }
 ```
 
-### 尽快开始调度
+#### 尽快开始调度
 
 `scheduledHostCallback`是开始刷新任务的一个入口函数，这里先不予理会。这里介绍的是什么条件才会去执行这个入口函数？
 
@@ -252,7 +252,7 @@ const performWorkUntilDeadline = () => {
 };
 ```
 
-## 调度
+### 调度
 
 在`flushWork`中需要确保一段时间只有一个`flushWork`，因此需要取消`requestHostCallback`读秒，以及利用`isPerformingWork`加锁。
 

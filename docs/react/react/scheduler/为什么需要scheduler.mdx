@@ -6,11 +6,11 @@ sidebar_position: 1
 title: ''
 ---
 
-# 存在即合理
+## 存在即合理
 
 ​		为了弥补`requestIdleCallback`的兼容问题而产生了`scheduler`，而实现`scheduler`为何需要宏任务而不是微任务？宏任务为何选择`message channel`而不用`setTimeout`？接下来将通过实际的例子为你解析。部分例子来源于[`electron-progress`](https://www.npmjs.com/package/electron-progress)。
 
-### 浏览器渲染帧与显示屏的刷新频率 ###
+### 浏览器渲染帧与显示屏的刷新频率
 
 首先我们需要介绍一下事件循环，重绘，帧率三者之间的关系。
 
@@ -111,7 +111,7 @@ function synchronizeUi(){
 
 
 
-# 总结
+## 总结
 
 ​	本片介绍了`react-scheduler`模拟实现`requestIdleCallback`的原因以及方法，并通过例子验证了`postmessage`为何比`setTimeout`更适合模拟实现`requestIdleCallback`。那么下一篇将会实现一个`scheduler`。
 
