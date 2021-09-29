@@ -2,11 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://BUPTlhuanyu.github.io/ReactNote/blog</id>
     <title>React Note Blog</title>
-    <updated>2021-09-27T00:00:00.000Z</updated>
+    <updated>2021-09-29T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://BUPTlhuanyu.github.io/ReactNote/blog"/>
     <subtitle>React Note Blog</subtitle>
     <icon>https://BUPTlhuanyu.github.io/ReactNote/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[AOP design-pattern in javascript]]></title>
+        <id>blog-post</id>
+        <link href="https://BUPTlhuanyu.github.io/ReactNote/blog/blog-post"/>
+        <updated>2021-09-29T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[- x] [简介]]></summary>
+        <author>
+            <name>liaohuanyu</name>
+            <uri>https://github.com/BUPTlhuanyu</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[First Blog Post]]></title>
         <id>first-blog-post</id>
