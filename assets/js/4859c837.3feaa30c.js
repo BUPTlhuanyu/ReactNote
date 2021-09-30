@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkreact_note_docusaurus=self.webpackChunkreact_note_docusaurus||[]).push([[2074],{7154:function(e){e.exports=JSON.parse('{"allTagsPath":"/ReactNote/blog/tags","slug":"/ReactNote/blog/tags/node-koa","name":"node koa","count":1,"permalink":"/ReactNote/blog/tags/node-koa"}')}}]);
