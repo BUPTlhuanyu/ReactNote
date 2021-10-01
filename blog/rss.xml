@@ -21,19 +21,5 @@
             <pubDate>Wed, 29 Sep 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[- x] [简介]]></description>
         </item>
-        <item>
-            <title><![CDATA[First Blog Post]]></title>
-            <link>https://BUPTlhuanyu.github.io/ReactNote/blog/first-blog-post</link>
-            <guid>first-blog-post</guid>
-            <pubDate>Mon, 27 Sep 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[This is my first blog posted using docusaurus.]]></description>
-        </item>
-        <item>
-            <title><![CDATA[Welcome]]></title>
-            <link>https://BUPTlhuanyu.github.io/ReactNote/blog/welcome</link>
-            <guid>welcome</guid>
-            <pubDate>Mon, 27 Sep 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[Welcome to my blog here!]]></description>
-        </item>
     </channel>
 </rss>

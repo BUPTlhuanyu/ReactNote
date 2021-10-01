@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkreact_note_docusaurus=self.webpackChunkreact_note_docusaurus||[]).push([[2535],{5641:function(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"koa code analyse","permalink":"/ReactNote/blog/blog-post"},{"title":"AOP design-pattern in javascript","permalink":"/ReactNote/blog/blog-post"}]}')}}]);
