@@ -54,12 +54,6 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
           src: 'img/logo.png',
         },
         items: [
-          {
-            type: 'doc',
-            docId: 'react/react/intro',
-            position: 'left',
-            label: 'React',
-          },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/BUPTlhuanyu',
