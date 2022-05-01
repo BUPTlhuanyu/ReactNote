@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkreact_note_docusaurus=self.webpackChunkreact_note_docusaurus||[]).push([[3303],{5798:function(e){e.exports=JSON.parse('{"allTagsPath":"/ReactNote/blog/tags","slug":"/ReactNote/blog/tags/design-pattern","name":"design-pattern","count":1,"permalink":"/ReactNote/blog/tags/design-pattern"}')}}]);
