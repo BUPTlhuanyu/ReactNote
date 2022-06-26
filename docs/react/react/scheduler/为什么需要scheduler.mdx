@@ -30,7 +30,7 @@ title: ''
 
 ### 比 setTimeout 更快的 postmessage
 
-`react-scheduler`模块是基于`requestAnimation`以及`message Chanel`实现的，`requestAnimation`以及`message Chanel`都是宏任务，根据[processing model](https://html.spec.whatwg.org/multipage/webappapis.html#event-loop-processing-model)可以知道前者的触发时机是在重绘之前。那么为什么使用`message Chanel`而不使用`setTimeout`来做呢？我们对比一下这两者我们会发现`message Chanel`更快，测试代码见[setTimeout vs requestAnimation](https://github.com/BUPTlhuanyu/Deep-into-JS/tree/master/scheduler/example-mirror/timeoutVsRequestAnimation)。
+`react-scheduler`模块是基于`requestAnimation`以及`message Channel`实现的，`requestAnimation`以及`message Channel`都是宏任务，根据[processing model](https://html.spec.whatwg.org/multipage/webappapis.html#event-loop-processing-model)可以知道前者的触发时机是在重绘之前。那么为什么使用`message Channel`而不使用`setTimeout`来做呢？我们对比一下这两者我们会发现`message Channel`更快，测试代码见[setTimeout vs requestAnimation](https://github.com/BUPTlhuanyu/Deep-into-JS/tree/master/scheduler/example-mirror/timeoutVsRequestAnimation)。
 
 ```javascript
 function firstRender() {
